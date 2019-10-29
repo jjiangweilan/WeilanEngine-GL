@@ -1,7 +1,7 @@
 #include "Utility.hpp"
 #include <vector>
 
-#include <wlEngine/wlEngine.hpp>
+#include "wlEngine.hpp"
 namespace wlEngine {
 namespace Utility {
 Json *Utility::findComponentWithName(Json &j, const std::string &name) {

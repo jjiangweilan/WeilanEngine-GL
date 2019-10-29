@@ -1,7 +1,7 @@
 #pragma once
 #include "Entity.hpp"
 #include <glm/matrix.hpp>
-#include <wlEngine/Settings.hpp>
+#include "../Settings.hpp"
 namespace wlEngine {
     class Camera : public Entity {
     public:

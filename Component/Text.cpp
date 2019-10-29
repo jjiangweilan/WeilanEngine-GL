@@ -5,7 +5,7 @@
 namespace wlEngine {
 	COMPONENT_DEFINATION(Component, Text, 32);
 	Text::Text(Entity* entity) : Component(entity), language(Language::English), animated(true), textRenderIndex(0), renderStarted(false), timePassed(0), animationSpeed(0.02){
-		shader = Shader::collection["text_shader"];
+		shader = Shader::collection["Text"];
 	}
 
 	/* Text Loading ***********************************************************************/

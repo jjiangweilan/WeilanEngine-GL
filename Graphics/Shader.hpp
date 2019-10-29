@@ -15,11 +15,11 @@ namespace wlEngine {
     class Shader {
     public:
         static std::map<std::string, Shader*> collection;
-        static void loadShader(const std::string& name, const char* vertexPath, const char* fragmentPath);
+        static void loadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
         static void deleteShader(const std::string& name);
         unsigned int ID;
-        Shader(const char* vertexPath, const char* fragmentPath);
-        Shader(const std::string& vertex, const std::string& fragment);
+        Shader(const std::string& vertexPath, const std::string& fragmentPath);
+        Shader(const char* vertex, const char* fragment);
 		Shader();
 		~Shader();
 

@@ -3,9 +3,9 @@
 #include <iostream>
 #include <fstream>
 #include "Component.hpp"
-#include <wlEngine/Graphics/Texture.hpp>
-#include <wlEngine/Graphics/Shader.hpp>
-#include <wlEngine/Utility/Utility.hpp>
+#include "../Graphics/Texture.hpp"
+#include "../Graphics/Shader.hpp"
+#include "../Utility/Utility.hpp"
 
 namespace wlEngine {
 	

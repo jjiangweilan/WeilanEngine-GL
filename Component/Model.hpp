@@ -7,7 +7,7 @@
 #include <functional>
 
 #include "Component.hpp"
-#include <wlEngine/Graphics/Mesh.hpp>
+#include "../Graphics/Mesh.hpp"
 
 namespace wlEngine {
     class Model : public Component{

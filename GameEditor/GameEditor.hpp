@@ -2,7 +2,7 @@
 #include <SDL_events.h>
 #include <string>
 #include <json.hpp>
-#include <wlEngine/GameObject/Scene.hpp>
+#include"../GameObject/Scene.hpp"
 namespace wlEngine {
     class Entity;
     class Sprite;

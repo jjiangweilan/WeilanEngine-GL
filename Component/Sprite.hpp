@@ -9,8 +9,8 @@
 
 #include "Component.hpp"
 #include "Struct/Clip.hpp"
-#include <wlEngine/Graphics/Shader.hpp>
-#include <wlEngine/Graphics/Texture.hpp>
+#include "../Graphics/Shader.hpp"
+#include "../Graphics/Texture.hpp"
 namespace wlEngine {
 /* class Texture
  * @description: use initialized GraphicsManager to draw picture on

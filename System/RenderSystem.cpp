@@ -25,9 +25,11 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     SDLInit();
     ImGuiInit();
     initSceneFrambufferData();
-    Shader::loadShader("SceneShader","../Shader/SceneShader.vert", "../Shader/SceneShader.frag");
-    Shader::loadShader("BasicShader","../Shader/BasicShader.vert", "../Shader/BasicShader.frag");
-    sceneShader = Shader::collection["SceneShader"];
+    Shader::loadShader("Scene",ROOT_DIR + "/Shader/Scene.vert", ROOT_DIR + "/Shader/Scene.frag");
+    Shader::loadShader("Basic",ROOT_DIR + "/Shader/Basic.vert", ROOT_DIR + "/Shader/Basic.frag");
+    Shader::loadShader("Sprite", ROOT_DIR + "/Shader/Sprite.vert", ROOT_DIR + "/Shader/Sprite.frag");
+    Shader::loadShader("Text", ROOT_DIR + "/Shader/Text.vert", ROOT_DIR + "/Shader/Text.frag");
+    sceneShader = Shader::collection["Scene"];
 
     gameEditor = new GameEditor;
     for(int i = 0 ; i < FramebufferSize; i++) {
@@ -38,7 +40,7 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     projection = glm::perspective(glm::radians(45.0f), (float)sceneWidth / sceneHeight, 0.1f, 100000.0f);
 #endif
 #ifdef DEBUG
-    Shader::loadShader("PhysicsDebugDrawShader", "../Shader/debugDrawShader.vert", "../Shader/debugDrawShader.frag");
+    Shader::loadShader("PhysicsDebugDrawShader", ROOT_DIR + "/Shader/PhysicsDebugDraw.vert", ROOT_DIR + "/Shader/PhysicsDebugDraw.frag");
     physicsDebugDrawShader = Shader::collection["PhysicsDebugDrawShader"];
     glGenVertexArrays(1, &physicsDebugVAO);
     glGenBuffers(1, &physicsDebugVBO);

@@ -1,9 +1,9 @@
 #pragma once
-#include <wlEngine/Settings.hpp>
+#include "../Settings.hpp"
 
-#include<map>
-#include<json.hpp>
-#include<wlEngine/GameObject/Entity.hpp>
+#include <map>
+#include <json.hpp>
+#include "../GameObject/Entity.hpp"
 
 namespace wlEngine {
     using Json = nlohmann::json;

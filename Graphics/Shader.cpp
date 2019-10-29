@@ -7,9 +7,9 @@ namespace wlEngine {
 
 	}
 
-    Shader::Shader(const std::string& vertexCode, const std::string& fragmentCode) {
-        const char* vShaderCode = vertexCode.c_str();
-        const char* fShaderCode = fragmentCode.c_str();
+    Shader::Shader(const char* vertexCode, const char* fragmentCode) {
+        const char* vShaderCode = vertexCode;
+        const char* fShaderCode = fragmentCode;
         // 2. compile shaders
         unsigned int vertex, fragment;
         // vertex shader
@@ -32,7 +32,7 @@ namespace wlEngine {
         glDeleteShader(vertex);
         glDeleteShader(fragment);
     }
-    Shader::Shader(const char* vertexPath, const char* fragmentPath) {
+    Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
         std::string fragmentCode;
@@ -86,7 +86,7 @@ namespace wlEngine {
         glDeleteShader(fragment);
     }
 
-    void Shader::loadShader(const std::string& name, const char* vertexPath, const char* fragmentPath) {
+    void Shader::loadShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath) {
         collection.insert({name, new Shader(vertexPath, fragmentPath)});
     }
 

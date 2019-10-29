@@ -6,7 +6,7 @@ namespace wlEngine {
     COMPONENT_DEFINATION(Component, VolumetricLight, 32);
     COMPONENT_EDITABLE_DEF(VolumetricLight);
     VolumetricLight::VolumetricLight(Entity* entity) : Component(entity) {
-        shader = Shader::collection["BasicShader"];
+        shader = Shader::collection["Basic"];
     }
     VolumetricLight::VolumetricLight(Entity*, void ** data) : Component(entity) {
     }

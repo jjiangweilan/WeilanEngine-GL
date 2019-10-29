@@ -1,11 +1,12 @@
 #pragma once
 #include <map>
 #include <string>
-#include <wlEngine/Graphics/Texture.hpp>
 #include <ft2build.h>
 #include <SDL_mixer.h>
 #include FT_FREETYPE_H
 #include <json.hpp>
+
+#include "../Graphics/Texture.hpp"
 
 namespace wlEngine {
     struct TextInfo {

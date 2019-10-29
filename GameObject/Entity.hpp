@@ -1,7 +1,7 @@
 #pragma once
-#include <wlEngine/Component/Component.hpp>
-#include <wlEngine/Component/Transform.hpp>
-#include <wlEngine/Settings.hpp>
+#include "../Component/Component.hpp"
+#include "../Component/Transform.hpp"
+#include "../Settings.hpp"
 #include <memory>
 
 namespace wlEngine {

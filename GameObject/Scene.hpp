@@ -5,7 +5,7 @@
 #include <SDL.h>
 
 #include "Entity.hpp"
-#include <wlEngine/GameEditor/SceneData.hpp>
+#include "../GameEditor/SceneData.hpp"
 #include <json.hpp>
 namespace wlEngine {
     class Scene {

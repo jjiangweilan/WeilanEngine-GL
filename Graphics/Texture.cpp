@@ -1,5 +1,5 @@
 #include "Texture.hpp"
-#include <wlEngine/Settings.hpp>
+#include "../Settings.hpp"
 namespace wlEngine {
     Texture::Texture(const std::string& file) {
         loadFromFile(file);

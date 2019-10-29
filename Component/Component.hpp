@@ -7,7 +7,7 @@
 #include <string>
 #include <unordered_set>
 
-#include <wlEngine/Memory/FixedArrayAllocator.hpp>
+#include "../Memory/FixedArrayAllocator.hpp"
 
 
 #define COMPONENT_DECLARATION_NEW(P, T)         \

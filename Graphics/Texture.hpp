@@ -2,8 +2,8 @@
 #include <glad/glad.h>
 #include <stb_image.hpp>
 
-#include <wlEngine/Graphics/Shader.hpp>
-#include <wlEngine/Component/Struct/Clip.hpp>
+#include "../Graphics/Shader.hpp"
+#include "../Component/Struct/Clip.hpp"
 #include <ft2build.h>
 #include FT_FREETYPE_H
 

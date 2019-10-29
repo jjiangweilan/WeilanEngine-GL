@@ -17,7 +17,7 @@ COMPONENT_EDITABLE_DEF(Sprite);
 Sprite::~Sprite(){};
 
 Sprite::Sprite(Entity *go) : Component(go), enable(true), transparency(1) { 
-	useShader("sprite_shader"); 
+	useShader("Sprite"); 
 };
 
 Sprite::Sprite(Entity *go, void **args) : Component(go), enable(true), transparency(1) {
@@ -28,14 +28,14 @@ Sprite::Sprite(Entity *go, void **args) : Component(go), enable(true), transpare
         mainTexture = resourceManager->getTexture(path);
         useShader(shader);
     } else {
-        useShader("sprite_shader");
+        useShader("Sprite");
     }
 }
 
 Sprite::Sprite(Entity *go, const std::string &path) : Component(go), enable(true), transparency(1) {
     auto resourceManager = ResourceManager::get();
     mainTexture = resourceManager->getTexture(path);
-    useShader("sprite_shader");
+    useShader("Sprite");
 }
 
 Sprite::Sprite(Entity *go, const std::string &path, const std::string &shader) : Sprite(go, path) { useShader(shader); }

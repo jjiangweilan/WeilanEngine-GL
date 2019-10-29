@@ -3,8 +3,8 @@
 #include "Scene.hpp"
 #include "../EngineManager.hpp"
 namespace wlEngine {
-    Entity::Entity(const std::string& name) : name(name), transform(nullptr), enable(true) {}
-
+    Entity::Entity(const std::string& name) : name(name), transform(nullptr), enable(true) { }
+	
     void Entity::setParent(Entity* newParent) {
         //remove from previous hierachy
         if (auto preParent = this->parent) preParent->children.erase(this);
