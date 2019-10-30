@@ -11,6 +11,7 @@
 #include "../Component/Animation.hpp"
 #include "../Component/Sprite.hpp"
 #include "../Component/TRigidbody.hpp"
+#include "../Component/VolumetricLight.hpp"
 
 #include "../System/RenderSystem.hpp"
 #include "../System/InputSystem.hpp"
@@ -47,6 +48,7 @@ void GameEditor::render(void **data)
     ImGui::SetNextWindowPos({160, 415}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({275, 350}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Helper Window");
+    if (!ImGui::IsWindowFocused()) helperWindowFunc = nullptr;
     if (helperWindowFunc)
         helperWindowFunc();
     ImGui::End();
@@ -254,7 +256,11 @@ void GameEditor::showGameObjectInfo()
             //add TRigidbody
             if (ImGui::Button("Add TRigidbody"))
             {
-                helperWindowFunc = [this]() { this->createTRigidbody(); };
+                setHelperWindowFunc([this]() { this->createTRigidbody(); });
+            }
+            if (ImGui::Button("Add VolumetricLight"))
+            {
+                setHelperWindowFunc([this]() { this->createVolumetricLight();});
             }
             //remove gameobject
             if (ImGui::Button("Remove"))
@@ -278,6 +284,9 @@ void GameEditor::showGameObjectInfo()
                 showComponent(go, c.get(), "Transform", std::bind(&GameEditor::showTransformInfo, this, std::placeholders::_1));
             else if (c->getId() == TRigidbody::componentId)
                 showComponent(go, c.get(), "TRigidbody", std::bind(&GameEditor::showTRigidbodyInfo, this, std::placeholders::_1));
+            else if(c->getId() == VolumetricLight::componentId) {
+                showComponent(go, c.get(), "Volumetric Light", std::bind(&GameEditor::showVolumetricLightInfo, this, std::placeholders::_1));
+            }
             //else if (c->getId() == Sprite::componentId)showComponent(go, c.get(), "Sprite", std::bind(&GameEditor::showSpriteInfo, this, std::placeholders::_1));
             //else if (c->getId() == Animation::componentId)showComponent(go, c.get(), "Animation", std::bind(&GameEditor::showAnimationInfo, this, std::placeholders::_1));
             else
@@ -636,8 +645,9 @@ void GameEditor::showTransformInfo(Entity *go)
         transform->setPosition(pos);
         Json &json = scene->sceneData.getData(go);
         Json *transform = Utility::findComponentWithName(json, "Transform");
-        if (auto &t = *transform)
+        if (transform)
         {
+			auto& t = *transform;
             t["params"][0] = pos.x;
             t["params"][1] = pos.y;
             t["params"][2] = pos.z;
@@ -661,7 +671,6 @@ void GameEditor::showTransformInfo(Entity *go)
         transform->rotate(glm::vec3{axis[0], axis[1], axis[2]}, rotate);
     }
 }
-
 void GameEditor::showResourceWindow()
 {
     ImGui::SetNextWindowPos({5, 30}, ImGuiCond_FirstUseEver);
@@ -670,7 +679,6 @@ void GameEditor::showResourceWindow()
     showResourceInDirectory("../resource");
     ImGui::End();
 }
-
 void GameEditor::showSpriteInfo(Entity *go)
 {
     auto sprite = go->getComponent<Sprite>();
@@ -917,4 +925,59 @@ void GameEditor::makeDropDown(const char *selections[], const char *&selected, c
     }
     ImGui::PopID();
 }
+
+void GameEditor::createVolumetricLight()
+{
+    static int total = 0;
+    static std::vector<std::string> files;
+    if (selectedGameObject->getComponent<TRigidbody>())
+    {
+        helperWindowFunc = nullptr;
+        return;
+    }
+
+    for (int i = 0; i < total ;i++) {
+        char file[256];
+        std::strcpy(file, files[i].data());
+        ImGui::InputText((std::string("Texture") + std::to_string(i)).data(), file, 256);
+        files[i] = file;
+    }
+
+    if (ImGui::Button("Add texture")) 
+    {
+        total +=1;
+        files.push_back("");
+    }
+    ImGui::SameLine(0, 5);
+    if (ImGui::Button("Remove"))
+    {
+        total -=1;
+        files.pop_back();
+    };
+
+    if (ImGui::Button("Create")) 
+    {
+        auto vl = selectedGameObject->addComponent<VolumetricLight>();
+        for (int i = 0; i < total; i++) {
+            vl->loadTexture(files[i]);
+        }
+        files.clear();
+        total = 0;
+        helperWindowFunc = nullptr;
+    }
+}
+
+void GameEditor::showVolumetricLightInfo(Entity* entity) {
+    auto vl = entity->getComponent<VolumetricLight>();
+    auto& textures = vl->getTextures();
+    for (auto& t : textures) {
+        ImGui::LabelText("",t.getSourcePath().data());
+    }
+}
+
+    void GameEditor::setHelperWindowFunc(std::function<void()> f)
+    {
+        helperWindowFunc = f;
+        ImGui::SetWindowFocus("Helper Window");
+    }
 } // namespace wlEngine

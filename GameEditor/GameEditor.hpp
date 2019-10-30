@@ -4,6 +4,7 @@
 #include <SDL_events.h>
 #include <string>
 #include <json.hpp>
+#include <functional>
 namespace wlEngine
 {
 class Entity;
@@ -58,6 +59,7 @@ private:
     void showAnimationInfo(Entity *);
     void showTransformInfo(Entity *);
     void showSpriteInfo(Entity *);
+    void showVolumetricLightInfo(Entity *);
 
     void showGameWindow(void **data);
 
@@ -83,10 +85,11 @@ private:
 
     void dragSprite();
 
+    void setHelperWindowFunc(std::function<void()> f);
     void makeDropDown(const char *selections[], const char *&selected, const int &selectionsSize, const int &widgetId);
     void createTRigidbody();
+    void createVolumetricLight();
 
-    /*************************** Helper **********************************/
     /**
 		 * @brief this function calculate the mouse click on scene (bottom-left being (0,0))
 		 *
