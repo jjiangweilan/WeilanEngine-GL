@@ -37,6 +37,9 @@ namespace wlEngine {
         removeGameObjects();
 		removeComponents();
         dragDropGameObject();
+
+        ImGui::SetNextWindowPos({160,415}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({275,350}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Helper Window");
             if(helperWindowFunc)helperWindowFunc();
         ImGui::End();
@@ -81,6 +84,7 @@ namespace wlEngine {
 		if (selectedTRigidbody && editLine)
 			windowName += " Editing Render Line";
 		windowName += "###";
+        ImGui::SetNextWindowPos({450,30}, ImGuiCond_FirstUseEver);
         ImGui::Begin(windowName.data(),nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 		gameplayWindowOffsetX = ImGui::GetWindowPos().x;
 		gameplayWindowOffsetY = ImGui::GetWindowPos().y + 20;
@@ -97,6 +101,8 @@ namespace wlEngine {
     }
 
     void GameEditor::showAllGameObjects() {
+        ImGui::SetNextWindowPos({5,415}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({150, 350}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Scene Graph", nullptr, ImGuiWindowFlags_None);
 		if (ImGui::BeginPopupContextItem()) {
 			if (ImGui::MenuItem("Add Game Object")) {
@@ -187,6 +193,8 @@ namespace wlEngine {
     }
 
     void GameEditor::showGameObjectInfo() {
+        ImGui::SetNextWindowPos({5,200}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({430, 200}, ImGuiCond_FirstUseEver);
         ImGui::Begin("GameObject");
         if(selectedGameObject) {
 			//gameobject little menu
@@ -545,6 +553,8 @@ namespace wlEngine {
     }
 
     void GameEditor::showResourceWindow() {
+        ImGui::SetNextWindowPos({5,30}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({430, 160}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Resource", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
         showResourceInDirectory("../resource");
         ImGui::End();

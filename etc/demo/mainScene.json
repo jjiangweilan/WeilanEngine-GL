@@ -1,0 +1,714 @@
+{
+    "gameObjects": {
+        "000001F478F700B0": {
+            "children": [
+                "000001F478F70130",
+                "000001F478F70530",
+                "000001F478F705B0",
+                "000001F478F70730"
+            ],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        -470,
+                        350,
+                        0
+                    ]
+                },
+                {
+                    "name": "Building",
+                    "params": []
+                },
+                {
+                    "name": "TRigidbody",
+                    "params": [
+                        "static",
+                        "line",
+                        [
+                            [
+                                79,
+                                -165
+                            ],
+                            [
+                                30,
+                                -190
+                            ],
+                            [
+                                -166,
+                                -96
+                            ],
+                            [
+                                113,
+                                41
+                            ],
+                            [
+                                297,
+                                -60
+                            ],
+                            [
+                                100,
+                                -156
+                            ]
+                        ],
+                        [
+                            [
+                                -1,
+                                0
+                            ],
+                            [
+                                1,
+                                0
+                            ]
+                        ],
+                        [
+                            1,
+                            65535
+                        ],
+                        false
+                    ]
+                }
+            ],
+            "name": "House",
+            "parent": "0000000000000000"
+        },
+        "000001F478F70130": {
+            "children": [
+                "000001F478F701B0",
+                "000001F478F704B0",
+                "000001F478F70630",
+                "000001F478F706B0"
+            ],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            ],
+            "name": "inside",
+            "parent": "000001F478F700B0"
+        },
+        "000001F478F701B0": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        -290,
+                        362,
+                        0
+                    ]
+                },
+                {
+                    "name": "Sprite",
+                    "params": [
+                        "../resource/tasta/item/house/house1-downleft.png",
+                        "Sprite"
+                    ]
+                },
+                {
+                    "name": "TRigidbody",
+                    "params": [
+                        "static",
+                        "polygon",
+                        [
+                            [
+                                -46,
+                                -32
+                            ],
+                            [
+                                -25,
+                                -17
+                            ],
+                            [
+                                45,
+                                -52
+                            ],
+                            [
+                                26,
+                                -69
+                            ]
+                        ],
+                        [
+                            [
+                                -45,
+                                -31
+                            ],
+                            [
+                                45,
+                                -52
+                            ]
+                        ],
+                        [
+                            32,
+                            65535
+                        ],
+                        false
+                    ]
+                }
+            ],
+            "name": "house1-downleft.png",
+            "parent": "000001F478F70130"
+        },
+                "00000172F4E74160": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Sprite",
+                    "params": [
+                        "",
+                        "Sprite"
+                    ]
+                },
+                {
+                    "name": "Transform",
+                    "params": [
+                        -307,
+                        230,
+                        0
+                    ]
+                },
+                {
+                    "name": "PlayerController",
+                    "params": []
+                }
+            ],
+            "name": "player",
+            "parent": "0000000000000000"
+        },
+        "000001F478F702B0": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        -765.0984497070313,
+                        -151.76441955566406,
+                        999.0
+                    ]
+                },
+                {
+                    "name": "Camera2D",
+                    "params": []
+                }
+            ],
+            "name": "Camera",
+            "parent": "0000000000000000"
+        },
+        "000001F478F703B0": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        535,
+                        543,
+                        0
+                    ]
+                },
+                {
+                    "name": "Sprite",
+                    "params": [
+                        "../resource/npc1.png",
+                        "Sprite"
+                    ]
+                }
+            ],
+            "name": "npc1.png",
+            "parent": "0000000000000000"
+        },
+        "000001F478F70430": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        302,
+                        257,
+                        0
+                    ]
+                },
+                {
+                    "name": "Sprite",
+                    "params": [
+                        "../resource/building.png",
+                        "Sprite"
+                    ]
+                }
+            ],
+            "name": "building.png",
+            "parent": "0000000000000000"
+        },
+        "000001F478F704B0": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        -406,
+                        335,
+                        0
+                    ]
+                },
+                {
+                    "name": "Sprite",
+                    "params": [
+                        "../resource/tasta/item/house/house1-back.png",
+                        "Sprite"
+                    ]
+                },
+                {
+                    "name": "TRigidbody",
+                    "params": [
+                        "static",
+                        "line",
+                        [],
+                        [
+                            [
+                                -227,
+                                168
+                            ],
+                            [
+                                236,
+                                175
+                            ]
+                        ],
+                        [
+                            32,
+                            65535
+                        ],
+                        false
+                    ]
+                }
+            ],
+            "name": "back_building",
+            "parent": "000001F478F70130"
+        },
+        "000001F478F70530": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        -383,
+                        217,
+                        0
+                    ]
+                },
+                {
+                    "name": "Sprite",
+                    "params": [
+                        "../resource/tasta/item/house/house1-door.png",
+                        "Sprite"
+                    ]
+                },
+                {
+                    "name": "TRigidbody",
+                    "params": [
+                        "static",
+                        "polygon",
+                        [
+                            [
+                                -59,
+                                -50
+                            ],
+                            [
+                                -245,
+                                40
+                            ],
+                            [
+                                28,
+                                171
+                            ],
+                            [
+                                206,
+                                75
+                            ]
+                        ],
+                        [
+                            [
+                                -9,
+                                -30
+                            ],
+                            [
+                                13,
+                                -29
+                            ]
+                        ],
+                        [
+                            1,
+                            65535
+                        ],
+                        false
+                    ]
+                }
+            ],
+            "name": "entrance_building",
+            "parent": "000001F478F700B0"
+        },
+        "000001F478F705B0": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        -406,
+                        342,
+                        0
+                    ]
+                },
+                {
+                    "name": "Sprite",
+                    "params": [
+                        "../resource/tasta/item/house/house1-front.png",
+                        "Sprite"
+                    ]
+                },
+                {
+                    "name": "TRigidbody",
+                    "params": [
+                        "static",
+                        "line",
+                        [],
+                        [
+                            [
+                                -229,
+                                -83
+                            ],
+                            [
+                                232,
+                                -49
+                            ]
+                        ],
+                        [
+                            1,
+                            65535
+                        ],
+                        false
+                    ]
+                }
+            ],
+            "name": "front_building",
+            "parent": "000001F478F700B0"
+        },
+        "000001F478F70630": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        -529,
+                        287,
+                        0
+                    ]
+                },
+                {
+                    "name": "Sprite",
+                    "params": [
+                        "../resource/tasta/item/house/house1-chashier.png",
+                        "Sprite"
+                    ]
+                },
+                {
+                    "name": "TRigidbody",
+                    "params": [
+                        "static",
+                        "polygon",
+                        [
+                            [
+                                -63,
+                                -33
+                            ],
+                            [
+                                40,
+                                19
+                            ],
+                            [
+                                65,
+                                4
+                            ],
+                            [
+                                -38,
+                                -46
+                            ]
+                        ],
+                        [
+                            [
+                                -62,
+                                -33
+                            ],
+                            [
+                                65,
+                                4
+                            ]
+                        ],
+                        [
+                            32,
+                            65535
+                        ],
+                        false
+                    ]
+                }
+            ],
+            "name": "house1-chashier.png",
+            "parent": "000001F478F70130"
+        },
+        "000001F478F706B0": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        -418,
+                        370,
+                        0
+                    ]
+                },
+                {
+                    "name": "Sprite",
+                    "params": [
+                        "../resource/tasta/item/house/house1-downright.png",
+                        "Sprite"
+                    ]
+                },
+                {
+                    "name": "TRigidbody",
+                    "params": [
+                        "static",
+                        "polygon",
+                        [
+                            [
+                                -45,
+                                -52
+                            ],
+                            [
+                                25,
+                                -15
+                            ],
+                            [
+                                44,
+                                -32
+                            ],
+                            [
+                                -27,
+                                -67
+                            ]
+                        ],
+                        [
+                            [
+                                -43,
+                                -51
+                            ],
+                            [
+                                44,
+                                -30
+                            ]
+                        ],
+                        [
+                            32,
+                            65535
+                        ],
+                        false
+                    ]
+                }
+            ],
+            "name": "house1-downright.png",
+            "parent": "000001F478F70130"
+        },
+        "000001F478F70730": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        0,
+                        0,
+                        0
+                    ]
+                },
+                {
+                    "name": "TRigidbody",
+                    "params": [
+                        "static",
+                        "polygon",
+                        [
+                            [
+                                -445,
+                                164
+                            ],
+                            [
+                                -634,
+                                253
+                            ],
+                            [
+                                -634,
+                                377
+                            ],
+                            [
+                                -432,
+                                520
+                            ],
+                            [
+                                -351,
+                                507
+                            ],
+                            [
+                                -176,
+                                411
+                            ],
+                            [
+                                -175,
+                                288
+                            ]
+                        ],
+                        [
+                            [
+                                -1,
+                                0
+                            ],
+                            [
+                                1,
+                                0
+                            ]
+                        ],
+                        [
+                            32,
+                            65535
+                        ],
+                        true
+                    ]
+                }
+            ],
+            "name": "outline",
+            "parent": "000001F478F700B0"
+        },
+        "000001F478F707B0": {
+            "children": [
+                "000001F478F70830"
+            ],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        28,
+                        313,
+                        0
+                    ]
+                },
+                {
+                    "name": "Sprite",
+                    "params": [
+                        "../resource/enemy/enemy1.png",
+                        "Sprite"
+                    ]
+                },
+                {
+                    "name": "BasicEnemy",
+                    "params": []
+                },
+                {
+                    "name": "TRigidbody",
+                    "params": [
+                        "static",
+                        "polygon",
+                        [
+                            [
+                                -29,
+                                -36
+                            ],
+                            [
+                                -25,
+                                -50
+                            ],
+                            [
+                                21,
+                                -46
+                            ],
+                            [
+                                19,
+                                -31
+                            ]
+                        ],
+                        [
+                            [
+                                -35,
+                                -45
+                            ],
+                            [
+                                29,
+                                -41
+                            ]
+                        ],
+                        [
+                            0,
+                            0
+                        ],
+                        true
+                    ]
+                }
+            ],
+            "name": "enemy1.png",
+            "parent": "0000000000000000"
+        },
+        "000001F478F70830": {
+            "children": [],
+            "components": [
+                {
+                    "name": "Transform",
+                    "params": [
+                        0,
+                        0,
+                        0
+                    ]
+                },
+                {
+                    "name": "TRigidbody",
+                    "params": [
+                        "static",
+                        "polygon",
+                        [
+                            [
+                                -4,
+                                279
+                            ],
+                            [
+                                55,
+                                282
+                            ],
+                            [
+                                53,
+                                268
+                            ],
+                            [
+                                0,
+                                264
+                            ]
+                        ],
+                        [
+                            [
+                                -1,
+                                0
+                            ],
+                            [
+                                1,
+                                0
+                            ]
+                        ],
+                        [
+                            0,
+                            0
+                        ],
+                        false
+                    ]
+                }
+            ],
+            "name": "collision",
+            "parent": "000001F478F707B0"
+        }
+    },
+    "scene_path": "../mainScene.json"
+}

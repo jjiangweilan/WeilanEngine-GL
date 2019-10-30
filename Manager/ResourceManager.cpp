@@ -42,22 +42,6 @@ namespace wlEngine {
         }
         ifs.close();
 
-        //saved game data
-        ifs.open("../savedGameData.json");
-        if (ifs) {
-            std::ostringstream oss;
-            oss << ifs.rdbuf();
-            savedGameData = Json::parse(oss.str());            
-        }
-        ifs.close();
-
-        //get monsters' date
-        ifs.open("../monsterData.json");
-        if (ifs) {
-            std::ostringstream oss;
-            oss << ifs.rdbuf();
-            monsterData = Json::parse(oss.str());            
-        }
         ifs.close();
     }
     void ResourceManager::init() {

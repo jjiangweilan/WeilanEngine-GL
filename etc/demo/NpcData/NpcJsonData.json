@@ -1,0 +1,64 @@
+{
+    "trader-1": {
+        "name": "Wuss",
+        "one-day-behavior-list": [
+            {
+                "probability": 1.0,
+                "behavior-list": {
+                    "movement": [
+                        {
+                            "from": 10,
+                            "position": [
+                                -480,
+                                225
+                            ],
+                            "animation" : "move-right"
+                        },
+                        {
+                            "from": 13,
+                            "position": [
+                                -384,
+                                226
+                            ],
+                            "animation" : "move-right"
+                        },
+                        {
+                            "from" : 16,
+                            "position" : [
+                                -351,
+                                89
+                            ],
+                            "animation" : "stand"
+
+                        }
+                    ],
+                    "conversation" : [
+                        {
+                            "from" : 0,
+                            "to" : 2700,
+                            "options" : [
+                                {
+                                    "question" : "how are you?",
+                                    "answer" : "I'm Wuss"
+                                },
+                                {
+                                    "question" : "bye",
+                                    "answer" : "good-bye"
+                                }
+                            ]
+                        }
+                    ],
+                    "trade" : {
+                        "from" : 0,
+                        "to" : 2700,
+                        "item-list" : [
+                            "weapon",
+                            "basic-item",
+                            "sunvalley-special-item"
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}
