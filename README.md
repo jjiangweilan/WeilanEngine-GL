@@ -3,14 +3,10 @@
 #### Description
 the readme will be updated soon
 
-#### Software Architecture
-Software architecture description
+#### How to run demo
 
-#### Installation
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  Clone the repository into local
+2.  Run `Python setup-demo.py`. This will copy the demo to the parent folder and run `cmake ..` within the build folder
 
 #### Instructions
 
