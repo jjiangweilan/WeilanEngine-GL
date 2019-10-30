@@ -31,19 +31,19 @@ void OpenGLTest::draw(const glm::mat4& view, const glm::mat4 proj) {
 
 void OpenGLTest::drawSprite(const glm::mat4& view, const glm::mat4 proj) {
     glActiveTexture(GL_TEXTURE0);
-    sprite->shader->use();
-    glBindTexture(GL_TEXTURE_2D, sprite->mainTexture->mTexture);
-    glUniform1i(glGetUniformLocation(sprite->shader->ID, "texture0"), 0);
+    sprite->getShader()->use();
+    glBindTexture(GL_TEXTURE_2D, sprite->getMainTexture()->getId());
+    glUniform1i(glGetUniformLocation(sprite->getShader()->ID, "texture0"), 0);
 
-    glUniformMatrix4fv(glGetUniformLocation(sprite->shader->ID, "model"), 1, GL_FALSE, &transform->getModel()[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(sprite->shader->ID, "view"), 1, GL_FALSE, &view[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(sprite->shader->ID, "projection"), 1, GL_FALSE, &proj[0][0]);
-    glUniform1i(glGetUniformLocation(sprite->shader->ID, "hasTRigidbody"), 1);
+    glUniformMatrix4fv(glGetUniformLocation(sprite->getShader()->ID, "model"), 1, GL_FALSE, &transform->getModel()[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(sprite->getShader()->ID, "view"), 1, GL_FALSE, &view[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(sprite->getShader()->ID, "projection"), 1, GL_FALSE, &proj[0][0]);
+    glUniform1i(glGetUniformLocation(sprite->getShader()->ID, "hasTRigidbody"), 1);
     glm::vec2 pos = transform->position;
-    sprite->shader->setVec2("point1", body->shape->leftPoint + pos);
-    sprite->shader->setVec2("point2", body->shape->rightPoint + pos);
+    sprite->getShader()->setVec2("point1", body->shape->leftPoint + pos);
+    sprite->getShader()->setVec2("point2", body->shape->rightPoint + pos);
 
-    glBindVertexArray(sprite->mainTexture->VAO);
+    glBindVertexArray(sprite->getMainTexture()->getVAO());
 
     glStencilFunc(GL_ALWAYS, 1, 0xff); //always pass the stencil test
     glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
@@ -58,13 +58,13 @@ void OpenGLTest::drawOutline(const glm::mat4& view, const glm::mat4 proj) {
     outlineShader->use();
     outlineShader->setInt("texture0", 0);
 
-    glBindTexture(GL_TEXTURE_2D, sprite->mainTexture->mTexture);
+    glBindTexture(GL_TEXTURE_2D, sprite->getMainTexture()->getId());
     glUniform1i(glGetUniformLocation(outlineShader->ID, "texture0"), 0);
 
     glUniformMatrix4fv(glGetUniformLocation(outlineShader->ID, "model"), 1, GL_FALSE, &transform->getModel()[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(outlineShader->ID, "view"), 1, GL_FALSE, &view[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(outlineShader->ID, "projection"), 1, GL_FALSE, &proj[0][0]);
-    glBindVertexArray(sprite->mainTexture->VAO);
+    glBindVertexArray(sprite->getMainTexture()->getVAO());
 
     glStencilFunc(GL_NOTEQUAL, 1, 0xff);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);

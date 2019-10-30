@@ -3,12 +3,14 @@
 #include <vector>
 #include <string>
 
-namespace wlEngine {
+namespace wlEngine
+{
 
-    class Audio : public Component {
-        COMPONENT_DECLARATION(Component, Audio, 32);
-        Audio(Entity* entity);
+class Audio : public Component
+{
+    COMPONENT_DECLARATION(Component, Audio, 32);
+    Audio(Entity *entity);
 
-        void play(const std::string& file);
-    };
-}
+    void play(const std::string &file);
+};
+} // namespace wlEngine

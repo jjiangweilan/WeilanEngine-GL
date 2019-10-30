@@ -1,5 +1,6 @@
 #include "NpcController.hpp"
 #include "../Manager/ResourceManager.hpp"
+
 #include <fstream>
 
 namespace wlEngine {

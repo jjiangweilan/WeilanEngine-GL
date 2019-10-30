@@ -2,17 +2,20 @@
 #include <json.hpp>
 
 using Json = nlohmann::json;
-namespace wlEngine {
-#define SETTINGS_ENGINEMODE 1 // 1: editor, 0: gameplay
+namespace wlEngine
+{
+#define SETTINGS_ENGINEMODE 1     // 1: editor, 0: gameplay
 #define SETTINGS_GAME_DIMENSION 0 // 1: 3D, 0: 2D
-    namespace Settings{
-        extern enum class EngineMode : uint8_t {
-            Gameplay = 0,
-            Editor = 1
-        } engineMode;
+namespace Settings
+{
+extern enum class EngineMode : uint8_t {
+    Gameplay = 0,
+    Editor = 1
+} engineMode;
 
-		extern enum class DebugRender {
-			On, Off
-		} debugRender;
-    }
-}
+extern enum class DebugRender {
+    On,
+    Off
+} debugRender;
+} // namespace Settings
+} // namespace wlEngine

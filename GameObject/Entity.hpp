@@ -94,9 +94,6 @@ namespace wlEngine {
         void Entity::removeComponent() {
             for (auto& c : components) {
                 if (c->isType(ComponentType::componentId)) {
-                    if (c->entities) {
-                        c->entities->erase(this);
-                    }
 					assert(c.get() != transform && "remove transform component is not allowed");
                     components.erase(c);
                     return;

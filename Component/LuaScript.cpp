@@ -1,6 +1,5 @@
 #include "LuaScript.hpp"
 #include "../GameObject/Entity.hpp"
-#include <string>
 #include "../Time.hpp"
 #include "../Input.hpp"
 #include "../Component/Transform.hpp"
@@ -8,78 +7,80 @@
 #include "../Component/TRigidbody.hpp"
 #include "../Component/Animation.hpp"
 
-#define LUA_CREATE_COMPONENT(LIB)         \
-    lua_newtable(state);                  \
-    lua_pushstring(state, "__index");     \
-    luaL_newlib(state, LIB);              \
-    lua_settable(state, -3);              \
+#include <string>
+
+#define LUA_CREATE_COMPONENT(LIB)     \
+    lua_newtable(state);              \
+    lua_pushstring(state, "__index"); \
+    luaL_newlib(state, LIB);          \
+    lua_settable(state, -3);          \
     lua_setmetatable(state, -2);
 
 #define LUA_CREATE_LIB(NAME, LIBNAME) \
-    luaL_newlib(state, LIBNAME);\
+    luaL_newlib(state, LIBNAME);      \
     lua_setglobal(state, NAME);
 
-#define LUA_SET_FIELD(NAME, VALUE);\
-    lua_pushinteger(state, VALUE);\
+#define LUA_SET_FIELD(NAME, VALUE) \
+    ;                              \
+    lua_pushinteger(state, VALUE); \
     lua_setfield(state, -2, NAME);
 
-#define COMPONENT_LIB \
-	{"getEntity", LuaScript::lua_component_getEntity}
+#define COMPONENT_LIB                                   \
+    {                                                   \
+        "getEntity", LuaScript::lua_component_getEntity \
+    }
 
-namespace wlEngine {
+namespace wlEngine
+{
 COMPONENT_DEFINATION(Component, LuaScript, 32);
 
-
 const luaL_Reg LuaScript::transformLib[] = {
-	COMPONENT_LIB,
-    {"moveBy", LuaScript::lua_transform_moveBy}, 
-    {"setPosition", LuaScript::lua_transform_setPosition}, 
-    {"setLocalPosition", LuaScript::lua_transform_setLocalPosition}, 
-    {"getPosition", LuaScript::lua_transform_getPosition}, 
-    {"getLocalPosition", LuaScript::lua_transform_getLocalPosition}, 
+    COMPONENT_LIB,
+    {"moveBy", LuaScript::lua_transform_moveBy},
+    {"setPosition", LuaScript::lua_transform_setPosition},
+    {"setLocalPosition", LuaScript::lua_transform_setLocalPosition},
+    {"getPosition", LuaScript::lua_transform_getPosition},
+    {"getLocalPosition", LuaScript::lua_transform_getLocalPosition},
     {nullptr, nullptr}};
 
-const luaL_Reg LuaScript::stateMachineLib [] = {
-	COMPONENT_LIB,
-    {"addTransition" , LuaScript::lua_stateMachine_addTransition},
+const luaL_Reg LuaScript::stateMachineLib[] = {
+    COMPONENT_LIB,
+    {"addTransition", LuaScript::lua_stateMachine_addTransition},
     {"setPosition", LuaScript::lua_stateMachine_addTransition},
     {"setAction", LuaScript::lua_stateMachine_setAction},
     {"changeState", LuaScript::lua_stateMachine_changeState},
     {"getCurrentState", LuaScript::lua_stateMachine_getCurrentState},
-    {nullptr, nullptr}
-};
+    {nullptr, nullptr}};
 const luaL_Reg LuaScript::TRigidbodyLib[] = {
-	COMPONENT_LIB,
-	{"setContactBegin", LuaScript::lua_tRigidbody_setContactBegin},
-	{"setContactEnd", LuaScript::lua_tRigidbody_setContactEnd},
-	{nullptr, nullptr}
-};
+    COMPONENT_LIB,
+    {"setContactBegin", LuaScript::lua_tRigidbody_setContactBegin},
+    {"setContactEnd", LuaScript::lua_tRigidbody_setContactEnd},
+    {nullptr, nullptr}};
 const luaL_Reg LuaScript::animationLib[] = {
-	COMPONENT_LIB,
-	{"playAnimation", LuaScript::lua_animation_playAnimation},
-	{"addAnimationFromAseprite", LuaScript::lua_animation_addAnimationFromAseprite},
-	{"isPlaying", LuaScript::lua_animation_isPlaying},
-	{"hasEnded", LuaScript::lua_animation_hasEnded},
-	{nullptr ,nullptr}
-};
+    COMPONENT_LIB,
+    {"playAnimation", LuaScript::lua_animation_playAnimation},
+    {"addAnimationFromAseprite", LuaScript::lua_animation_addAnimationFromAseprite},
+    {"isPlaying", LuaScript::lua_animation_isPlaying},
+    {"hasEnded", LuaScript::lua_animation_hasEnded},
+    {nullptr, nullptr}};
 const luaL_Reg LuaScript::timeLib[] = {
     {"getDeltaTime", LuaScript::lua_time_getDeltaTime},
-    {nullptr, nullptr}
-};
-const luaL_Reg LuaScript::inputLib [] = {
+    {nullptr, nullptr}};
+const luaL_Reg LuaScript::inputLib[] = {
     {"getControllerAxis", LuaScript::lua_input_getControllerAxis},
     {"getControllerButton", LuaScript::lua_input_getControllerButton},
     {"isControllerButtonClicked", LuaScript::lua_input_isControllerButtonClicked},
     {"isControllerAxisClicked", LuaScript::lua_input_isControllerAxisClicked},
-    {nullptr, nullptr}
-};
+    {nullptr, nullptr}};
 const luaL_Reg LuaScript::gameObjectLib[] = {{"getComponent", LuaScript::lua_getComponent}, {nullptr, nullptr}};
-LuaScript::LuaScript(Entity *entity, const std::string &file) : Component(entity), file(file) {
+LuaScript::LuaScript(Entity *entity, const std::string &file) : Component(entity), file(file)
+{
     state = luaL_newstate();
-	luaL_requiref(state, "_G", luaopen_base, 1); lua_pop(state,1);
-    Entity** userData = static_cast<Entity**>(lua_newuserdata(state, sizeof(Entity*)));
-	*userData = entity;
-	
+    luaL_requiref(state, "_G", luaopen_base, 1);
+    lua_pop(state, 1);
+    Entity **userData = static_cast<Entity **>(lua_newuserdata(state, sizeof(Entity *)));
+    *userData = entity;
+
     /* the meta table*/
     lua_newtable(state); // 2
     lua_pushstring(state, "__index");
@@ -115,33 +116,40 @@ LuaScript::LuaScript(Entity *entity, const std::string &file) : Component(entity
     LUA_SET_FIELD("TriggerRight", SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
     LUA_SET_FIELD("AxisMax", 0x7fff);
     lua_pop(state, 1);
-
-	
 }
-void LuaScript::postInit() {
-    if (luaL_dofile(state, file.data())) {
+void LuaScript::postInit()
+{
+    if (luaL_dofile(state, file.data()))
+    {
         std::cerr << "load lua file failed: " << file << std::endl;
         std::cout << lua_tostring(state, -1);
     }
 }
-int LuaScript::lua_getComponent(lua_State *state) {
-    auto entity = *static_cast<Entity **>(lua_touserdata(state, 1));         
+int LuaScript::lua_getComponent(lua_State *state)
+{
+    auto entity = *static_cast<Entity **>(lua_touserdata(state, 1));
     size_t componentId = std::hash<std::string>()(lua_tostring(state, 2));
-    
-    for (auto &c : entity->components) {
-        if (c->isType(componentId)) {
-			Component** userData = static_cast<Component **>(lua_newuserdata(state, sizeof(void*)));
-			*userData = &*c;
-            if (componentId == Transform::componentId) {
+
+    for (auto &c : entity->components)
+    {
+        if (c->isType(componentId))
+        {
+            Component **userData = static_cast<Component **>(lua_newuserdata(state, sizeof(void *)));
+            *userData = &*c;
+            if (componentId == Transform::componentId)
+            {
                 LUA_CREATE_COMPONENT(transformLib);
             }
-            else if (componentId == StateMachine::componentId) {
+            else if (componentId == StateMachine::componentId)
+            {
                 LUA_CREATE_COMPONENT(stateMachineLib);
             }
-            else if (componentId == TRigidbody::componentId) {
+            else if (componentId == TRigidbody::componentId)
+            {
                 LUA_CREATE_COMPONENT(TRigidbodyLib);
             }
-            else if(componentId == Animation::componentId) {
+            else if (componentId == Animation::componentId)
+            {
                 LUA_CREATE_COMPONENT(animationLib);
             }
             return 1;
@@ -152,22 +160,24 @@ int LuaScript::lua_getComponent(lua_State *state) {
 }
 
 /* Component*/
-int LuaScript::lua_component_getEntity(lua_State* state) {
-	auto component = *static_cast<Component * *>(lua_touserdata(state, 1));
-    Entity** userData = static_cast<Entity**>(lua_newuserdata(state, sizeof(Entity*)));
-	*userData = component->entity;
-	
+int LuaScript::lua_component_getEntity(lua_State *state)
+{
+    auto component = *static_cast<Component **>(lua_touserdata(state, 1));
+    Entity **userData = static_cast<Entity **>(lua_newuserdata(state, sizeof(Entity *)));
+    *userData = component->entity;
+
     /* the meta table*/
-    lua_newtable(state); 
+    lua_newtable(state);
     lua_pushstring(state, "__index");
     luaL_newlib(state, gameObjectLib);
     lua_settable(state, 3);
     lua_setmetatable(state, 2); // table out
-	return 1;
+    return 1;
 }
 
 /*Transform*/
-int LuaScript::lua_transform_moveBy(lua_State *state) {
+int LuaScript::lua_transform_moveBy(lua_State *state)
+{
     auto transform = *static_cast<Transform **>(lua_touserdata(state, 1));
     float x = lua_tonumber(state, 2);
     float y = lua_tonumber(state, 3);
@@ -177,50 +187,67 @@ int LuaScript::lua_transform_moveBy(lua_State *state) {
     return 0;
 }
 
-int LuaScript::lua_transform_setPosition(lua_State* state) {
+int LuaScript::lua_transform_setPosition(lua_State *state)
+{
     auto transform = *static_cast<Transform **>(lua_touserdata(state, -4));
     float x = lua_tonumber(state, -3);
     float y = lua_tonumber(state, -2);
     float z = lua_tonumber(state, -1);
 
-    transform->setPosition({x,y,z});
+    transform->setPosition({x, y, z});
     return 0;
 }
-int LuaScript::lua_transform_setLocalPosition(lua_State* state) {
+int LuaScript::lua_transform_setLocalPosition(lua_State *state)
+{
     auto transform = *static_cast<Transform **>(lua_touserdata(state, 1));
     float x = lua_tonumber(state, 2);
     float y = lua_tonumber(state, 3);
     float z = lua_tonumber(state, 4);
 
-    transform->setLocalPosition({x,y,z});
+    transform->setLocalPosition({x, y, z});
     return 0;
 }
-int LuaScript::lua_transform_getLocalPosition(lua_State* state) {
+int LuaScript::lua_transform_getLocalPosition(lua_State *state)
+{
     auto transform = *static_cast<Transform **>(lua_touserdata(state, 1));
-    
+
     auto pos = transform->getLocalPosition();
     lua_newtable(state); // 2
-    lua_pushstring(state, "x"); lua_pushnumber(state, pos.x); lua_settable(state, 2);
-    lua_pushstring(state, "y"); lua_pushnumber(state, pos.y); lua_settable(state, 2);
-    lua_pushstring(state, "z"); lua_pushnumber(state, pos.z); lua_settable(state, 2);
+    lua_pushstring(state, "x");
+    lua_pushnumber(state, pos.x);
+    lua_settable(state, 2);
+    lua_pushstring(state, "y");
+    lua_pushnumber(state, pos.y);
+    lua_settable(state, 2);
+    lua_pushstring(state, "z");
+    lua_pushnumber(state, pos.z);
+    lua_settable(state, 2);
 
     return 1;
 }
-int LuaScript::lua_transform_getPosition(lua_State* state) {
+int LuaScript::lua_transform_getPosition(lua_State *state)
+{
     auto transform = *static_cast<Transform **>(lua_touserdata(state, 1));
-    
+
     auto pos = transform->position;
     lua_newtable(state); // 2
-    lua_pushstring(state, "x"); lua_pushnumber(state, pos.x); lua_settable(state, 2);
-    lua_pushstring(state, "y"); lua_pushnumber(state, pos.y); lua_settable(state, 2);
-    lua_pushstring(state, "z"); lua_pushnumber(state, pos.z); lua_settable(state, 2);
+    lua_pushstring(state, "x");
+    lua_pushnumber(state, pos.x);
+    lua_settable(state, 2);
+    lua_pushstring(state, "y");
+    lua_pushnumber(state, pos.y);
+    lua_settable(state, 2);
+    lua_pushstring(state, "z");
+    lua_pushnumber(state, pos.z);
+    lua_settable(state, 2);
 
     return 1;
 }
 
-/* StateMachine*/ 
-int LuaScript::lua_stateMachine_addTransition(lua_State* state) {
-    auto stateMachine = *static_cast<StateMachine**>(lua_touserdata(state, 1));
+/* StateMachine*/
+int LuaScript::lua_stateMachine_addTransition(lua_State *state)
+{
+    auto stateMachine = *static_cast<StateMachine **>(lua_touserdata(state, 1));
 
     assert(typeid(StateType) == typeid(std::string));
     StateType from = lua_tostring(state, 2);
@@ -229,101 +256,116 @@ int LuaScript::lua_stateMachine_addTransition(lua_State* state) {
     static std::map<StateType, std::map<StateType, int>> refLog;
     int ref;
     auto hasRef = refLog[from].find(to);
-    if (hasRef == refLog[from].end()) {
+    if (hasRef == refLog[from].end())
+    {
         ref = luaL_ref(state, LUA_REGISTRYINDEX);
         refLog[from][to] = ref;
     }
-    else {
+    else
+    {
         ref = hasRef->second;
-		lua_rawseti(state, LUA_REGISTRYINDEX, ref); //set the new func
+        lua_rawseti(state, LUA_REGISTRYINDEX, ref); //set the new func
     }
 
     stateMachine->addTransition(from, to, [=]() -> StatePriority {
         lua_rawgeti(state, LUA_REGISTRYINDEX, ref);
         lua_call(state, 0, 1);
-		StatePriority rlt = lua_tonumber(state, -1);
-		lua_pop(state, 1);
-		return rlt;
+        StatePriority rlt = lua_tonumber(state, -1);
+        lua_pop(state, 1);
+        return rlt;
     });
 
     return 0;
 }
-int LuaScript::lua_stateMachine_addState(lua_State* state) {
-	auto stateMachine = *static_cast<StateMachine * *>(lua_touserdata(state, 1));
-	const char* name = lua_tostring(state, 2);
+int LuaScript::lua_stateMachine_addState(lua_State *state)
+{
+    auto stateMachine = *static_cast<StateMachine **>(lua_touserdata(state, 1));
+    const char *name = lua_tostring(state, 2);
 
-	stateMachine->addState(name);
-	return 0;
+    stateMachine->addState(name);
+    return 0;
 }
-int LuaScript::lua_stateMachine_setAction(lua_State* state) {
-    auto stateMachine = *static_cast<StateMachine**>(lua_touserdata(state, 1));
-	std::string stateStr = lua_tostring(state, 2);
+int LuaScript::lua_stateMachine_setAction(lua_State *state)
+{
+    auto stateMachine = *static_cast<StateMachine **>(lua_touserdata(state, 1));
+    std::string stateStr = lua_tostring(state, 2);
     std::string stateActionIndexStr = lua_tostring(state, 3);
-	
+
     int stateActionIndex = 0;
-    if (stateActionIndexStr[1] == 'n' ) stateActionIndex = StateActionEnterFuncIndex;  // enter
-    else if (stateActionIndexStr[0] == 'u') stateActionIndex = StateActionUpdateFuncIndex;  // update
-    else if (stateActionIndexStr[0] == 'e') stateActionIndex = StateActionExitFuncIndex;  //exit
+    if (stateActionIndexStr[1] == 'n')
+        stateActionIndex = StateActionEnterFuncIndex; // enter
+    else if (stateActionIndexStr[0] == 'u')
+        stateActionIndex = StateActionUpdateFuncIndex; // update
+    else if (stateActionIndexStr[0] == 'e')
+        stateActionIndex = StateActionExitFuncIndex; //exit
 
     static std::map<std::string, std::map<std::string, int>> refLog;
     int ref;
     auto hasRef = refLog[stateStr].find(stateActionIndexStr);
-    if (hasRef == refLog[stateStr].end()) {
+    if (hasRef == refLog[stateStr].end())
+    {
         ref = luaL_ref(state, LUA_REGISTRYINDEX);
         refLog[stateStr][stateActionIndexStr] = ref;
     }
-    else {
+    else
+    {
         ref = hasRef->second;
-		lua_rawseti(state, LUA_REGISTRYINDEX, ref);
+        lua_rawseti(state, LUA_REGISTRYINDEX, ref);
     }
 
     (*(stateMachine->getActionGroup(stateStr)))[stateActionIndex] = [=]() {
         lua_rawgeti(state, LUA_REGISTRYINDEX, ref);
-		lua_call(state, 0, 0);
+        lua_call(state, 0, 0);
     };
 
-	
     return 0;
 }
-int LuaScript::lua_stateMachine_changeState(lua_State* state) {
-    auto stateMachine = *static_cast<StateMachine**>(lua_touserdata(state, 1));
-    const char* newState = lua_tostring(state, 2);
+int LuaScript::lua_stateMachine_changeState(lua_State *state)
+{
+    auto stateMachine = *static_cast<StateMachine **>(lua_touserdata(state, 1));
+    const char *newState = lua_tostring(state, 2);
 
     stateMachine->changeState(newState);
-	return 0;
+    return 0;
 }
-int LuaScript::lua_stateMachine_getCurrentState(lua_State* state) {
-    auto stateMachine = *static_cast<StateMachine**>(lua_touserdata(state, 1));
+int LuaScript::lua_stateMachine_getCurrentState(lua_State *state)
+{
+    auto stateMachine = *static_cast<StateMachine **>(lua_touserdata(state, 1));
     lua_pushstring(state, stateMachine->getCurrentState().data());
-	return 1;
+    return 1;
 }
 
 /* Time*/
-int LuaScript::lua_time_getDeltaTime(lua_State* state) {
+int LuaScript::lua_time_getDeltaTime(lua_State *state)
+{
     lua_pushnumber(state, Time::deltaTime);
     return 1;
 }
 
 /* Input*/
-int LuaScript::lua_input_getControllerAxis(lua_State *state) {
+int LuaScript::lua_input_getControllerAxis(lua_State *state)
+{
     int axis = lua_tointeger(state, 1);
     int rlt = Input::getControllerAxis(static_cast<ControllerAxis>(axis));
     lua_pushinteger(state, rlt);
     return 1;
 }
-int LuaScript::lua_input_getControllerButton(lua_State *state) {
+int LuaScript::lua_input_getControllerButton(lua_State *state)
+{
     int button = lua_tointeger(state, 1);
     int rlt = Input::getControllerButton(static_cast<ControllerButton>(button));
     lua_pushinteger(state, rlt);
     return 1;
 }
-int LuaScript::lua_input_isControllerButtonClicked(lua_State *state) {
+int LuaScript::lua_input_isControllerButtonClicked(lua_State *state)
+{
     int button = lua_tointeger(state, 1);
     bool rlt = Input::isControllerButtonClicked(static_cast<ControllerButton>(button));
     lua_pushboolean(state, rlt);
     return 1;
 }
-int LuaScript::lua_input_isControllerAxisClicked(lua_State *state) {
+int LuaScript::lua_input_isControllerAxisClicked(lua_State *state)
+{
     int axis = lua_tointeger(state, 1);
     bool rlt = Input::isControllerAxisClicked(static_cast<ControllerAxis>(axis));
     lua_pushboolean(state, rlt);
@@ -331,18 +373,21 @@ int LuaScript::lua_input_isControllerAxisClicked(lua_State *state) {
 }
 
 /* TRgidbody*/
-int LuaScript::lua_tRigidbody_setContactBegin(lua_State* state) {
-    auto body = *static_cast<TRigidbody**>(lua_touserdata(state, 1));
+int LuaScript::lua_tRigidbody_setContactBegin(lua_State *state)
+{
+    auto body = *static_cast<TRigidbody **>(lua_touserdata(state, 1));
 
     static int ref = -1;
-    if (ref == -1) {
+    if (ref == -1)
+    {
         ref = luaL_ref(state, LUA_REGISTRYINDEX);
     }
-    else {
-		lua_rawseti(state, LUA_REGISTRYINDEX, ref);
+    else
+    {
+        lua_rawseti(state, LUA_REGISTRYINDEX, ref);
     }
 
-    body->contactBegin = [=](TRigidbody* body, TRigidbody* other) {
+    body->contactBegin = [=](TRigidbody *body, TRigidbody *other) {
         lua_rawgeti(state, LUA_REGISTRYINDEX, ref);
 
         TRigidbody **bodyData = static_cast<TRigidbody **>(lua_newuserdata(state, sizeof(void *)));
@@ -356,20 +401,23 @@ int LuaScript::lua_tRigidbody_setContactBegin(lua_State* state) {
         lua_call(state, 2, 0);
     };
 
-	return 0;
+    return 0;
 }
-int LuaScript::lua_tRigidbody_setContactEnd(lua_State* state) {
-    auto body = *static_cast<TRigidbody**>(lua_touserdata(state, 1));
+int LuaScript::lua_tRigidbody_setContactEnd(lua_State *state)
+{
+    auto body = *static_cast<TRigidbody **>(lua_touserdata(state, 1));
 
     static int ref = -1;
-    if (ref == -1) {
+    if (ref == -1)
+    {
         ref = luaL_ref(state, LUA_REGISTRYINDEX);
     }
-    else {
-		lua_rawseti(state, LUA_REGISTRYINDEX, ref);
+    else
+    {
+        lua_rawseti(state, LUA_REGISTRYINDEX, ref);
     }
 
-    body->contactEnd = [=](TRigidbody* body, TRigidbody* other) {
+    body->contactEnd = [=](TRigidbody *body, TRigidbody *other) {
         lua_rawgeti(state, LUA_REGISTRYINDEX, ref);
 
         TRigidbody **bodyData = static_cast<TRigidbody **>(lua_newuserdata(state, sizeof(void *)));
@@ -383,35 +431,39 @@ int LuaScript::lua_tRigidbody_setContactEnd(lua_State* state) {
         lua_call(state, 2, 0);
     };
 
-	return 0;
+    return 0;
 }
 
 /* animation*/
-int LuaScript::lua_animation_playAnimation(lua_State *state) {
-    auto animation = *static_cast<Animation**>(lua_touserdata(state, 1));
-    const char* name = lua_tostring(state, 2);
+int LuaScript::lua_animation_playAnimation(lua_State *state)
+{
+    auto animation = *static_cast<Animation **>(lua_touserdata(state, 1));
+    const char *name = lua_tostring(state, 2);
 
     animation->playAnimation(name);
     return 0;
 }
-int LuaScript::lua_animation_addAnimationFromAseprite(lua_State *state) {
-    auto animation = *static_cast<Animation**>(lua_touserdata(state, 1));
-    const char* json = lua_tostring(state, 2);
-    const char* file = lua_tostring(state, 3);
+int LuaScript::lua_animation_addAnimationFromAseprite(lua_State *state)
+{
+    auto animation = *static_cast<Animation **>(lua_touserdata(state, 1));
+    const char *json = lua_tostring(state, 2);
+    const char *file = lua_tostring(state, 3);
 
-    animation->addAnimationFromAseprite(json ,file);
+    animation->addAnimationFromAseprite(json, file);
     return 0;
 }
-int LuaScript::lua_animation_isPlaying(lua_State *state) {
-    auto animation = *static_cast<Animation**>(lua_touserdata(state, 1));
-    const char* name = lua_tostring(state, 2);
+int LuaScript::lua_animation_isPlaying(lua_State *state)
+{
+    auto animation = *static_cast<Animation **>(lua_touserdata(state, 1));
+    const char *name = lua_tostring(state, 2);
 
     bool rlt = animation->isPlaying(name);
     lua_pushboolean(state, rlt);
     return 1;
 }
-int LuaScript::lua_animation_hasEnded(lua_State *state) {
-    auto animation = *static_cast<Animation**>(lua_touserdata(state, 1));
+int LuaScript::lua_animation_hasEnded(lua_State *state)
+{
+    auto animation = *static_cast<Animation **>(lua_touserdata(state, 1));
     bool rlt = animation->hasEnded();
     lua_pushboolean(state, rlt);
     return 1;

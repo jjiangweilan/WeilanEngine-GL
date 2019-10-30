@@ -9,8 +9,10 @@
 #include "Component/Sprite.hpp"
 #include "GameObject/Entity.hpp"
 
-namespace wlEngine {
-Entity *UserInterface::showDialog(NpcController *npcController) {
+namespace wlEngine
+{
+Entity *UserInterface::showDialog(NpcController *npcController)
+{
     auto engineManager = EngineManager::getwlEngine();
     auto renderSystem = RenderSystem::get();
     auto scene = engineManager->getCurrentScene();

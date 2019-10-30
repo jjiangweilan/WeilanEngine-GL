@@ -5,20 +5,25 @@
 #include "../GameObject/Entity.hpp"
 #include "../Utility/Utility.hpp"
 extern wlEngine::Entity *player;
-namespace wlEngine {
+namespace wlEngine
+{
 PhysicsSystem *PhysicsSystem::system = nullptr;
 
-PhysicsSystem::PhysicsSystem() : System() {
+PhysicsSystem::PhysicsSystem() : System()
+{
     registerSystem(this);
 }
 
-void PhysicsSystem::init() {
-    if (!system) {
+void PhysicsSystem::init()
+{
+    if (!system)
+    {
         system = new PhysicsSystem();
     }
 }
 
-void PhysicsSystem::update() {
+void PhysicsSystem::update()
+{
     /*for (auto& r : RigidBody::collection) {
         auto transform = r->entity->getComponent<Transform>();
         transform->setPosition(r->getPosition());
@@ -27,26 +32,34 @@ void PhysicsSystem::update() {
     // update cells
     auto scene = EngineManager::getwlEngine()->getCurrentScene();
     TRigidbody::dynamicSpaticalHash.clear();
-    for (auto &body : TRigidbody::collection) {
+    for (auto &body : TRigidbody::collection)
+    {
         if (!body->entity->isEnable() || body->entity->getScene() != scene)
             continue;
-        if (body->type == BodyType::Dynamic) {
-            for (auto &cell : body->getCells()) {
+        if (body->type == BodyType::Dynamic)
+        {
+            for (auto &cell : body->getCells())
+            {
                 TRigidbody::dynamicSpaticalHash[cell].push_back(body);
             }
         }
     }
 
     // collision detection
-    for (auto &body : TRigidbody::collection) {
+    for (auto &body : TRigidbody::collection)
+    {
         if (!body->entity->isEnable() || body->entity->getScene() != scene)
             continue;
-        if (body->type == BodyType::Dynamic) {
-            for (auto &cell : body->getCells()) {
-                for (auto &other : TRigidbody::dynamicSpaticalHash[cell]) {
+        if (body->type == BodyType::Dynamic)
+        {
+            for (auto &cell : body->getCells())
+            {
+                for (auto &other : TRigidbody::dynamicSpaticalHash[cell])
+                {
                     collisionCheck(body, other, true);
                 }
-                for (auto &other : TRigidbody::staticSpaticalHash[cell]) {
+                for (auto &other : TRigidbody::staticSpaticalHash[cell])
+                {
                     collisionCheck(body, other, false);
                 }
             }
@@ -55,14 +68,18 @@ void PhysicsSystem::update() {
 }
 PhysicsSystem::MinMax
 PhysicsSystem::getMinMax(const std::vector<glm::vec2> &vecs,
-                         const glm::vec2 &normal) {
+                         const glm::vec2 &normal)
+{
     MinMax mm;
-    for (auto &v : vecs) {
+    for (auto &v : vecs)
+    {
         float mag = glm::dot(v, normal);
-        if (mag < mm.min) {
+        if (mag < mm.min)
+        {
             mm.min = mag;
         }
-        if (mag > mm.max) {
+        if (mag > mm.max)
+        {
             mm.max = mag;
         }
     }
@@ -70,7 +87,8 @@ PhysicsSystem::getMinMax(const std::vector<glm::vec2> &vecs,
 }
 
 bool PhysicsSystem::polygonVsPolygon(TRigidbody *polygon1, TRigidbody *polygon2,
-                                     glm::vec2 &penetrationVec) {
+                                     glm::vec2 &penetrationVec)
+{
     PolygonShape *shape1 = static_cast<PolygonShape *>(polygon1->shape);
     PolygonShape *shape2 = static_cast<PolygonShape *>(polygon2->shape);
 
@@ -89,21 +107,24 @@ bool PhysicsSystem::polygonVsPolygon(TRigidbody *polygon1, TRigidbody *polygon2,
     float overlap = FLT_MAX;
 
     auto checkFunc = [&](std::vector<glm::vec2> &normals, bool fromMain) {
-        for (auto &n : normals) {
+        for (auto &n : normals)
+        {
             MinMax mm1 = getMinMax(points1, n);
             MinMax mm2 = getMinMax(points2, n);
 
             float test1 = mm1.min - mm2.max;
             float test2 = mm2.min - mm1.max;
 
-            if (test1 > 0 || test2 > 0) {
+            if (test1 > 0 || test2 > 0)
+            {
                 contactEndHelper(polygon1, polygon2);
                 return true;
             }
 
             // calculate penetration
             float overlapNew = test1 > test2 ? -test1 : -test2;
-            if (overlapNew < overlap) {
+            if (overlapNew < overlap)
+            {
                 overlap = overlapNew;
                 penetrationVec = fromMain && overlap == -test2 ? -n : n;
             }
@@ -125,7 +146,8 @@ bool PhysicsSystem::polygonVsPolygon(TRigidbody *polygon1, TRigidbody *polygon2,
     return false;
 }
 bool PhysicsSystem::polygonVsCircle(TRigidbody *polygon, TRigidbody *circle,
-                                    glm::vec2 &penetrationVec) {
+                                    glm::vec2 &penetrationVec)
+{
     PolygonShape *polygonShape = static_cast<PolygonShape *>(polygon->shape);
     CircleShape *circleShape = static_cast<CircleShape *>(circle->shape);
     Transform *t1 = polygon->entity->getComponent<Transform>();
@@ -137,12 +159,14 @@ bool PhysicsSystem::polygonVsCircle(TRigidbody *polygon, TRigidbody *circle,
     // add the offset and find closest point
     float distance2 = FLT_MAX;
     glm::vec2 closestAxis;
-    for (auto &p : points) {
+    for (auto &p : points)
+    {
         p += polyPos;
         auto distanceVecNew = circlePos - p;
         float distance2New = distanceVecNew.x * distanceVecNew.x +
                              distanceVecNew.y * distanceVecNew.y;
-        if (distance2New < distance2) {
+        if (distance2New < distance2)
+        {
             distance2 = distance2New;
             closestAxis = distanceVecNew;
         }
@@ -155,7 +179,8 @@ bool PhysicsSystem::polygonVsCircle(TRigidbody *polygon, TRigidbody *circle,
 
     float overlap = FLT_MAX;
 
-    for (auto &n : axies) {
+    for (auto &n : axies)
+    {
         auto polyMM = getMinMax(points, n);
         auto circleProject = glm::dot(circlePos, n);
         float circleProjMin = circleProject - radius;
@@ -163,14 +188,16 @@ bool PhysicsSystem::polygonVsCircle(TRigidbody *polygon, TRigidbody *circle,
 
         float test1 = circleProjMin - polyMM.max;
         float test2 = polyMM.min - circleProjMax;
-        if (test1 > 0 || test2 > 0) {
+        if (test1 > 0 || test2 > 0)
+        {
             contactEndHelper(polygon, circle);
             return true;
         }
 
         // calculate penetration
         float overlapNew = test1 > test2 ? -test1 : -test2;
-        if (overlapNew < overlap) {
+        if (overlapNew < overlap)
+        {
             overlap = overlapNew;
             penetrationVec = n;
         }
@@ -182,7 +209,8 @@ bool PhysicsSystem::polygonVsCircle(TRigidbody *polygon, TRigidbody *circle,
 }
 
 bool PhysicsSystem::circleVsCircle(TRigidbody *circle1, TRigidbody *circle2,
-                                   glm::vec2 &penetrationVec) {
+                                   glm::vec2 &penetrationVec)
+{
     auto t1 = circle1->entity->getComponent<Transform>();
     auto t2 = circle2->entity->getComponent<Transform>();
     auto circleShape1 = static_cast<CircleShape *>(circle1->shape);
@@ -192,7 +220,8 @@ bool PhysicsSystem::circleVsCircle(TRigidbody *circle1, TRigidbody *circle2,
     auto distanceVec = glm::vec2(t1->position) + circleShape1->center -
                        (glm::vec2(t2->position) + circleShape2->center);
     float dis = glm::length(distanceVec);
-    if (dis > radius1 + radius2) {
+    if (dis > radius1 + radius2)
+    {
         return true;
     }
 
@@ -202,7 +231,8 @@ bool PhysicsSystem::circleVsCircle(TRigidbody *circle1, TRigidbody *circle2,
 }
 
 bool PhysicsSystem::lineVsLine(TRigidbody *line1, TRigidbody *line2,
-                               glm::vec2 &penetrationVec) {
+                               glm::vec2 &penetrationVec)
+{
     LineShape *shape1 = static_cast<LineShape *>(line1->shape);
     LineShape *shape2 = static_cast<LineShape *>(line2->shape);
 
@@ -221,7 +251,8 @@ bool PhysicsSystem::lineVsLine(TRigidbody *line1, TRigidbody *line2,
     float overlap = FLT_MAX;
 
     bool separated = true;
-    for (unsigned int i = 0; i < points1.size() - 1; i++) {
+    for (unsigned int i = 0; i < points1.size() - 1; i++)
+    {
         unsigned int next = i + 1;
         glm::vec2 normal;
         normal.x = points1[i].y - points1[next].y;
@@ -240,11 +271,13 @@ bool PhysicsSystem::lineVsLine(TRigidbody *line1, TRigidbody *line2,
         bool test3 = parallelMax < parallelmm.min;
         bool test4 = parallelMin > parallelmm.max;
 
-        if (test1 > 0 && test2 > 0 && !test3 && !test4) {
+        if (test1 > 0 && test2 > 0 && !test3 && !test4)
+        {
             contactEndHelper(line1, line2);
             // calculate penetration
             float overlapNew = test1 < test2 ? test1 : test2;
-            if (overlapNew < overlap) {
+            if (overlapNew < overlap)
+            {
                 overlap = overlapNew;
                 penetrationVec = test1 < test2 ? -normal : normal;
             }
@@ -253,7 +286,8 @@ bool PhysicsSystem::lineVsLine(TRigidbody *line1, TRigidbody *line2,
         }
     }
 
-    if (!separated) {
+    if (!separated)
+    {
         contactBeginHelper(line1, line2);
         penetrationVec *= overlap;
     }
@@ -262,7 +296,8 @@ bool PhysicsSystem::lineVsLine(TRigidbody *line1, TRigidbody *line2,
 }
 
 bool PhysicsSystem::lineVsPolygon(TRigidbody *line, TRigidbody *polygon,
-                                  glm::vec2 &penetrationVec) {
+                                  glm::vec2 &penetrationVec)
+{
     LineShape *shape1 = static_cast<LineShape *>(line->shape);
     PolygonShape *shape2 = static_cast<PolygonShape *>(polygon->shape);
 
@@ -285,7 +320,8 @@ bool PhysicsSystem::lineVsPolygon(TRigidbody *line, TRigidbody *polygon,
     glm::vec2 penetrationPolygonVec = {0, 0};
     static std::vector<glm::vec2> lineTemp(2); // no multi thread
     float lastLineOverlap = -FLT_MAX;
-    for (unsigned int i = 0; i < points1.size() - 1; i++) {
+    for (unsigned int i = 0; i < points1.size() - 1; i++)
+    {
         unsigned int next = i + 1;
         glm::vec2 normal;
         normal.x = points1[i].y - points1[next].y;
@@ -301,12 +337,14 @@ bool PhysicsSystem::lineVsPolygon(TRigidbody *line, TRigidbody *polygon,
         glm::vec2 vertexPenetrationVec = {0, 0};
         lineTemp[0] = points1[i];
         lineTemp[1] = points1[next];
-        if (test1 > 0 && test2 > 0) {
+        if (test1 > 0 && test2 > 0)
+        {
             // more test
             float overlap = FLT_MAX;
             int i = 0;
             bool isSeparated = false;
-            for (; i < normals.size(); i++) {
+            for (; i < normals.size(); i++)
+            {
                 auto lineMM = getMinMax(lineTemp, normals[i]);
                 auto polygonMM = getMinMax(points2, normals[i]);
 
@@ -314,15 +352,17 @@ bool PhysicsSystem::lineVsPolygon(TRigidbody *line, TRigidbody *polygon,
                 float test6 = polygonMM.min - lineMM.max;
 
                 if (test5 > 0 ||
-                    test6 > 0) { // separated, this line is separated from the
-                                 // polygon, go to next line
+                    test6 > 0)
+                {   // separated, this line is separated from the
+                    // polygon, go to next line
                     isSeparated = true;
                     break;
                 }
 
                 // need a penetration vec to compare with the one below
                 float overlapNew = test5 > test6 ? -test5 : -test6;
-                if (overlapNew < overlap) {
+                if (overlapNew < overlap)
+                {
                     if (overlapNew == 0)
                         overlapNew = 0.1;
                     vertexPenetrationVec =
@@ -330,8 +370,10 @@ bool PhysicsSystem::lineVsPolygon(TRigidbody *line, TRigidbody *polygon,
                     overlap = overlapNew;
                 }
             }
-            if (!isSeparated) {
-                if (overlap > lastLineOverlap) {
+            if (!isSeparated)
+            {
+                if (overlap > lastLineOverlap)
+                {
                     lastLineOverlap = overlap;
                     penetrationPolygonVec = (vertexPenetrationVec * overlap);
                 }
@@ -346,7 +388,8 @@ bool PhysicsSystem::lineVsPolygon(TRigidbody *line, TRigidbody *polygon,
             }
         }
     }
-    if (separated) {
+    if (separated)
+    {
         contactEndHelper(line, polygon);
         return true;
     }
@@ -357,7 +400,8 @@ bool PhysicsSystem::lineVsPolygon(TRigidbody *line, TRigidbody *polygon,
         penetrationPolygonVec.x * penetrationPolygonVec.x +
             penetrationPolygonVec.y * penetrationPolygonVec.y)
         penetrationVec = penetrationLineVec;
-    else {
+    else
+    {
         penetrationVec = penetrationPolygonVec;
     }
 
@@ -365,7 +409,8 @@ bool PhysicsSystem::lineVsPolygon(TRigidbody *line, TRigidbody *polygon,
 }
 
 bool PhysicsSystem::lineVsCircle(TRigidbody *line, TRigidbody *circle,
-                                 glm::vec2 &penetrationVec) {
+                                 glm::vec2 &penetrationVec)
+{
     LineShape *shape1 = static_cast<LineShape *>(line->shape);
     CircleShape *shape2 = static_cast<CircleShape *>(circle->shape);
 
@@ -384,16 +429,19 @@ bool PhysicsSystem::lineVsCircle(TRigidbody *line, TRigidbody *circle,
     float distance2 = FLT_MAX;
     float radius2 = shape2->radius * shape2->radius;
     glm::vec2 closestAxis;
-    for (auto &p : points1) {
+    for (auto &p : points1)
+    {
         auto distanceVecNew = pos2 - p;
         float distance2New = distanceVecNew.x * distanceVecNew.x +
                              distanceVecNew.y * distanceVecNew.y;
-        if (distance2New < distance2) {
+        if (distance2New < distance2)
+        {
             distance2 = distance2New;
             closestAxis = distanceVecNew;
         }
 
-        if (distance2 < radius2) {
+        if (distance2 < radius2)
+        {
             contactBeginHelper(line, circle);
             penetrationVec = glm::normalize(closestAxis) * glm::sqrt(distance2);
             return false;
@@ -401,7 +449,8 @@ bool PhysicsSystem::lineVsCircle(TRigidbody *line, TRigidbody *circle,
     }
 
     bool separated = true;
-    for (unsigned int i = 0; i < points1.size() - 1; i++) {
+    for (unsigned int i = 0; i < points1.size() - 1; i++)
+    {
         unsigned int next = i + 1;
         glm::vec2 normal;
         normal.x = points1[i].y - points1[next].y;
@@ -423,11 +472,13 @@ bool PhysicsSystem::lineVsCircle(TRigidbody *line, TRigidbody *circle,
         bool test3 = parallelMax < circleParallelDot - shape2->radius;
         bool test4 = parallelMin > circleParallelDot + shape2->radius;
 
-        if (test1 > 0 && test2 > 0 && !test3 && !test4) {
+        if (test1 > 0 && test2 > 0 && !test3 && !test4)
+        {
             contactEndHelper(line, circle);
             // calculate penetration
             float overlapNew = test1 < test2 ? test1 : test2;
-            if (overlapNew < overlap) {
+            if (overlapNew < overlap)
+            {
                 overlap = overlapNew;
                 penetrationVec = test1 < test2 ? -normal : normal;
             }
@@ -436,7 +487,8 @@ bool PhysicsSystem::lineVsCircle(TRigidbody *line, TRigidbody *circle,
         }
     }
 
-    if (!separated) {
+    if (!separated)
+    {
         contactBeginHelper(line, circle);
         penetrationVec *= overlap;
     }
@@ -445,15 +497,19 @@ bool PhysicsSystem::lineVsCircle(TRigidbody *line, TRigidbody *circle,
 }
 
 void PhysicsSystem::collisionCheck(TRigidbody *body, TRigidbody *other,
-                                   const bool &otherIsDynamic) {
-    if (body == other || (body->mask & other->category) == 0)//((body->category & other->mask) == 0 ))//|
+                                   const bool &otherIsDynamic)
+{
+    if (body == other || (body->mask & other->category) == 0) //((body->category & other->mask) == 0 ))//|
         return;
-    if (body->shouldCollide && !body->shouldCollide(other)) return;
+    if (body->shouldCollide && !body->shouldCollide(other))
+        return;
     ShapeType thisShape = body->shape->getShapeType();
     ShapeType otherShape = other->shape->getShapeType();
     CollisionResult cr;
-    if (thisShape == ShapeType::Polygon) {
-        switch (otherShape) {
+    if (thisShape == ShapeType::Polygon)
+    {
+        switch (otherShape)
+        {
         case ShapeType::Polygon:
             cr.separated = polygonVsPolygon(body, other, cr.penetrationVec);
             break;
@@ -464,8 +520,11 @@ void PhysicsSystem::collisionCheck(TRigidbody *body, TRigidbody *other,
             cr.separated = lineVsPolygon(other, body, cr.penetrationVec);
             break;
         }
-    } else if (thisShape == ShapeType::Circle) {
-        switch (otherShape) {
+    }
+    else if (thisShape == ShapeType::Circle)
+    {
+        switch (otherShape)
+        {
         case ShapeType::Polygon:
             cr.separated = polygonVsCircle(other, body, cr.penetrationVec);
             break;
@@ -476,8 +535,11 @@ void PhysicsSystem::collisionCheck(TRigidbody *body, TRigidbody *other,
             cr.separated = lineVsCircle(other, body, cr.penetrationVec);
             break;
         }
-    } else if (thisShape == ShapeType::Line) {
-        switch (otherShape) {
+    }
+    else if (thisShape == ShapeType::Line)
+    {
+        switch (otherShape)
+        {
         case ShapeType::Polygon:
             cr.separated = lineVsPolygon(body, other, cr.penetrationVec);
             break;
@@ -492,31 +554,36 @@ void PhysicsSystem::collisionCheck(TRigidbody *body, TRigidbody *other,
 
     if (cr.separated || body->sensor || other->sensor || !body->entity)
         return;
-    if (otherIsDynamic) {
+    if (otherIsDynamic)
+    {
         cr.penetrationVec /= 2;
         body->entity->getComponent<Transform>()->moveBy(cr.penetrationVec.x,
                                                         cr.penetrationVec.y, 0);
         other->entity->getComponent<Transform>()->moveBy(
             -cr.penetrationVec.x, -cr.penetrationVec.y, 0);
-    } else
+    }
+    else
         body->entity->getComponent<Transform>()->moveBy(cr.penetrationVec.x,
                                                         cr.penetrationVec.y, 0);
 }
 
-void PhysicsSystem::contactEndHelper(TRigidbody *body1, TRigidbody *body2) {
+void PhysicsSystem::contactEndHelper(TRigidbody *body1, TRigidbody *body2)
+{
     //find body2 in body1's contact list
     auto p2 =
         std::find(body1->contactList.begin(), body1->contactList.end(), body2);
 
     //if body2 is not in body1's contact list
-    if (p2 != body1->contactList.end()) {
+    if (p2 != body1->contactList.end())
+    {
         *p2 = body1->contactList.back();
         body1->contactList.pop_back();
 
         if (body1->contactEnd)
             body1->contactEnd(body1, body2);
 
-        if (body2->type == BodyType::Static || body2->mask & body1->category) {
+        if (body2->type == BodyType::Static || body2->mask & body1->category)
+        {
             auto p1 = std::find(body2->contactList.begin(), body2->contactList.end(), body1);
             *p1 = body2->contactList.back();
             body2->contactList.pop_back();
@@ -525,17 +592,20 @@ void PhysicsSystem::contactEndHelper(TRigidbody *body1, TRigidbody *body2) {
         }
     }
 }
-void PhysicsSystem::contactBeginHelper(TRigidbody *body1, TRigidbody *body2) {
+void PhysicsSystem::contactBeginHelper(TRigidbody *body1, TRigidbody *body2)
+{
     // find body2 from body1's contact list
     auto p2 = std::find(body1->contactList.begin(), body1->contactList.end(), body2);
 
     // if body2 is not in body1's contact list
-    if (p2 == body1->contactList.end()) {
+    if (p2 == body1->contactList.end())
+    {
         body1->contactList.push_back(body2);
         if (body1->contactBegin)
             body1->contactBegin(body1, body2);
 
-        if (body2->type == BodyType::Static || body2->mask & body1->category) {
+        if (body2->type == BodyType::Static || body2->mask & body1->category)
+        {
             body2->contactList.push_back(body1);
             if (body2->contactBegin)
                 body2->contactBegin(body2, body1);

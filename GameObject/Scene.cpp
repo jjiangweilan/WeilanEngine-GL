@@ -2,11 +2,14 @@
 
 #include "../System/System.hpp"
 #include "../System/PhysicsSystem.hpp"
+
 #include "../Utility/Utility.hpp"
+
 #include "../Component/Transform.hpp"
 #include "../Component/Sprite.hpp"
 #include "../Component/TRigidbody.hpp"
 #include "../Component/Camera2D.hpp"
+
 #include <memory>
 #include <cassert>
 
@@ -191,7 +194,7 @@ Entity *Scene::findGameObjectNearHelper(std::set<Entity *>::iterator iter, std::
         auto sprite = (*iter)->getComponent<Sprite>();
         if (transform && sprite) {
             auto pos = transform->position;
-            auto sizeHalf = glm::vec2(sprite->mainTexture->rect.width, sprite->mainTexture->rect.height) / 2.0f;
+            auto sizeHalf = glm::vec2(sprite->getMainTexture()->getClipRect().width, sprite->getMainTexture()->getClipRect().height) / 2.0f;
             int minX = pos.x - sizeHalf.x;
             int minY = pos.y - sizeHalf.y;
             int maxX = pos.x + sizeHalf.x;

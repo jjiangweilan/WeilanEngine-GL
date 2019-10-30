@@ -1,21 +1,22 @@
 #pragma once
+#include "Component.hpp"
+#include "../GameObject/Entity.hpp"
+
 #include <string>
 #include <glm/glm.hpp>
 #include <map>
-#include "Component.hpp"
-#include "../GameObject/Entity.hpp"
 namespace wlEngine
 {
 
-
-struct NpcMovement {
+struct NpcMovement
+{
     float from;
     glm::vec2 position;
     std::string animationName;
 };
 
-
-struct NpcConversation {
+struct NpcConversation
+{
     float from;
     float to;
     std::map<std::string, std::string> options;
@@ -33,6 +34,7 @@ class NpcController : public Component
 {
     COMPONENT_DECLARATION(Component, NpcController, 32);
     COMPONENT_EDITABLE_DEC();
+
 public:
     /**
      * @brief
@@ -46,7 +48,7 @@ public:
     std::vector<NpcOneDayBehavior> behaviorList;
     std::string id;
     std::string name;
-	int todaysBehaviorIndex;
+    int todaysBehaviorIndex;
     int currentMovementIndex;
 };
 } // namespace wlEngine

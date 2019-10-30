@@ -1,12 +1,11 @@
 #pragma once
-#include <set>
-#include <glm/glm.hpp>
-
-#include <SDL.h>
-
 #include "Entity.hpp"
 #include "../GameEditor/SceneData.hpp"
+
 #include <json.hpp>
+#include <set>
+#include <glm/glm.hpp>
+#include <SDL.h>
 namespace wlEngine {
     class Scene {
         public:

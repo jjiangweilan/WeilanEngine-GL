@@ -17,24 +17,27 @@
 #include "../imgui/imgui_impl_sdl.h"
 #include "../imgui/imgui_impl_opengl3.h"
 
-namespace wlEngine {
+namespace wlEngine
+{
 RenderSystem *RenderSystem::renderSystem = nullptr;
 
-RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize), framebufferTextures(FramebufferSize), depthAndStencilTextures(FramebufferSize) {
+RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize), framebufferTextures(FramebufferSize), depthAndStencilTextures(FramebufferSize)
+{
     // SDL and OpenGL init
     SDLInit();
     ImGuiInit();
     initSceneFrambufferData();
-    Shader::loadShader("Scene",ROOT_DIR + "/Shader/Scene.vert", ROOT_DIR + "/Shader/Scene.frag");
-    Shader::loadShader("Basic",ROOT_DIR + "/Shader/Basic.vert", ROOT_DIR + "/Shader/Basic.frag");
+    Shader::loadShader("Scene", ROOT_DIR + "/Shader/Scene.vert", ROOT_DIR + "/Shader/Scene.frag");
+    Shader::loadShader("Basic", ROOT_DIR + "/Shader/Basic.vert", ROOT_DIR + "/Shader/Basic.frag");
     Shader::loadShader("Sprite", ROOT_DIR + "/Shader/Sprite.vert", ROOT_DIR + "/Shader/Sprite.frag");
     Shader::loadShader("Text", ROOT_DIR + "/Shader/Text.vert", ROOT_DIR + "/Shader/Text.frag");
     sceneShader = Shader::collection["Scene"];
 
     gameEditor = new GameEditor;
-    for(int i = 0 ; i < FramebufferSize; i++) {
+    for (int i = 0; i < FramebufferSize; i++)
+    {
         genFramebuffer(framebuffers[i], framebufferTextures[i], depthAndStencilTextures[i]);
-    }    
+    }
 
 #if SETTINGS_GAME_DIMENSION == 1
     projection = glm::perspective(glm::radians(45.0f), (float)sceneWidth / sceneHeight, 0.1f, 100000.0f);
@@ -49,7 +52,8 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     registerSystem(this);
 }
 
-RenderSystem::~RenderSystem() {
+RenderSystem::~RenderSystem()
+{
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
@@ -65,12 +69,13 @@ RenderSystem *RenderSystem::get() { return renderSystem; }
 
 void RenderSystem::init() { renderSystem = new RenderSystem(); }
 
-void RenderSystem::render() {
+void RenderSystem::render()
+{
 #if SETTINGS_GAME_DIMENSION == 0
     camera2D = EngineManager::getwlEngine()->getCurrentScene()->getCamera()->getComponent<Camera2D>();
     coordTransform = camera2D->getTransformMatrix();
 #endif
-    glBindFramebuffer(GL_FRAMEBUFFER,framebuffers[FramebuffersIndex::Main]);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffers[FramebuffersIndex::Main]);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
     glViewport(0, 0, sceneWidth, sceneHeight);
     renderGame();
@@ -79,8 +84,10 @@ void RenderSystem::render() {
     glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
     glViewport(0, 0, sceneWidth, sceneHeight);
-    for (auto c : VolumetricLight::collection) {
-        if (!c->entity->isEnable()) continue;
+    for (auto c : VolumetricLight::collection)
+    {
+        if (!c->entity->isEnable())
+            continue;
         render(c);
     }
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -107,12 +114,15 @@ void RenderSystem::render() {
 }
 
 #ifdef DEBUG
-void RenderSystem::debugRender() {
-    for (auto &rb : TRigidbody::collection) {
+void RenderSystem::debugRender()
+{
+    for (auto &rb : TRigidbody::collection)
+    {
         if (!rb->entity->isEnable())
             continue;
         auto shape = rb->shape->getShapeType();
-        if (shape == ShapeType::Polygon || shape == ShapeType::Line) {
+        if (shape == ShapeType::Polygon || shape == ShapeType::Line)
+        {
             auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera()->getComponent<Camera2D>();
             std::vector<glm::vec2> vertices;
             if (shape == ShapeType::Polygon)
@@ -122,7 +132,8 @@ void RenderSystem::debugRender() {
             std::vector<float> glVertices(vertices.size() * 2);
             physicsDebugDrawShader->use();
             auto pos = rb->entity->getComponent<Transform>()->position;
-            for (int i = 0; i < vertices.size(); i++) {
+            for (int i = 0; i < vertices.size(); i++)
+            {
                 glVertices[2 * i] = vertices[i].x + pos.x;
                 glVertices[2 * i + 1] = vertices[i].y + pos.y;
             }
@@ -153,8 +164,9 @@ void RenderSystem::debugRender() {
                 glDrawArrays(GL_LINE_LOOP, 0, vertices.size());
             else
                 glDrawArrays(GL_LINE_STRIP, 0, vertices.size());
-
-        } else if (shape == ShapeType::Circle) {
+        }
+        else if (shape == ShapeType::Circle)
+        {
             auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera()->getComponent<Camera2D>();
             auto circle = static_cast<CircleShape *>(rb->shape);
             float centerX = circle->center.x;
@@ -165,7 +177,8 @@ void RenderSystem::debugRender() {
             std::vector<float> glVertices(vertices.size() * 2);
             physicsDebugDrawShader->use();
             auto pos = rb->entity->getComponent<Transform>()->position;
-            for (int i = 0; i < vertices.size(); i++) {
+            for (int i = 0; i < vertices.size(); i++)
+            {
                 glVertices[2 * i] = vertices[i].x + pos.x;
                 glVertices[2 * i + 1] = vertices[i].y + pos.y;
             }
@@ -205,7 +218,8 @@ void RenderSystem::debugRender() {
             std::vector<float> glVertices(vertices.size() * 2);
             physicsDebugDrawShader->use();
             auto pos = rb->entity->getComponent<Transform>()->position;
-            for (int i = 0; i < vertices.size(); i++) {
+            for (int i = 0; i < vertices.size(); i++)
+            {
                 glVertices[2 * i] = vertices[i].x + pos.x;
                 glVertices[2 * i + 1] = vertices[i].y + pos.y;
             }
@@ -236,17 +250,24 @@ void RenderSystem::debugRender() {
 }
 #endif
 
-void RenderSystem::update() { render(); }
+void RenderSystem::update()
+{
+    render();
+}
 
-int RenderSystem::windowResizeCallbackWrapper(void *data, SDL_Event *event) {
+int RenderSystem::windowResizeCallbackWrapper(void *data, SDL_Event *event)
+{
     if (renderSystem)
         return renderSystem->windowResizeCallback(data, event);
     return 0;
 }
 
-int RenderSystem::windowResizeCallback(void *data, SDL_Event *event) {
-    if (event->type == SDL_WINDOWEVENT) {
-        switch (event->window.event) {
+int RenderSystem::windowResizeCallback(void *data, SDL_Event *event)
+{
+    if (event->type == SDL_WINDOWEVENT)
+    {
+        switch (event->window.event)
+        {
         case SDL_WINDOWEVENT_RESIZED:
             SDL_GetWindowSize(window, &windowWidth, &windowHeight);
             break;
@@ -258,7 +279,8 @@ int RenderSystem::windowResizeCallback(void *data, SDL_Event *event) {
 
 void RenderSystem::setViewPort(int x, int y, int width, int height) { glViewport(x, y, width, height); }
 
-void RenderSystem::SDLInit() {
+void RenderSystem::SDLInit()
+{
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -288,7 +310,8 @@ void RenderSystem::SDLInit() {
     glClearStencil(0);
 }
 
-void RenderSystem::ImGuiInit() {
+void RenderSystem::ImGuiInit()
+{
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
 
@@ -298,7 +321,8 @@ void RenderSystem::ImGuiInit() {
     ImGui_ImplOpenGL3_Init("#version 450");
 }
 #if SETTINGS_ENGINEMODE
-void RenderSystem::renderGameEditor() {
+void RenderSystem::renderGameEditor()
+{
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);
     ImGui::NewFrame();
@@ -315,47 +339,58 @@ void RenderSystem::renderGameEditor() {
 #endif
 
 /* Render *************/
-void RenderSystem::renderGame() {
+void RenderSystem::renderGame()
+{
     auto currentScene = EngineManager::getwlEngine()->getCurrentScene();
 
-    for (auto c : Sprite::collection) {
+    for (auto c : Sprite::collection)
+    {
         if (!c->entity->isEnable() || c->entity->getScene() != currentScene)
             continue;
         render(c);
     }
 
-    for (auto text : Text::collection) {
+    for (auto text : Text::collection)
+    {
         if (!text->entity->isEnable())
             continue;
         render(text);
     }
 }
-void RenderSystem::render(VolumetricLight* vl) {
-    vl->shader->use();
+void RenderSystem::render(VolumetricLight *vl)
+{
+    auto vlShader = vl->getShader();
+    auto &vlTextures = vl->getTextures();
+    vlShader->use();
     auto transform = vl->entity->getComponent<Transform>();
-    vl->shader->setMat4("model", transform->getModel());
-    vl->shader->setMat4("view", coordTransform.view);
-    vl->shader->setMat4("projection", coordTransform.projection);
-    glBindVertexArray(vl->textures[0].VAO);
+    vlShader->setMat4("model", transform->getModel());
+    vlShader->setMat4("view", coordTransform.view);
+    vlShader->setMat4("projection", coordTransform.projection);
+
+    int vao = vlTextures[0].getVAO();
+    int t = vlTextures[0].getId();
+    glBindVertexArray(vao);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, vl->textures[0].mTexture);
+    glBindTexture(GL_TEXTURE_2D, t);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
-void RenderSystem::render(Text *t) {
-    t->shader->use();
+void RenderSystem::render(Text *t)
+{
+    t->getShader()->use();
     //
     // main texture
     glActiveTexture(GL_TEXTURE0);
     auto model = t->entity->getComponent<Transform>()->getModel();
     size_t till = t->renderUntilCharacter();
-    for (size_t i = 0; i < till; i++) {
+    for (size_t i = 0; i < till; i++)
+    {
         auto &character = t->text[i];
-        glBindTexture(GL_TEXTURE_2D, character.texture->mTexture);
+        glBindTexture(GL_TEXTURE_2D, character.texture->getId());
 
-        t->shader->setMat4("model", model * character.getTextTransform());
-        t->shader->setMat4("view", coordTransform.view);
-        t->shader->setMat4("projection", coordTransform.projection);
-        glBindVertexArray(character.texture->VAO);
+        t->getShader()->setMat4("model", model * character.getTextTransform());
+        t->getShader()->setMat4("view", coordTransform.view);
+        t->getShader()->setMat4("projection", coordTransform.projection);
+        glBindVertexArray(character.texture->getVAO());
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
 
@@ -363,64 +398,72 @@ void RenderSystem::render(Text *t) {
     // glBindVertexArray(0);
 }
 
-void RenderSystem::render(Sprite *t) {
+void RenderSystem::render(Sprite *t)
+{
     if (!t->enable)
         return;
 
-    if (t->draw) {
+    if (t->draw)
+    {
         t->draw(coordTransform.view, coordTransform.projection);
         return;
     }
 
     int i = 0;
-    t->shader->use();
+    t->getShader()->use();
     if (t->beforeRenderFunc)
         t->beforeRenderFunc();
     //
     // main texture
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, t->mainTexture->mTexture);
+    glBindTexture(GL_TEXTURE_2D, t->getMainTexture()->getId());
     auto animation = t->entity->getComponent<Animation>();
     auto tRigidbody = t->entity->getComponent<TRigidbody>();
     auto transform = t->entity->getComponent<Transform>();
     if (animation)
-        t->mainTexture->clip(animation->getCurrentClip(), true);
+        t->getMainTexture()->clip(animation->getCurrentClip(), true);
 
     // other textures
-    for (auto &texture : t->textures) {
+    for (auto &texture : t->getTextures())
+    {
         i++;
         glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, texture.second->mTexture);
+        glBindTexture(GL_TEXTURE_2D, texture.second->getId());
         if (animation)
             texture.second->clip(animation->getCurrentClip(), true);
-        t->shader->setInt(texture.first, i);
+        t->getShader()->setInt(texture.first, i);
     }
 
-    t->shader->setMat4("model", transform->getModel());
-    t->shader->setMat4("view", coordTransform.view);
-    t->shader->setMat4("projection", coordTransform.projection);
-    t->shader->setFloat("transparency", t->transparency);
-    if (tRigidbody) {
-        t->shader->setInt("hasTRigidbody", 1);
+    t->getShader()->setMat4("model", transform->getModel());
+    t->getShader()->setMat4("view", coordTransform.view);
+    t->getShader()->setMat4("projection", coordTransform.projection);
+    t->getShader()->setFloat("transparency", t->transparency);
+    if (tRigidbody)
+    {
+        t->getShader()->setInt("hasTRigidbody", 1);
         glm::vec2 pos = transform->position;
-        t->shader->setVec2("point1", tRigidbody->shape->leftPoint + pos);
-        t->shader->setVec2("point2", tRigidbody->shape->rightPoint + pos);
-    } else {
-        t->shader->setInt("hasTRigidbody", 0);
+        t->getShader()->setVec2("point1", tRigidbody->shape->leftPoint + pos);
+        t->getShader()->setVec2("point2", tRigidbody->shape->rightPoint + pos);
     }
-    glBindVertexArray(t->mainTexture->VAO);
+    else
+    {
+        t->getShader()->setInt("hasTRigidbody", 0);
+    }
+    glBindVertexArray(t->getMainTexture()->getVAO());
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     if (t->afterRenderFunc)
         t->afterRenderFunc();
-     glActiveTexture(GL_TEXTURE0);
-     glBindTexture(GL_TEXTURE_2D, 0);
-     glBindVertexArray(0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindVertexArray(0);
 }
 
-void RenderSystem::render(Model *model) {
-    for (auto &gameObject : *model->entities) {
+void RenderSystem::render(Model *model)
+{
+	auto gameObject = model->entity;
+    
 
         if (model->beforeRenderFunc)
             model->beforeRenderFunc();
@@ -434,13 +477,15 @@ void RenderSystem::render(Model *model) {
         shader->setMat4("projection", coordTransform.projection);
         shader->setVec3("viewPos", camera2D->transform->position); // should be 3D
 
-        for (auto &mesh : model->meshes) {
+        for (auto &mesh : model->meshes)
+        {
             // bind appropriate textures
             unsigned int diffuseNr = 1;
             unsigned int specularNr = 1;
             unsigned int normalNr = 1;
             unsigned int heightNr = 1;
-            for (unsigned int i = 0; i < mesh.textures.size(); i++) {
+            for (unsigned int i = 0; i < mesh.textures.size(); i++)
+            {
                 glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
                 // retrieve texture number (the N in diffuse_textureN)
                 std::string number;
@@ -470,10 +515,11 @@ void RenderSystem::render(Model *model) {
             if (model->afterRenderFunc)
                 model->afterRenderFunc();
         }
-    }
+    
 }
 
-void RenderSystem::genFramebuffer(GLuint &fb, GLuint &ft, GLuint &ds) {
+void RenderSystem::genFramebuffer(GLuint &fb, GLuint &ft, GLuint &ds)
+{
     glGenFramebuffers(1, &fb);
     glBindFramebuffer(GL_FRAMEBUFFER, fb);
 
@@ -493,12 +539,13 @@ void RenderSystem::genFramebuffer(GLuint &fb, GLuint &ft, GLuint &ds) {
     glEnable(GL_STENCIL_TEST);
     glEnable(GL_BLEND);
 }
-void RenderSystem::initSceneFrambufferData() {
+void RenderSystem::initSceneFrambufferData()
+{
     GLfloat vertices[] = {
         1.0, 1.0, 1.0f, 1.0f,   // top right
-        1.0, -1.0, 1.0f, 0.0f,   // bottom right
-        -1.0, -1.0, 0.0f, 0.0f,   // bottom left
-        -1.0, 1.0, 0.0f, 1.0f    // top left 
+        1.0, -1.0, 1.0f, 0.0f,  // bottom right
+        -1.0, -1.0, 0.0f, 0.0f, // bottom left
+        -1.0, 1.0, 0.0f, 1.0f   // top left
     };
 
     unsigned int indices[] = {
@@ -514,14 +561,15 @@ void RenderSystem::initSceneFrambufferData() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sceneEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void *)(2 * sizeof(GLfloat)));
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
 }
 
-void RenderSystem::combineTheFramebuffersToFramebuffer(const GLuint& framebufferTarget) {
+void RenderSystem::combineTheFramebuffersToFramebuffer(const GLuint &framebufferTarget)
+{
     glBindFramebuffer(GL_FRAMEBUFFER, framebufferTarget);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
     glViewport(0, 0, sceneWidth, sceneHeight);
@@ -535,6 +583,5 @@ void RenderSystem::combineTheFramebuffersToFramebuffer(const GLuint& framebuffer
     glBindTexture(GL_TEXTURE_2D, framebufferTextures[FramebuffersIndex::VolumetricLight]);
     sceneShader->setInt("volumetricLightSampler", 1);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
 }
 } // namespace wlEngine

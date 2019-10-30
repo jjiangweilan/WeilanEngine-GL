@@ -34,9 +34,6 @@ namespace wlEngine {
 		assert(component != transform && "remove transform component is not allowed");
         for(auto c : components) {
             if(c.get() == component) {
-                if(c->entities) {
-                    c->entities->erase(this);
-                }
                 components.erase(c);
                 return;
             }

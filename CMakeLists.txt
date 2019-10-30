@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.11.3)
-project(uuens_tale VERSION 0.1)
+project(wlEngine VERSION 0.1)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -50,7 +50,6 @@ include_directories(
 )
 
 file(GLOB source_file
-    "Math/*.cpp" "Math/*.hpp"
     "GameObject/*.cpp" "GameObject/*.hpp"
     "Component/*.cpp" "Component/*.hpp"
     "Component/Struct/*.cpp" "Component/Struct/*.hpp"
@@ -58,7 +57,6 @@ file(GLOB source_file
     "Graphics/*.cpp" "Graphics/*.hpp"
     "Memory/*.cpp" "Memory/*.hpp"
     "Event/*.cpp" "Event/*.hpp"
-    #"Physics/*.cpp" "Physics/*.hpp"
     "GameEditor/*.cpp" "GameEditor/*.hpp"
     "Manager/*.cpp" "Manager/*.hpp"
     "Utility/*.cpp" "Utility/*.hpp"

@@ -1,9 +1,12 @@
 #include "Settings.hpp"
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
-namespace wlEngine {
-namespace Settings {
+namespace wlEngine
+{
+namespace Settings
+{
 #if SETTINGS_ENGINEMODE
 EngineMode engineMode = EngineMode::Editor;
 #else
