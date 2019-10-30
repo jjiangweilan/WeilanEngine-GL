@@ -101,7 +101,7 @@ void GameEditor::showGameWindow(void **data)
         windowName += " Editing Vertex";
     if (selectedTRigidbody && editLine)
         windowName += " Editing Render Line";
-    windowName += "###";
+    windowName += "###GameScene";
     ImGui::SetNextWindowPos({450, 30}, ImGuiCond_FirstUseEver);
     ImGui::Begin(windowName.data(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
     gameplayWindowOffsetX = ImGui::GetWindowPos().x;
@@ -657,8 +657,8 @@ void GameEditor::showTransformInfo(Entity *go)
     float scaleX = transform->scale.x;
     float scaleY = transform->scale.y;
 
-    bool edit0 = ImGui::InputFloat("ScaleX", &scaleX, 0.01, 0.05, 2);
-    bool edit1 = ImGui::InputFloat("ScaleY", &scaleY, 0.01, 0.05, 2);
+    bool edit0 = ImGui::InputFloat("ScaleX", &scaleX, 0.005, 0.05, 3);
+    bool edit1 = ImGui::InputFloat("ScaleY", &scaleY, 0.005, 0.05, 3);
     if (edit0 || edit1)
     {
         transform->setScale(scaleX, scaleY, 1.0);
@@ -666,7 +666,9 @@ void GameEditor::showTransformInfo(Entity *go)
 
     float rotate = transform->rotationData.degree;
     float axis[3] = {transform->rotationData.axis.x, transform->rotationData.axis.y, transform->rotationData.axis.z};
-    if (ImGui::InputFloat("rotate degree", &rotate, 1.0, 20.0, 0) || ImGui::InputFloat3("rotate axis", axis, 0))
+    edit0 = ImGui::InputFloat("rotate degree", &rotate, 1.0, 20.0, 0);
+    edit1 =  ImGui::InputFloat3("rotate axis", axis, 0);
+    if (edit0 || edit1)
     {
         transform->rotate(glm::vec3{axis[0], axis[1], axis[2]}, rotate);
     }
@@ -806,6 +808,10 @@ void GameEditor::dragSprite()
 {
     static Transform *target = nullptr;
     static int lastX, lastY;
+    if (ImGui::IsMouseClicked(2)) 
+    {
+        ImGui::SetWindowFocus("Resource");
+    }
     if (ImGui::IsWindowFocused())
     {
         int mouseX, mouseY;

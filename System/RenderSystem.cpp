@@ -81,9 +81,10 @@ void RenderSystem::render()
     renderGame();
 
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffers[FramebuffersIndex::VolumetricLight]);
-    glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
     glViewport(0, 0, sceneWidth, sceneHeight);
+    glBlendFunc(GL_ONE, GL_ONE);
     for (auto c : VolumetricLight::collection)
     {
         if (!c->entity->isEnable())
@@ -91,7 +92,7 @@ void RenderSystem::render()
         render(c);
     }
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-
+    glBlendFunc(GL_ONE, GL_ZERO);
 #if SETTINGS_ENGINEMODE
     //glBindFramebuffer(GL_FRAMEBUFFER, sceneFramebuffer);
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
