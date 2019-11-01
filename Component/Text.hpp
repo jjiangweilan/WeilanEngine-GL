@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Component.hpp"
-#include "../Graphics/Texture.hpp"
+#include "../Graphics/Character.hpp"
 #include "../Graphics/Shader.hpp"
 #include "../Utility/Utility.hpp"
 
@@ -17,6 +17,7 @@ enum class Language
 	Korean,
 	English
 };
+
 class Text : public Component
 {
 	COMPONENT_DECLARATION(Component, Text, 32);
@@ -42,10 +43,10 @@ public:
 	/** Configure Text*/
 	void setLanguage(const Language &choice);
 	/* structs *************************************/
-	struct Character
+	struct CharacterETX
 	{
-		Character(Texture *t, const int &x, const int &rows);
-		Texture *texture;
+		CharacterETX(Character *c, const int &x, const int &rows);
+		Character *character;
 		int x;
 		int offsetY;
 		glm::mat4 getTextTransform();
@@ -57,20 +58,20 @@ public:
 	float animationSpeed;
 	size_t renderUntilCharacter();
 
-	const Shader* getShader() const;
+	const Shader *getShader() const;
 
 	/**
 	 * @brief Get the Time Passed object
 	 * 
 	 * @return const float& the time passed since the text started render
 	 */
-	const float& getTimePassed() const;
+	const float &getTimePassed() const;
 
 private:
 	Shader *m_shader;
 	float m_timePassed;
 
-	std::vector<Character> text;
+	std::vector<CharacterETX> text;
 	int textRenderIndex;
 	std::wstring textString;
 	Language language;

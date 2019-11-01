@@ -43,7 +43,7 @@ void OpenGLTest::drawSprite(const glm::mat4& view, const glm::mat4 proj) {
     sprite->getShader()->setVec2("point1", body->shape->leftPoint + pos);
     sprite->getShader()->setVec2("point2", body->shape->rightPoint + pos);
 
-    glBindVertexArray(sprite->getMainTexture()->getVAO());
+    glBindVertexArray(sprite->getMesh()->getVAO());
 
     glStencilFunc(GL_ALWAYS, 1, 0xff); //always pass the stencil test
     glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
@@ -64,7 +64,7 @@ void OpenGLTest::drawOutline(const glm::mat4& view, const glm::mat4 proj) {
     glUniformMatrix4fv(glGetUniformLocation(outlineShader->ID, "model"), 1, GL_FALSE, &transform->getModel()[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(outlineShader->ID, "view"), 1, GL_FALSE, &view[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(outlineShader->ID, "projection"), 1, GL_FALSE, &proj[0][0]);
-    glBindVertexArray(sprite->getMainTexture()->getVAO());
+    glBindVertexArray(sprite->getMesh()->getVAO());
 
     glStencilFunc(GL_NOTEQUAL, 1, 0xff);
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);

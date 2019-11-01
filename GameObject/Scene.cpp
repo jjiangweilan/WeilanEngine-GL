@@ -15,7 +15,7 @@
 
 namespace wlEngine {
 void Scene::update() {
-    camera->getComponent<Camera2D>()->update();
+    camera->getComponent<Camera>()->update();
 }
 
 Scene::Scene() : sceneGraph(), gameObjectAllocator() {}
@@ -80,11 +80,10 @@ Entity *Scene::loadGameObjectFromFile(const Json &go_json, const std::string &id
 
 void Scene::addComponent(Entity *go, const Json &components) {
     for (auto &iter : components) {
-        if (iter["name"] == "Camera2D")
-            setCamera(go);
-            
+		auto k = Component::getComponentFactoryList();
+		auto g = std::hash<std::string>()(iter["name"]);
         auto componentGenerator = (*Component::getComponentFactoryList())[std::hash<std::string>()(iter["name"])];
-        assert(componentGenerator != nullptr && "component is not editable!");
+        assert(componentGenerator && "component is not editable!");
 
         auto args_json = iter["params"];
         std::vector<void *> args(args_json.size());
@@ -111,6 +110,11 @@ void Scene::addComponent(Entity *go, const Json &components) {
             i++;
         }
         componentGenerator(go, args.data());
+
+		if (iter["name"] == "Camera2D" || iter["name"] == "Camera3D") 
+		{
+			setCamera(go);
+		}
     }
 }
 
@@ -194,7 +198,7 @@ Entity *Scene::findGameObjectNearHelper(std::set<Entity *>::iterator iter, std::
         auto sprite = (*iter)->getComponent<Sprite>();
         if (transform && sprite) {
             auto pos = transform->position;
-            auto sizeHalf = glm::vec2(sprite->getMainTexture()->getClipRect().width, sprite->getMainTexture()->getClipRect().height) / 2.0f;
+            auto sizeHalf = glm::vec2(sprite->getMesh()->getClipRect()->width, sprite->getMesh()->getClipRect()->height) / 2.0f;
             int minX = pos.x - sizeHalf.x;
             int minY = pos.y - sizeHalf.y;
             int maxX = pos.x + sizeHalf.x;

@@ -4,24 +4,60 @@
 
 namespace wlEngine
 {
-COMPONENT_DEFINATION(Component, Camera2D, 3);
+
+COMPONENT_DEFINATION_NEW(Camera, Camera2D);
 COMPONENT_EDITABLE_DEF(Camera2D);
 
-Camera2D::Camera2D(Entity *go) : Component(go)
+
+Camera2D::Camera2D(Entity *go) : Camera(go)
 {
-    viewport = RenderSystem::get()->getSceneSize();
-    viewportScale = viewport.x / viewport.y;
-    transform = go->getComponent<Transform>();
 }
 
-const CoordTransform &Camera2D::getTransformMatrix()
+Camera2D::Camera2D(Entity *go, void **data) : Camera(go)
 {
-    //#if SETTINGS_ENGINEMODE
-
-    //#endif
-    coordTransform.view = glm::lookAt(transform->position, transform->position + glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
-    coordTransform.projection = glm::ortho(0.0f, (float)viewport.x, 0.0f, (float)viewport.y, -1000000.0f, 1000000.0f);
-    return coordTransform;
 }
 
+glm::mat4 Camera2D::getViewMatrix() const
+{
+	auto transform = entity->getComponent<Transform>();
+    return glm::lookAt(transform->position, transform->position + glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+}
+
+glm::mat4 Camera2D::getProjMatrix() const
+{
+    return m_projMatrix;
+}
+
+void Camera2D::setProjectionMatrix(const float &left, const float &right,
+                                   const float &bottom, const float &top, const float &zNear, const float &zFar)
+{
+    m_projMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
+}
+
+void Camera2D::update()
+	{
+		auto transform = entity->getComponent<Transform>();
+		const int DEAD_ZONE = 10000;
+		ControllerAxisType xx, yy;
+		xx = Input::getControllerAxis(ControllerAxis::AxisRightX);
+		yy = Input::getControllerAxis(ControllerAxis::AxisRightY); 
+
+		int radius2 = xx * xx + yy * yy;
+		if (radius2 < 100000000)
+		{
+			xx = 0;
+			yy = 0;
+		}
+
+		float x = (float)xx / Input::AXIS_MAX;
+		float y = (float)yy / Input::AXIS_MAX;
+		float left = Input::getKeyStatus(SDL_SCANCODE_J) - x;
+		float right = Input::getKeyStatus(SDL_SCANCODE_L) + x;
+		float up = Input::getKeyStatus(SDL_SCANCODE_I) + y;
+		float down = Input::getKeyStatus(SDL_SCANCODE_K) - y;
+		transform->moveBy(Time::deltaTime * 3000 * (-left + right), Time::deltaTime * 3000 * (up - down), 0);
+        
+        auto size = RenderSystem::get()->getSceneSize();
+        setProjectionMatrix(0, size.x, 0, size.y, -100000,100000);
+	}
 } // namespace wlEngine

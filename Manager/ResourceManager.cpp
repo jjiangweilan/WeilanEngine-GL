@@ -77,12 +77,12 @@ const TextureMap &ResourceManager::getTextures()
     return textures;
 }
 
-TextInfo *ResourceManager::getTextTexture(const wchar_t &wideCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight)
+Character *ResourceManager::getCharacter(const wchar_t &wideCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight)
 {
     std::wstring id = std::wstring(1, wideCharacter) + L"_" + std::to_wstring(pixelSizeWidth) + L"_" + std::to_wstring(pixelSizeHeight); // IMPROVE: we can write this as a struct to improve performance
-    auto iter = textTextures.find(id);
-    if (iter != textTextures.end())
-        return &textTextures[id];
+    auto iter = characters.find(id);
+    if (iter != characters.end())
+        return &characters[id];
 
     FT_UInt glyph_index = FT_Get_Char_Index(face, (FT_ULong)wideCharacter);
     FT_Error error = FT_Set_Pixel_Sizes(
@@ -91,10 +91,9 @@ TextInfo *ResourceManager::getTextTexture(const wchar_t &wideCharacter, const in
     error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
     error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
 
-    auto &t = textTextures[id];
-    t.text.loadFromFTBitmap(face->glyph);
-    t.face = face;
-    return &t;
+    auto characterTexture = textTextures[id].loadFromFTBitmap(face->glyph);
+    characters[id] = Character(face, characterTexture);
+    return &characters[id];
 }
 
 Json &ResourceManager::getNpcJsonData()

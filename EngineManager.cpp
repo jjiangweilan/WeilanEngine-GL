@@ -52,6 +52,10 @@ void EngineManager::postInitialization() {
     for (auto &luaScript : LuaScript::collection) {
         luaScript->postInit();
     }
+
+    for (auto& system : System::collection) {
+        system->postInit();
+    }
 }
 
 EngineManager *EngineManager::getwlEngine() {
@@ -59,6 +63,7 @@ EngineManager *EngineManager::getwlEngine() {
         return engine;
 
     engine = new EngineManager();
+
     return engine;
 }
 
@@ -128,4 +133,8 @@ void EngineManager::initializeSystems() {
 
 void EngineManager::initializeManagers() { ResourceManager::init(); }
 void EngineManager::addGameplaySystem(System *s) { gameplaySystem.push_back(s); }
+void EngineManager::start() {
+    postInitialization();
+    loop();
+}
 } // namespace wlEngine

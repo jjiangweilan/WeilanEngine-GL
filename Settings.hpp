@@ -17,5 +17,10 @@ extern enum class DebugRender {
     On,
     Off
 } debugRender;
+
+extern enum class GameDimension {
+    Two,
+    Three
+} gameDimension;
 } // namespace Settings
 } // namespace wlEngine

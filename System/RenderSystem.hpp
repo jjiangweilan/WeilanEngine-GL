@@ -3,8 +3,6 @@
 
 #include "../Settings.hpp"
 
-#include "../Component/Camera2D.hpp"
-
 #include <glad/glad.h>
 #include <SDL.h>
 #include <string>
@@ -17,7 +15,7 @@ class Sprite;
 class Model;
 class Text;
 class GameEditor;
-class Camera3D;
+class Camera;
 class Shader;
 class VolumetricLight;
 namespace FramebuffersIndex
@@ -66,7 +64,6 @@ private:
   int sceneWidth = 1280;
   int sceneHeight = 720;
   const int topMenuHeight = 20;
-  CoordTransform coordTransform;
 
   const int FramebufferSize;
   /**
@@ -82,6 +79,7 @@ private:
   GLuint sceneEBO;
 
   RenderSystem();
+  void updateFrameSettings();
 
   void SDLInit();
   void ImGuiInit();
@@ -95,19 +93,26 @@ private:
   SDL_GLContext glContext;
   SDL_Window *window;
   GameEditor *gameEditor;
-  Camera2D *camera2D = nullptr;
-  Camera3D *camera3D = nullptr; // under development
+  Camera *camera = nullptr;
 
   glm::mat4 projection;
 
   int windowResizeCallback(void *data, SDL_Event *event);
   static int windowResizeCallbackWrapper(void *data, SDL_Event *event);
 
+  void postInit() override;
+
   friend class PhysicsDebugDraw;
   friend class GameEditor;
   friend class EngineManager;
 
 private:
+  EngineManager* m_engine;
+
+  // used to store information for each frame update
+  glm::mat4 m_projMatrix;
+  glm::mat4 m_viewMatrix;
+
   void genFramebuffer(GLuint &fb, GLuint &ft, GLuint &ds);
   void initSceneFrambufferData();
   void combineTheFramebuffersToFramebuffer(const GLuint &framebufferTarget);

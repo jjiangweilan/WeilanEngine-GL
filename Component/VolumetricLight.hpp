@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.hpp"
-#include "../Graphics/Texture.hpp"
+#include "../Graphics/Mesh2D.hpp"
 namespace wlEngine
 {
 class Shader;
@@ -14,11 +14,11 @@ public:
     VolumetricLight(Entity *, void **args);
     void loadTexture(const std::string &file);
 
-    const std::vector<Texture> &getTextures() const;
+    const Mesh2D* getMesh() const;
     const Shader *getShader() const;
 
 private:
-    std::vector<Texture> m_textures;
+    Mesh2D m_mesh;
     Shader *m_shader;
 };
 

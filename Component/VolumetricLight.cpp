@@ -12,19 +12,20 @@ VolumetricLight::VolumetricLight(Entity *entity) : Component(entity)
 }
 VolumetricLight::VolumetricLight(Entity *, void **data) : Component(entity)
 {
+    //std::string path = volu
 }
 
-void VolumetricLight::loadTexture(const std::string &file)
+const Mesh2D* VolumetricLight::getMesh() const
 {
-    m_textures.emplace_back(file);
-}
-const std::vector<Texture> &VolumetricLight::getTextures() const
-{
-    return m_textures;
+    return &m_mesh;
 }
 const Shader *VolumetricLight::getShader() const
 {
     return m_shader;
+}
+void VolumetricLight::loadTexture(const std::string &file)
+{
+    m_mesh.addTexture(file);
 }
 
 } // namespace wlEngine

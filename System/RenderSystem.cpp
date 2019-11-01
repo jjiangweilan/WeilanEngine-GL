@@ -10,6 +10,10 @@
 #include "../Component/Text.hpp"
 #include "../Component/TRigidbody.hpp"
 #include "../Component/VolumetricLight.hpp"
+#include "../Component/Camera2D.hpp"
+#include "../Component/Camera3D.hpp"
+
+#include "../Graphics/Mesh2D.hpp"
 
 #include "../GameEditor/GameEditor.hpp"
 
@@ -31,6 +35,7 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     Shader::loadShader("Basic", ROOT_DIR + "/Shader/Basic.vert", ROOT_DIR + "/Shader/Basic.frag");
     Shader::loadShader("Sprite", ROOT_DIR + "/Shader/Sprite.vert", ROOT_DIR + "/Shader/Sprite.frag");
     Shader::loadShader("Text", ROOT_DIR + "/Shader/Text.vert", ROOT_DIR + "/Shader/Text.frag");
+    Shader::loadShader("Model", ROOT_DIR + "/Shader/Model.vert", ROOT_DIR + "/Shader/Model.frag");
     sceneShader = Shader::collection["Scene"];
 
     gameEditor = new GameEditor;
@@ -71,10 +76,6 @@ void RenderSystem::init() { renderSystem = new RenderSystem(); }
 
 void RenderSystem::render()
 {
-#if SETTINGS_GAME_DIMENSION == 0
-    camera2D = EngineManager::getwlEngine()->getCurrentScene()->getCamera()->getComponent<Camera2D>();
-    coordTransform = camera2D->getTransformMatrix();
-#endif
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffers[FramebuffersIndex::Main]);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
     glViewport(0, 0, sceneWidth, sceneHeight);
@@ -124,7 +125,6 @@ void RenderSystem::debugRender()
         auto shape = rb->shape->getShapeType();
         if (shape == ShapeType::Polygon || shape == ShapeType::Line)
         {
-            auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera()->getComponent<Camera2D>();
             std::vector<glm::vec2> vertices;
             if (shape == ShapeType::Polygon)
                 vertices = static_cast<PolygonShape *>(rb->shape)->getPoints();
@@ -153,8 +153,8 @@ void RenderSystem::debugRender()
 #else
             proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
 #endif
-            physicsDebugDrawShader->setMat4("view", coordTransform.view);
-            physicsDebugDrawShader->setMat4("projection", coordTransform.projection);
+            physicsDebugDrawShader->setMat4("view", m_viewMatrix);
+            physicsDebugDrawShader->setMat4("projection",m_projMatrix);
             glm::vec3 color;
             if (rb->type == BodyType::Dynamic)
                 color = {1, 0, 0};
@@ -168,7 +168,6 @@ void RenderSystem::debugRender()
         }
         else if (shape == ShapeType::Circle)
         {
-            auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera()->getComponent<Camera2D>();
             auto circle = static_cast<CircleShape *>(rb->shape);
             float centerX = circle->center.x;
             float centerY = circle->center.y;
@@ -198,8 +197,8 @@ void RenderSystem::debugRender()
 #else
             proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
 #endif
-            physicsDebugDrawShader->setMat4("view", coordTransform.view);
-            physicsDebugDrawShader->setMat4("projection", coordTransform.projection);
+            physicsDebugDrawShader->setMat4("view", m_viewMatrix);
+            physicsDebugDrawShader->setMat4("projection",m_projMatrix);
             glm::vec3 color;
             if (rb->type == BodyType::Dynamic)
                 color = {1, 0, 0};
@@ -212,7 +211,6 @@ void RenderSystem::debugRender()
 
         // render render line
         {
-            auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera()->getComponent<Camera2D>();
             auto shape = rb->shape;
             std::vector<glm::vec2> vertices = {shape->leftPoint, shape->rightPoint};
 
@@ -239,8 +237,8 @@ void RenderSystem::debugRender()
 #else
             proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
 #endif
-            physicsDebugDrawShader->setMat4("view", coordTransform.view);
-            physicsDebugDrawShader->setMat4("projection", coordTransform.projection);
+            physicsDebugDrawShader->setMat4("view", m_viewMatrix);
+            physicsDebugDrawShader->setMat4("projection",m_projMatrix);
             glm::vec3 color;
             color = {0.3, 0.8, 0.8};
             physicsDebugDrawShader->setVec3("color", glm::vec3(color.r, color.g, color.b));
@@ -253,7 +251,20 @@ void RenderSystem::debugRender()
 
 void RenderSystem::update()
 {
+    updateFrameSettings();
     render();
+}
+
+void RenderSystem::updateFrameSettings() 
+{
+    //why we get the Camera2D then the Camera3D, instead of get the Camera?
+    //this is a trick to force the isComponentRegs of Camera2D and Camera3D to initialize
+    //the program will use dynamic initialization if no function of the class is called within the program (won't count lambda), this is wired...
+    camera = m_engine->getCurrentScene()->getCamera()->getComponent<Camera2D>();
+    if (!camera) camera = m_engine->getCurrentScene()->getCamera()->getComponent<Camera3D>();
+    
+    m_viewMatrix = camera->getViewMatrix();
+    m_projMatrix = camera->getProjMatrix();
 }
 
 int RenderSystem::windowResizeCallbackWrapper(void *data, SDL_Event *event)
@@ -344,6 +355,13 @@ void RenderSystem::renderGame()
 {
     auto currentScene = EngineManager::getwlEngine()->getCurrentScene();
 
+    for (auto c : Model::collection)
+    {
+        if (!c->entity->isEnable() || c->entity->getScene() != currentScene)
+            continue;
+        render(c);
+    }
+
     for (auto c : Sprite::collection)
     {
         if (!c->entity->isEnable() || c->entity->getScene() != currentScene)
@@ -361,16 +379,16 @@ void RenderSystem::renderGame()
 void RenderSystem::render(VolumetricLight *vl)
 {
     auto vlShader = vl->getShader();
-    auto &vlTextures = vl->getTextures();
+    auto mesh = vl->getMesh();
+    auto& vlTextures = *mesh->getTextures();
     vlShader->use();
     auto transform = vl->entity->getComponent<Transform>();
     vlShader->setMat4("model", transform->getModel());
-    vlShader->setMat4("view", coordTransform.view);
-    vlShader->setMat4("projection", coordTransform.projection);
+    vlShader->setMat4("view", m_viewMatrix);
+    vlShader->setMat4("projection", m_projMatrix);
 
-    int vao = vlTextures[0].getVAO();
-    int t = vlTextures[0].getId();
-    glBindVertexArray(vao);
+    int t = vlTextures[0]->getId();
+    glBindVertexArray(mesh->getVAO());
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, t);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
@@ -385,13 +403,14 @@ void RenderSystem::render(Text *t)
     size_t till = t->renderUntilCharacter();
     for (size_t i = 0; i < till; i++)
     {
-        auto &character = t->text[i];
-        glBindTexture(GL_TEXTURE_2D, character.texture->getId());
+        auto &characterETX = t->text[i];
+        auto mesh = characterETX.character->getMesh();
+        glBindTexture(GL_TEXTURE_2D, mesh->getTextures()->at(0)->getId());
 
-        t->getShader()->setMat4("model", model * character.getTextTransform());
-        t->getShader()->setMat4("view", coordTransform.view);
-        t->getShader()->setMat4("projection", coordTransform.projection);
-        glBindVertexArray(character.texture->getVAO());
+        t->getShader()->setMat4("model", model * characterETX.getTextTransform());
+        t->getShader()->setMat4("view", m_viewMatrix);
+        t->getShader()->setMat4("projection", m_projMatrix);
+        glBindVertexArray(mesh->getVAO());
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
 
@@ -406,51 +425,46 @@ void RenderSystem::render(Sprite *t)
 
     if (t->draw)
     {
-        t->draw(coordTransform.view, coordTransform.projection);
+        t->draw(m_viewMatrix, m_projMatrix);
         return;
     }
 
-    int i = 0;
     t->getShader()->use();
     if (t->beforeRenderFunc)
         t->beforeRenderFunc();
-    //
-    // main texture
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, t->getMainTexture()->getId());
+
+    auto mesh = t->getMesh();
+    auto textures = mesh->getTextures();
+    for (int i = 0; i < textures->size(); i++)
+    {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, textures->at(i)->getId());
+        Shader::setUniform(1000 + i, i);
+    }
+
     auto animation = t->entity->getComponent<Animation>();
     auto tRigidbody = t->entity->getComponent<TRigidbody>();
     auto transform = t->entity->getComponent<Transform>();
     if (animation)
-        t->getMainTexture()->clip(animation->getCurrentClip(), true);
+        t->getMesh()->clip(animation->getCurrentClip());
 
-    // other textures
-    for (auto &texture : t->getTextures())
-    {
-        i++;
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, texture.second->getId());
-        if (animation)
-            texture.second->clip(animation->getCurrentClip(), true);
-        t->getShader()->setInt(texture.first, i);
-    }
-
-    t->getShader()->setMat4("model", transform->getModel());
-    t->getShader()->setMat4("view", coordTransform.view);
-    t->getShader()->setMat4("projection", coordTransform.projection);
-    t->getShader()->setFloat("transparency", t->transparency);
+    //set the uniform values according to the shader
+    Shader::setUniform(0, transform->getModel());
+    Shader::setUniform(1, m_viewMatrix);
+    Shader::setUniform(2, m_projMatrix);
+    Shader::setUniform(7, t->transparency);
     if (tRigidbody)
     {
-        t->getShader()->setInt("hasTRigidbody", 1);
+        Shader::setUniform(3, 1); // shaTRigidbody;
         glm::vec2 pos = transform->position;
-        t->getShader()->setVec2("point1", tRigidbody->shape->leftPoint + pos);
-        t->getShader()->setVec2("point2", tRigidbody->shape->rightPoint + pos);
+        Shader::setUniform(4, tRigidbody->shape->leftPoint + pos);
+        Shader::setUniform(5, tRigidbody->shape->rightPoint + pos);
     }
     else
     {
-        t->getShader()->setInt("hasTRigidbody", 0);
+        Shader::setUniform(3, 0); // shaTRigidbody;
     }
-    glBindVertexArray(t->getMainTexture()->getVAO());
+    glBindVertexArray(mesh->getVAO());
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -463,60 +477,58 @@ void RenderSystem::render(Sprite *t)
 
 void RenderSystem::render(Model *model)
 {
-	auto gameObject = model->entity;
-    
+    auto gameObject = model->entity;
 
-        if (model->beforeRenderFunc)
-            model->beforeRenderFunc();
-        auto shader = model->shader;
-        auto transform = gameObject->getComponent<Transform>();
-        auto modelMatrix = transform->getModel();
+    if (model->beforeRenderFunc)
+        model->beforeRenderFunc();
+    auto shader = model->shader;
+    auto transform = gameObject->getComponent<Transform>();
+    auto modelMatrix = transform->getModel();
 
-        shader->use();
-        shader->setMat4("model", modelMatrix);
-        shader->setMat4("view", coordTransform.view);
-        shader->setMat4("projection", coordTransform.projection);
-        shader->setVec3("viewPos", camera2D->transform->position); // should be 3D
+    shader->use();
+    Shader::setUniform(0, modelMatrix);  //model
+    Shader::setUniform(1, m_viewMatrix); //view
+    Shader::setUniform(2, m_projMatrix); // projection
+    Shader::setUniform(12, camera->entity->getComponent<Transform>()->position);
 
-        for (auto &mesh : model->meshes)
+    for (auto &mesh : model->meshes)
+    {
+        // bind appropriate textures
+        unsigned int diffuseNr = 1;
+        unsigned int specularNr = 1;
+        unsigned int normalNr = 1;
+        unsigned int heightNr = 1;
+        for (unsigned int i = 0; i < mesh.textures.size(); i++)
         {
-            // bind appropriate textures
-            unsigned int diffuseNr = 1;
-            unsigned int specularNr = 1;
-            unsigned int normalNr = 1;
-            unsigned int heightNr = 1;
-            for (unsigned int i = 0; i < mesh.textures.size(); i++)
-            {
-                glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
-                // retrieve texture number (the N in diffuse_textureN)
-                std::string number;
-                std::string name = mesh.textures[i].type;
-                if (name == "texture_diffuse")
-                    number = std::to_string(diffuseNr++);
-                else if (name == "texture_specular")
-                    number = std::to_string(specularNr++); // transfer unsigned int to stream
-                else if (name == "texture_normal")
-                    number = std::to_string(normalNr++); // transfer unsigned int to stream
-                else if (name == "texture_height")
-                    number = std::to_string(heightNr++); // transfer unsigned int to stream
+            glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
+            // retrieve texture number (the N in diffuse_textureN)
+            std::string number;
+            std::string name = mesh.textures[i].type;
+            if (name == "texture_diffuse")
+                number = std::to_string(diffuseNr++);
+            else if (name == "texture_specular")
+                number = std::to_string(specularNr++); // transfer unsigned int to stream
+            else if (name == "texture_normal")
+                number = std::to_string(normalNr++); // transfer unsigned int to stream
+            else if (name == "texture_height")
+                number = std::to_string(heightNr++); // transfer unsigned int to stream
 
-                // now set the sampler to the correct texture unit
-                glUniform1i(glGetUniformLocation(model->shader->ID, (name + number).c_str()), i);
-                // and finally bind the texture
-                glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
-            }
-            //
-            // draw mesh
-            glBindVertexArray(mesh.VAO);
-            glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-
-            // always good practice to set everything back to defaults once configured.
-            glActiveTexture(GL_TEXTURE0);
-            if (model->afterRenderFunc)
-                model->afterRenderFunc();
+            // now set the sampler to the correct texture unit
+            glUniform1i(glGetUniformLocation(model->shader->ID, (name + number).c_str()), i);
+            // and finally bind the texture
+            glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
         }
-    
+        //
+        // draw mesh
+        glBindVertexArray(mesh.VAO);
+        glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+
+        // always good practice to set everything back to defaults once configured.
+        glActiveTexture(GL_TEXTURE0);
+        if (model->afterRenderFunc)
+            model->afterRenderFunc();
+    }
 }
 
 void RenderSystem::genFramebuffer(GLuint &fb, GLuint &ft, GLuint &ds)
@@ -584,5 +596,10 @@ void RenderSystem::combineTheFramebuffersToFramebuffer(const GLuint &framebuffer
     glBindTexture(GL_TEXTURE_2D, framebufferTextures[FramebuffersIndex::VolumetricLight]);
     sceneShader->setInt("volumetricLightSampler", 1);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void RenderSystem::postInit()
+{
+    m_engine = EngineManager::getwlEngine();
 }
 } // namespace wlEngine

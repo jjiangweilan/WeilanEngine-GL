@@ -5,19 +5,17 @@ in vec2 TexCoords;
 in vec3 Normal;
 in vec3 FragPos;
 
-uniform sampler2D texture_diffuse1;
-
 struct Light {
     vec3 position;
-
     vec3 diffuse;
     vec3 specular;
     vec3 ambient;
 };
 
-uniform Light light1;
-uniform Light light2;
-uniform vec3 viewPos;
+layout (location = 3) uniform sampler2D texture_diffuse1;
+layout (location = 4) uniform Light light1;
+layout (location = 8) uniform Light light2;
+layout (location = 12) uniform vec3 viewPos;
 
 vec3 calculateColor(Light light) {
     vec4 tex = texture(texture_diffuse1, TexCoords);
@@ -42,5 +40,5 @@ void main()
 {    
     vec3 rlt1 = calculateColor(light1);
     vec3 rlt2 = calculateColor(light2);
-    FragColor =  vec4(rlt1 + rlt2, 1.0);
+    FragColor =  texture(texture_diffuse1, TexCoords);//vec4(rlt1 + rlt2, 1.0);
 }

@@ -14,7 +14,6 @@ namespace wlEngine {
             void setScene(Scene*);
 
             
-            void loop();
             
             ~EngineManager();
 
@@ -22,12 +21,16 @@ namespace wlEngine {
             Scene* getCurrentScene() {return currentScene;};
 
             void addGameplaySystem(System*);
+
+            void start();
+        private:
+            void loop();
 			/**
 			* @brief initialize anything that needs to be inited before game loop
 			*/
 			void postInitialization();
-        private:
             bool quit;
+            
             EngineManager();
             static EngineManager* engine;
 

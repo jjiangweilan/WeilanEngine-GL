@@ -4,7 +4,7 @@
 
 #include "Animation.hpp"
 #include "Sprite.hpp"
-#include "../GameObject/Camera.hpp"
+#include "../Component/Camera.hpp"
 #include "../EngineManager.hpp"
 #include "../Settings.hpp"
 
@@ -12,7 +12,7 @@
 
 namespace wlEngine
 {
-COMPONENT_DEFINATION(Component, Sprite, 100);
+COMPONENT_DEFINATION(Component, Sprite, 64);
 COMPONENT_EDITABLE_DEF(Sprite);
 
 Sprite::~Sprite(){};
@@ -22,14 +22,17 @@ Sprite::Sprite(Entity *go) : Component(go), transparency(1)
     useShader("Sprite");
 };
 
-Sprite::Sprite(Entity *go, void **args) : Component(go), transparency(1)
+Sprite::Sprite(Entity *go, void **args) : Sprite(go)
 {
     if (args)
     {
         std::string path(*static_cast<std::string *>(args[0]));
         std::string shader(*static_cast<std::string *>(args[1]));
         auto resourceManager = ResourceManager::get();
-        m_mainTexture = resourceManager->getTexture(path);
+		if (path.size() != 0)
+        {
+            m_mesh.addTexture(path);
+        }
         useShader(shader);
     }
     else
@@ -41,23 +44,37 @@ Sprite::Sprite(Entity *go, void **args) : Component(go), transparency(1)
 Sprite::Sprite(Entity *go, const std::string &path) : Component(go), transparency(1)
 {
     auto resourceManager = ResourceManager::get();
-    m_mainTexture = resourceManager->getTexture(path);
+	loadTexture(path);
     useShader("Sprite");
+}
+
+void Sprite::loadTexture(const std::string& path) {
+	m_mesh.addTexture(path);
 }
 
 Sprite::Sprite(Entity *go, const std::string &path, const std::string &shader) : Sprite(go, path) { useShader(shader); }
 
-void Sprite::useShader(const std::string &name) { m_shader = Shader::collection[name]; }
-
-void Sprite::addTexture(const std::string &id, const std::string &path) { m_textures[id] = ResourceManager::get()->getTexture(path); }
-
-void Sprite::removeTexture(const std::string &id) { m_textures.erase(id); }
-void Sprite::setMainTexture(Texture *t)
-{
-    m_mainTexture = t;
+void Sprite::useShader(const std::string &name) 
+{ 
+	m_shader = Shader::collection[name];
+}
+const Shader *Sprite::getShader() const 
+{ 
+	return m_shader;
 }
 
-const std::map<std::string, Texture *> Sprite::getTextures() const { return m_textures; }
-const Texture *Sprite::getMainTexture() const { return m_mainTexture; }
-const Shader *Sprite::getShader() const { return m_shader; }
+const Mesh2D* Sprite::getMesh() const
+{
+	return &m_mesh;
+}
+
+void Sprite::changeTexture(const int &loc, Texture *texture)
+{
+    m_mesh.changeTexture(loc, texture);
+}
+
+Texture *Sprite::getMainTexture() const
+{
+    return m_mesh.getTextures()->at(0);
+}
 } // namespace wlEngine

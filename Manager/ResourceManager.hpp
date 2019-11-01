@@ -1,23 +1,21 @@
 #pragma once
 #include "../Graphics/Texture.hpp"
+#include "../Graphics/Character.hpp"
 
 #include <map>
 #include <string>
 #include <ft2build.h>
-#include <SDL_mixer.h>
 #include FT_FREETYPE_H
+#include <SDL_mixer.h>
 #include <json.hpp>
 
 namespace wlEngine
 {
-struct TextInfo
-{
-    Texture text;
-    FT_Face face;
-};
 using Json = nlohmann::json;
+
+//seperate texture and text texture because of they use different kinds of keys
 using TextureMap = std::map<std::string, Texture>;
-using TextTextureMap = std::map<std::wstring, TextInfo>;
+using CharacterMap = std::map<std::wstring, Character>;
 class ResourceManager
 {
 public:
@@ -29,7 +27,7 @@ public:
 
     const TextureMap &getTextures();
     /* FreeType *************************************/
-    TextInfo *getTextTexture(const wchar_t &wildCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight);
+    Character *getCharacter(const wchar_t &wildCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight);
 
     /* Get Data ***********************************/
     Json &getNpcJsonData();
@@ -44,7 +42,8 @@ private:
     static ResourceManager *resourceManager;
     ResourceManager();
     TextureMap textures;
-    TextTextureMap textTextures;
+    CharacterMap characters;
+    std::map<std::wstring, Texture> textTextures;
     Texture *loadTexture(const std::string &path);
 
     Json npcJsonData;

@@ -14,15 +14,47 @@ public:                                                            \
     static const std::size_t componentId;                          \
     virtual bool isType(const std::size_t &typeId) const override; \
     static std::set<T *> collection;                               \
-    static void destroy(T *ptr);                                   \
     template <typename... Args>                                    \
     static auto createComponent(Entity *go, Args &&... params)     \
     {                                                              \
-        auto ptr = new T(go, std::forward(params)...);             \
+        auto ptr = new T(go, std::forward<Args>(params)...);       \
         collection.insert(ptr);                                    \
         return std::shared_ptr<T>(ptr);                            \
     }                                                              \
+    static void destroy(T *ptr);                                   \
     virtual std::size_t getId() override;
+
+#define COMPONENT_DEFINATION_NEW(P, T)                               \
+    const std::size_t T::componentId = std::hash<std::string>()(#T); \
+    bool T::isType(const std::size_t &typeId) const                  \
+    {                                                                \
+        if (typeId == T::componentId)                                \
+            return true;                                             \
+        return P::isType(typeId);                                    \
+    }                                                                \
+    std::size_t T::getId() { return componentId; }                   \
+    std::set<T *> T::collection = std::set<T *>();                   \
+    void T::destroy(T *ptr)                                          \
+    {                                                                \
+        collection.erase(ptr);                                       \
+        delete ptr;                                                  \
+    }
+
+#define COMPONENT_DECLARATION_ABSTRACT(P, T)                       \
+public:                                                            \
+    static const std::size_t componentId;                          \
+    virtual bool isType(const std::size_t &typeId) const override; \
+    virtual std::size_t getId() override;
+
+#define COMPONENT_DEFINATION_ABSTRACT(P, T)                          \
+    const std::size_t T::componentId = std::hash<std::string>()(#T); \
+    bool T::isType(const std::size_t &typeId) const                  \
+    {                                                                \
+        if (typeId == T::componentId)                                \
+            return true;                                             \
+        return P::isType(typeId);                                    \
+    }                                                                \
+    std::size_t T::getId() { return componentId; }
 
 #define COMPONENT_DECLARATION(P, T, N)                                              \
 public:                                                                             \
@@ -61,14 +93,11 @@ public:                                                                         
 
 #define COMPONENT_EDITABLE_DEC()                                     \
 public:                                                              \
-    static std::function<void(Entity * go, void **arr)> addToEntity; \
     static bool isComponentReg;                                      \
-                                                                     \
 private:
 
 #define COMPONENT_EDITABLE_DEF(T)                                                                                       \
-    std::function<void(Entity *, void **)> T::addToEntity = [](Entity *go, void **args) { go->addComponent<T>(args); }; \
-    bool T::isComponentReg = registerComponent<T>();
+    bool T::isComponentReg = registerComponent<T>([](Entity *go, void **args) { go->addComponent<T>(args); });
 
 namespace wlEngine
 {
@@ -92,14 +121,14 @@ public:
     virtual std::size_t getId();
     virtual ~Component(){};
     template <class T>
-    static bool registerComponent();
+    static bool registerComponent(std::function<void(Entity *, void**)>);
     bool enable;
 };
 
 template <class T>
-bool Component::registerComponent()
+bool Component::registerComponent(std::function<void(Entity *, void**)> f)
 {
-    (*getComponentFactoryList())[T::componentId] = T::addToEntity;
+    (*getComponentFactoryList())[T::componentId] = f;
     return true;
 }
 } // namespace wlEngine

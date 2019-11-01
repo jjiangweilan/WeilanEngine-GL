@@ -1,22 +1,47 @@
 #include "Camera3D.hpp"
+
 #include "../Time.hpp"
+#include "../System/RenderSystem.hpp"
+
+#include "../GameObject/Entity.hpp"
 #include "../Component/Transform.hpp"
 namespace wlEngine
 {
-Camera3D::Camera3D() : Camera(), front(0, 0, -1), right(1, 0, 0)
+COMPONENT_DEFINATION_NEW(Camera, Camera3D);
+COMPONENT_EDITABLE_DEF(Camera3D);
+Camera3D::Camera3D(Entity* entity) : Camera(entity), front(0, 0, -1), right(1, 0, 0)
 {
     SDL_GetMouseState(&relX, &relY);
 };
+Camera3D::Camera3D(Entity *entity, void **data): Camera(entity), front(0, 0, -1), right(1, 0, 0)
+{
+}
 Camera3D::~Camera3D(){};
 
-glm::mat4 Camera3D::getViewMatrix()
+glm::mat4 Camera3D::getViewMatrix() const
 {
-    auto transform = getComponent<Transform>();
-    return glm::lookAt(transform->position, transform->position + front, glm::cross(right, front));
+    auto transform = entity->getComponent<Transform>();
+    return glm::lookAt(transform->position, transform->position + front,
+                       glm::cross(right, front));
+}
+
+glm::mat4 Camera3D::getProjMatrix() const
+{
+    return m_projMatrix;
+}
+
+void Camera3D::setProjectionMatrix(const float &fovy, const float &aspect,
+                                   const float &zNear, const float &zFar)
+{
+
+    m_projMatrix = glm::perspective(glm::radians(fovy), aspect,
+                                    zNear, zFar);
 }
 
 void Camera3D::update()
 {
+	auto sceneSize = RenderSystem::get()->getSceneSize();
+	setProjectionMatrix(glm::radians(45.0f), sceneSize.x / sceneSize.y, 0.1, 100000);
     updatePosition();
     updateEyeDirection();
     if (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON(SDL_BUTTON_LEFT))
@@ -53,11 +78,11 @@ void Camera3D::updateEyeDirection()
 }
 void Camera3D::updatePosition()
 {
+    auto transform = entity->getComponent<Transform>();
     auto keyboard = SDL_GetKeyboardState(nullptr);
     right = glm::normalize(glm::cross(front, WORLD_UP));
 
     float speedDelta = speed * Time::deltaTime;
-    auto transform = getComponent<Transform>();
     if (keyboard[SDL_SCANCODE_LEFT])
     {
         transform->position -= right * speedDelta;

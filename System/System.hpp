@@ -33,6 +33,7 @@ class System
 {
 public:
     virtual void update(){};
+    virtual void postInit(){};
     static std::unordered_set<System *> collection;
 
 protected:

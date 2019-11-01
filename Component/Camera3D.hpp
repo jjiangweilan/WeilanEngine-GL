@@ -8,10 +8,15 @@
 namespace wlEngine {
     class Camera3D : public Camera {
     public:
-        Camera3D();
+    COMPONENT_DECLARATION_NEW(Camera, Camera3D);
+    COMPONENT_EDITABLE_DEC();
+	public:
+        Camera3D(Entity* entity);
+        Camera3D(Entity* entity, void** data);
         ~Camera3D();
 
-		glm::mat4 getViewMatrix() override;
+        virtual glm::mat4 getViewMatrix() const override;
+        virtual glm::mat4 getProjMatrix() const override;
         void update() override;
 
         glm::vec3 front;
@@ -21,13 +26,17 @@ namespace wlEngine {
         //mouse
         int relX;
         int relY;
-        float sensitivity = 0.3;
+        float sensitivity = 0.03;
 		bool enableMouse = false;
         float pitch = 0;
         float yaw = -90;
 
-        float speed = 5;
+        float speed = 5000;
+        void setProjectionMatrix(const float &fovy, const float &aspect,
+                                 const float &zNear, const float &zFar) override;
+
     private:
+        glm::mat4 proj;
         void updateEyeDirection();
         void updatePosition();
     };

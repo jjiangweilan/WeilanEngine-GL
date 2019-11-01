@@ -21,18 +21,18 @@ void Text::loadText(const std::wstring &textStr)
     auto resourceManager = ResourceManager::get();
     int advance = 0;
     int offsetY = 0;
-    for (const wchar_t &character : textStr)
+    for (const wchar_t &rawCharacter : textStr)
     {
-        if (character == L'\n')
+        if (rawCharacter == L'\n')
         {
             offsetY -= 40; // note: 40 is a magic number! becuase we use FT_Set_Pixel_Sizes(face, 32, 32); in ResourceManager! Be aware!
             advance = 0;
             continue;
         }
-        auto textInfo = resourceManager->getTextTexture(character, 24, 24);
+        auto character = resourceManager->getCharacter(rawCharacter, 24, 24);
 
-        text.emplace_back(&textInfo->text, advance, offsetY);
-        advance += textInfo->face->glyph->advance.x >> 6; // The advance vector is expressed in 1/64th of pixels
+        text.emplace_back(character, advance, offsetY);
+        advance += character->getFace()->glyph->advance.x >> 6; // The advance vector is expressed in 1/64th of pixels
     }
 }
 
@@ -58,7 +58,7 @@ void Text::loadText(const std::wstring &textStr, const int &maxLineWidth, const 
 void Text::loadText(const std::string &textStr, const int &maxLineWidth, const int &lineSpace, const int &charWidth, const int &charHeight)
 {
 
-    std::wstring str(textStr.length(), L' '); // Make room for characters
+    std::wstring str(textStr.length(), L' '); // Make room for rawCharacters
     // Copy string to wstring.
     std::copy(textStr.begin(), textStr.end(), str.begin());
     loadText(str, maxLineWidth, lineSpace, charWidth, charHeight);
@@ -69,26 +69,26 @@ void Text::loadChinese(const std::wstring &textStr, const int &maxLineWidth, con
     auto resourceManager = ResourceManager::get();
     int totalAdvance = 0;
     int offsetY = 0;
-    for (const wchar_t &character : textStr)
+    for (const wchar_t &rawCharacter : textStr)
     {
-        auto textInfo = resourceManager->getTextTexture(character, charWidth, charHeight);
+        auto character = resourceManager->getCharacter(rawCharacter, charWidth, charHeight);
 
-        if (character == L'\n')
+        if (rawCharacter == L'\n')
         {
             offsetY -= lineSpace;
             totalAdvance = 0;
             continue;
         }
-        if (totalAdvance + (textInfo->face->glyph->advance.x >> 6) > maxLineWidth)
+        if (totalAdvance + (character->getFace()->glyph->advance.x >> 6) > maxLineWidth)
         {
             offsetY -= lineSpace;
             totalAdvance = 0;
         }
-        if (character == L' ' && totalAdvance == 0)
+        if (rawCharacter == L' ' && totalAdvance == 0)
             continue;
 
-        text.emplace_back(&textInfo->text, totalAdvance, offsetY);
-        totalAdvance += textInfo->face->glyph->advance.x >> 6; // The totalAdvance vector is expressed in 1/64th of pixels
+        text.emplace_back(character, totalAdvance, offsetY);
+        totalAdvance += character->getFace()->glyph->advance.x >> 6; // The totalAdvance vector is expressed in 1/64th of pixels
     }
 }
 
@@ -99,11 +99,11 @@ void Text::loadEnglish(const std::wstring &textStr, const int &maxLineWidth, con
     int offsetY = 0;
     for (int i = 0; i < textStr.size(); i++)
     {
-        const wchar_t &character = textStr[i];
-        if (character != L' ')
+        const wchar_t &rawCharacter = textStr[i];
+        if (rawCharacter != L' ')
         {
             // if the first char is line new, we directly offset Y
-            if (character == L'\n')
+            if (rawCharacter == L'\n')
             {
                 offsetY -= lineSpace;
                 totalAdvance = 0;
@@ -111,13 +111,13 @@ void Text::loadEnglish(const std::wstring &textStr, const int &maxLineWidth, con
             }
 
             // build this word, used to test maximum line width
-            std::vector<TextInfo *> word;
+            std::vector<Character *> word;
             int wordWidth = 0;
             while (textStr[i] != L'\n' && i < textStr.size())
             {
-                auto textInfo = resourceManager->getTextTexture(textStr[i], charWidth, charHeight);
-                word.push_back(textInfo);
-                wordWidth += textInfo->face->glyph->advance.x >> 6;
+                auto character = resourceManager->getCharacter(textStr[i], charWidth, charHeight);
+                word.push_back(character);
+                wordWidth += character->getFace()->glyph->advance.x >> 6;
                 if (textStr[i] == L' ')
                     break;
                 i++;
@@ -131,18 +131,18 @@ void Text::loadEnglish(const std::wstring &textStr, const int &maxLineWidth, con
             }
 
             // add the word to our text
-            for (auto textInfo : word)
+            for (auto character : word)
             {
-                if (totalAdvance + (textInfo->face->glyph->advance.x >> 6) > maxLineWidth)
+                if (totalAdvance + (character->getFace()->glyph->advance.x >> 6) > maxLineWidth)
                 {
                     offsetY -= lineSpace;
                     totalAdvance = 0;
                 }
-                if (character == L' ' && totalAdvance == 0)
+                if (rawCharacter == L' ' && totalAdvance == 0)
                     continue;
 
-                text.emplace_back(&textInfo->text, totalAdvance, offsetY);
-                totalAdvance += textInfo->face->glyph->advance.x >> 6; // The totalAdvance vector is expressed in 1/64th of pixels
+                text.emplace_back(character, totalAdvance, offsetY);
+                totalAdvance += character->getFace()->glyph->advance.x >> 6; // The totalAdvance vector is expressed in 1/64th of pixels
             }
 
             // the next char after the word is a new line, we offset Y
@@ -167,11 +167,11 @@ size_t Text::renderUntilCharacter()
     return rtn;
 }
 
-glm::mat4 Text::Character::getTextTransform() { return glm::translate(glm::mat4(1.0), {x, offsetY, 0}); }
+glm::mat4 Text::CharacterETX::getTextTransform() { return glm::translate(glm::mat4(1.0), {x, offsetY, 0}); }
 
 void Text::setLanguage(const Language &choice) { language = choice; }
 
-Text::Character::Character(Texture *t, const int &x, const int &offsetY) : texture(t), x(x), offsetY(offsetY) {}
+Text::CharacterETX::CharacterETX(Character *c, const int &x, const int &offsetY) : character(c), x(x), offsetY(offsetY) {}
 
 const Shader *Text::getShader() const
 {

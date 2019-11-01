@@ -2,8 +2,11 @@
 in vec2 texCoords;
 out vec4 fragColor;
 
-uniform sampler2D texture0;
-uniform float transparency;
+layout(location = 1000) uniform sampler2D texture0;
+layout(location = 1001) uniform sampler2D texture1;
+layout(location = 1002) uniform sampler2D texture2;
+layout(location = 1004) uniform sampler2D texture3;
+layout(location = 7) uniform float transparency;
 
 void main() {
     vec4 fragColorTemp = texture(texture0, texCoords);

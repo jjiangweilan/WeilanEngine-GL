@@ -41,8 +41,7 @@ int main() {
 
     vl->addComponent<Transform>(-480,225,0);
 
-    engine->postInitialization();
-    engine->loop();
+    engine->start();
 }
 
 void initGameplaySystem() {

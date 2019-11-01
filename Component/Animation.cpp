@@ -25,7 +25,7 @@ Animation::Animation(Entity *go, void **args) : Component(go), currentAnimation(
 {
     if (args)
     {
-        go->getComponent<Sprite>()->getMainTexture()->clip(getCurrentClip());
+        go->getComponent<Sprite>()->getMesh()->clip(getCurrentClip());
     }
 }
 
@@ -70,7 +70,7 @@ void Animation::playAnimation(const std::string &name, bool recursive, bool time
     currentAnimation = &animations[name];
 
     auto sprite = entity->getComponent<Sprite>();
-	sprite->setMainTexture(currentAnimation->atlas);
+	sprite->changeTexture(0, currentAnimation->atlas);
     currentFrame = 0;
 }
 

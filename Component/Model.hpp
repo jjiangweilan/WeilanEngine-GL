@@ -24,6 +24,7 @@ public:
     Model(Entity *go, const std::string &path, bool gamma = false) : Component(go), gammaCorrection(gamma)
     {
         loadModel(path);
+        shader = Shader::collection["Model"];
     }
 
     void destruct(Entity *go) override;
