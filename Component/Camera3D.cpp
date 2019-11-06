@@ -2,6 +2,7 @@
 
 #include "../Time.hpp"
 #include "../System/RenderSystem.hpp"
+#include "../GameEditor/GameEditor.hpp"
 
 #include "../GameObject/Entity.hpp"
 #include "../Component/Transform.hpp"
@@ -49,7 +50,7 @@ void Camera3D::update()
 
     updateEyeDirection();
     updatePosition();
-    if (Input::isMousePressing(MouseButton::Left))
+    if (Input::isMousePressing(MouseButton::Left) && RenderSystem::get()->getGameEditor()->isGameSceneFocused())
     {
         enableMouse = true;
         Input::getMouse(relX, relY);
@@ -73,8 +74,7 @@ void Camera3D::updateEyeDirection()
         relY = currY - relY;
 
         yaw += relX * sensitivity * Time::deltaTime;
-        pitch += relY * sensitivity * Time::deltaTime;
-
+		pitch += relY * sensitivity * Time::deltaTime;
         if (pitch > 89.0f)
             pitch = 89.0f;
         if (pitch < -89.0f)
@@ -94,14 +94,6 @@ void Camera3D::updatePosition()
     auto keyboard = SDL_GetKeyboardState(nullptr);
     float speedDelta = speed * Time::deltaTime;
 
-    //update y pos
-    if (enableMouse) {
-        if (Input::isMousePressing(MouseButton::Right))
-        {
-            transform->position.y += relY * speedDelta * 0.4;
-        }
-    }
-
     right = glm::normalize(glm::cross(front, WORLD_UP));
     if (keyboard[SDL_SCANCODE_LEFT])
     {
@@ -119,5 +111,13 @@ void Camera3D::updatePosition()
     {
         transform->position -= front * speedDelta;
     }
+
+	//update y pos
+	if (enableMouse) {
+		if (Input::isMousePressing(MouseButton::Right))
+		{
+			transform->position += (float)relY * glm::cross(right, front) * speedDelta * 0.4f;
+		}
+	}
 }
 } // namespace wlEngine

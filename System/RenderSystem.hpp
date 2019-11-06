@@ -117,5 +117,8 @@ private:
   void genFramebuffer(GLuint &fb, GLuint &ft, GLuint &ds);
   void initSceneFrambufferData();
   void combineTheFramebuffersToFramebuffer(const GLuint &framebufferTarget);
+
+  /* Uniform Buffers */
+  GLuint m_projectionUBO;
 };
 } // namespace wlEngine

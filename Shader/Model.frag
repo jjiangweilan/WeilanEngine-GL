@@ -45,7 +45,7 @@ void main()
     Light light;
     light.position = vec3(500,500,500);
     light.diffuse = vec3(0.4,0.4,0.4);
-    light.specular = vec3(0.2,0.2,0.2);
+    light.specular = vec3(0.6,0.6,0.6);
     light.ambient = vec3(0.1,0.1,0.1);
     vec3 rlt1 = calculateColor(light);
     //vec3 rlt2 = calculateColor(light2);

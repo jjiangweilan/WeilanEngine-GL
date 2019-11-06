@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "Mesh.hpp"
+#include "../Graphics/Texture.hpp"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -22,7 +23,7 @@ private:
 
     Model3D *loadModel(const std::string &name);
     void processNode(aiNode *node, const aiScene *scene);
-    std::vector<Texture *> loadMaterialTextures(aiMaterial *mat, aiTextureType textureType, std::string typeName, const aiScene *);
+    std::vector<Texture *> loadMaterialTextures(aiMaterial *mat, aiTextureType textureType, const TextureType& type, const aiScene *);
 
     friend class ResourceManager;
 };

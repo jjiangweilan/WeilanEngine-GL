@@ -92,16 +92,16 @@ void Model3D::processNode(aiNode *node, const aiScene *scene)
 
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-        std::vector<Texture*> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", scene);
+        std::vector<Texture*> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, TextureType::Diffuse, scene);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         // 2. specular maps
-        std::vector<Texture*> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", scene);
+        std::vector<Texture*> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TextureType::Specular, scene);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         // 3. normal maps
-        std::vector<Texture*> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal", scene);
+        std::vector<Texture*> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, TextureType::Height, scene);
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
         // 4. height maps
-        std::vector<Texture*> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height", scene);
+        std::vector<Texture*> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, TextureType::Ambient, scene);
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
         m_meshes.emplace_back(std::move(textures), std::move(indices), std::move(vertices));
@@ -113,7 +113,7 @@ void Model3D::processNode(aiNode *node, const aiScene *scene)
     }
 }
 
-std::vector<Texture*> Model3D::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName, const aiScene *scene)
+std::vector<Texture*> Model3D::loadMaterialTextures(aiMaterial *mat, aiTextureType type, const TextureType& myType, const aiScene *scene)
 {
     std::vector<Texture*> textures;
 
@@ -122,7 +122,7 @@ std::vector<Texture*> Model3D::loadMaterialTextures(aiMaterial *mat, aiTextureTy
         aiString str;
         mat->GetTexture(type, i, &str);
         // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
-        Texture* texture = ResourceManager::get()->getTexture(m_directory + "/" + str.C_Str());
+        Texture* texture = ResourceManager::get()->getTexture(m_directory + "/" + str.C_Str(), myType);
         bool skip = false;
         textures.push_back(texture);
     }

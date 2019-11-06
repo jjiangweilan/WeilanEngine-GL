@@ -22,6 +22,7 @@
 #include "../imgui/imgui_impl_sdl.h"
 #include "../imgui/imgui_impl_opengl3.h"
 
+#define UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS 0
 namespace wlEngine
 {
 RenderSystem *RenderSystem::renderSystem = nullptr;
@@ -37,6 +38,11 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     Shader::loadShader("Sprite", ROOT_DIR + "/Shader/Sprite.vert", ROOT_DIR + "/Shader/Sprite.frag");
     Shader::loadShader("Text", ROOT_DIR + "/Shader/Text.vert", ROOT_DIR + "/Shader/Text.frag");
     Shader::loadShader("Model", ROOT_DIR + "/Shader/Model.vert", ROOT_DIR + "/Shader/Model.frag");
+
+    auto modelShader = Shader::collection["Model"];
+    auto matricesIndex = glGetUniformBlockIndex(modelShader->ID, "Matrices");
+    glUniformBlockBinding(modelShader->ID, matricesIndex,UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS);
+
     sceneShader = Shader::collection["Scene"];
 
     gameEditor = new GameEditor;
@@ -55,6 +61,13 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     glGenBuffers(1, &physicsDebugVBO);
 #endif
 
+
+    //uniform buffers
+    glGenBuffers(1, &m_projectionUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, m_projectionUBO);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBindBufferBase(GL_UNIFORM_BUFFER, UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS, m_projectionUBO);
     registerSystem(this);
 }
 
@@ -266,6 +279,10 @@ void RenderSystem::updateFrameSettings()
     
     m_viewMatrix = camera->getViewMatrix();
     m_projMatrix = camera->getProjMatrix();
+
+    glBindBuffer(GL_UNIFORM_BUFFER, m_projectionUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &m_viewMatrix[0][0]);
+    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), &m_projMatrix[0][0]);
 }
 
 int RenderSystem::windowResizeCallbackWrapper(void *data, SDL_Event *event)
@@ -488,8 +505,6 @@ void RenderSystem::render(Model *model)
 
     shader->use();
     Shader::setUniform(0, modelMatrix);  //model
-    Shader::setUniform(1, m_viewMatrix); //view
-    Shader::setUniform(2, m_projMatrix); // projection
     Shader::setUniform(12, camera->entity->getComponent<Transform>()->position);
 
     for (auto &mesh : *model->getModel3D()->getMeshes())

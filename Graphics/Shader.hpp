@@ -17,11 +17,15 @@ class Shader
 {
 public:
     static std::map<std::string, Shader *> collection;
+    static void loadShader(const std::string &name, const std::string &vertexPath, const std::string& geometryPath, const std::string &fragmentPath);
     static void loadShader(const std::string &name, const std::string &vertexPath, const std::string &fragmentPath);
     static void deleteShader(const std::string &name);
     unsigned int ID;
-    Shader(const std::string &vertexPath, const std::string &fragmentPath);
-    Shader(const char *vertex, const char *fragment);
+    Shader(const std::string &vertexPath,
+           const std::string &fragmentPath);
+    Shader(const std::string &vertexPath,
+           const std::string &geometryPath,
+           const std::string &fragmentPath);
     Shader();
     ~Shader();
 
@@ -72,52 +76,54 @@ public:
         glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
     }
 
-    static void setUniform(const GLuint& location, const glm::mat4 &mat)
+    static void setUniform(const GLuint &location, const glm::mat4 &mat)
     {
         glUniformMatrix4fv(location, 1, GL_FALSE, &mat[0][0]);
     }
-    static void setUniform(const GLuint& location, const glm::mat3 &mat)
+    static void setUniform(const GLuint &location, const glm::mat3 &mat)
     {
         glUniformMatrix3fv(location, 1, GL_FALSE, &mat[0][0]);
     }
-    static void setUniform(const GLuint& location, const glm::mat2 &mat)
+    static void setUniform(const GLuint &location, const glm::mat2 &mat)
     {
         glUniformMatrix2fv(location, 1, GL_FALSE, &mat[0][0]);
     }
-    static void setUniform(const GLuint& location, const glm::vec2& vec)
+    static void setUniform(const GLuint &location, const glm::vec2 &vec)
     {
         glUniform2fv(location, 1, &vec[0]);
     }
-    static void setUniform(const GLuint& location, const float& x, const float& y)
+    static void setUniform(const GLuint &location, const float &x, const float &y)
     {
         glUniform2f(location, x, y);
     }
-    static void setUniform(const GLuint& location, const glm::vec3& vec)
+    static void setUniform(const GLuint &location, const glm::vec3 &vec)
     {
         glUniform3fv(location, 1, &vec[0]);
     }
-    static void setUniform(const GLuint& location, const float& x, const float& y, const float& z)
+    static void setUniform(const GLuint &location, const float &x, const float &y, const float &z)
     {
         glUniform3f(location, x, y, z);
     }
-    static void setUniform(const GLuint& location, const float& v)
+    static void setUniform(const GLuint &location, const float &v)
     {
         glUniform1f(location, v);
     }
-    static void setUniform(const GLuint& location, const int& v)
+    static void setUniform(const GLuint &location, const int &v)
     {
         glUniform1i(location, v);
     }
-    static void setUniform(const GLuint& location, const unsigned int& v)
+    static void setUniform(const GLuint &location, const unsigned int &v)
     {
         glUniform1i(location, v);
     }
-    static void setUniform(const GLuint& location, const bool& v)
+    static void setUniform(const GLuint &location, const bool &v)
     {
         glUniform1i(location, v);
     }
 
 private:
-    void checkCompileErrors(unsigned int shader, std::string type);
+    GLuint createShaderFromFile(const std::string &path, const GLenum &type);
+    GLuint createProgram(const GLuint &vertexShader, const GLuint &geometryShader, const GLuint &fragmentShader);
+    GLuint createProgram(const GLuint &vertexShader, const GLuint &fragmentShader);
 };
 } // namespace wlEngine

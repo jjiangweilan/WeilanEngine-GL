@@ -40,6 +40,8 @@ public:
 		 * @return
 		 */
     bool mousePressingOnScene(int &x, int &y, bool world = false, int mouse = 0);
+
+    bool isGameSceneFocused() const;
 private:
     /********************** Data ***************************/
     Entity *selectedGameObject;
@@ -50,6 +52,7 @@ private:
     std::function<void()> helperWindowFunc;
     float gameplayWindowOffsetX;
     float gameplayWindowOffsetY;
+    bool m_isGameSceneFocused;
 
     void showGameObjectInfo();
     void showAllGameObjects();

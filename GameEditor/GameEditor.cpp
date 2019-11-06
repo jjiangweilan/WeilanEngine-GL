@@ -26,7 +26,7 @@
 #include <dirent.h>
 namespace wlEngine
 {
-GameEditor::GameEditor() : selectedGameObject(nullptr), selectedTRigidbody(nullptr), editVertex(false), editLine(false)
+GameEditor::GameEditor() : selectedGameObject(nullptr), selectedTRigidbody(nullptr), editVertex(false), editLine(false), m_isGameSceneFocused(true)
 {
 }
 
@@ -107,6 +107,7 @@ void GameEditor::showGameWindow(void **data)
     windowName += "###GameScene";
     ImGui::SetNextWindowPos({450, 30}, ImGuiCond_FirstUseEver);
     ImGui::Begin(windowName.data(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
+    m_isGameSceneFocused = ImGui::IsWindowFocused();
     gameplayWindowOffsetX = ImGui::GetWindowPos().x;
     gameplayWindowOffsetY = ImGui::GetWindowPos().y + 20;
     float sceneWidth = *(int *)(data[1]);
@@ -1039,5 +1040,10 @@ void GameEditor::setHelperWindowFunc(std::function<void()> f)
 {
     helperWindowFunc = f;
     ImGui::SetWindowFocus("Helper Window");
+}
+
+bool GameEditor::isGameSceneFocused() const 
+{
+    return m_isGameSceneFocused;
 }
 } // namespace wlEngine
