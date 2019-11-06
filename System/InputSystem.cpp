@@ -8,7 +8,10 @@ namespace wlEngine
 {
 SYSTEM_DEFINATION(InputSystem);
 
-InputSystem::InputSystem() : buttonPressed(SDL_CONTROLLER_BUTTON_MAX, false), axisPressed(SDL_CONTROLLER_AXIS_MAX, false), gameController(nullptr)
+InputSystem::InputSystem() : buttonPressed(SDL_CONTROLLER_BUTTON_MAX, false), 
+axisPressed(SDL_CONTROLLER_AXIS_MAX, false), 
+gameController(nullptr),
+mouseClickedState(5, false)
 {
     SDL_GameControllerEventState(SDL_ENABLE);
     if (SDL_NumJoysticks() > 0)
@@ -32,14 +35,12 @@ void InputSystem::update()
             keyDown(event);
             break;
         case SDL_MOUSEBUTTONDOWN:
-            if (event.button.button == SDL_BUTTON_LEFT)
-                leftMouseClicked = true;
-            if (event.button.button == SDL_BUTTON_RIGHT)
-                rightMouseClicked = true;
+            mouseClickedState[SDL_BUTTON(event.button.button)] = true;
             break;
         case SDL_MOUSEWHEEL:
             wheelX = event.wheel.x;
             wheelY = event.wheel.y;
+            std::cout << wheelX << std::endl;
             break;
         }
     }
@@ -89,8 +90,11 @@ void InputSystem::getMouseWheel(int &x, int &y)
 void InputSystem::reset()
 {
     wheelY = 0;
-    leftMouseClicked = false;
-    rightMouseClicked = false;
+    mouseClickedState[0] = false;
+    mouseClickedState[1] = false;
+    mouseClickedState[2] = false;
+    mouseClickedState[3] = false;
+    mouseClickedState[4] = false;
 }
 
 bool InputSystem::isControllerButtonClicked(const ControllerButton &button)

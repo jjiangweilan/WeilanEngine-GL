@@ -68,8 +68,9 @@ void Mesh2D::clip(Rect *rect) const
     m_vertices[15] = -width / 2;
     m_vertices[16] = height / 2;
 
-    const int &tWidth = m_textures[0]->getWidth();
-    const int &tHeight = m_textures[0]->getHeight();
+
+    const int &tWidth = width;
+    const int &tHeight = height;
     //top right
     m_vertices[3] = (float)(rect->x + rect->width) / tWidth;
     m_vertices[4] = (float)(rect->y + rect->height) / tHeight;

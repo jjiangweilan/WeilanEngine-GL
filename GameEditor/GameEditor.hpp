@@ -30,6 +30,16 @@ public:
 
     void loadScene(const std::string &);
 
+    /**
+		 * @brief this function calculate the mouse click on scene (bottom-left being (0,0))
+		 *
+		 * @param x
+		 * @param y
+		 * @param Button right or left click
+		 *
+		 * @return
+		 */
+    bool mousePressingOnScene(int &x, int &y, bool world = false, int mouse = 0);
 private:
     /********************** Data ***************************/
     Entity *selectedGameObject;
@@ -60,6 +70,7 @@ private:
     void showTransformInfo(Entity *);
     void showSpriteInfo(Entity *);
     void showVolumetricLightInfo(Entity *);
+    void showModelInfo(Entity *);
 
     void showGameWindow(void **data);
 
@@ -90,16 +101,6 @@ private:
     void createTRigidbody();
     void createVolumetricLight();
 
-    /**
-		 * @brief this function calculate the mouse click on scene (bottom-left being (0,0))
-		 *
-		 * @param x
-		 * @param y
-		 * @param Button right or left click
-		 *
-		 * @return
-		 */
-    bool mousePressingOnScene(int &x, int &y, bool world = false, int mouse = 0);
 
     template <typename... Args>
     Json createComponentJson(const std::string &name, Args &&...);

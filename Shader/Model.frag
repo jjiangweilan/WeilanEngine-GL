@@ -12,13 +12,17 @@ struct Light {
     vec3 ambient;
 };
 
-layout (location = 3) uniform sampler2D texture_diffuse1;
 layout (location = 4) uniform Light light1;
 layout (location = 8) uniform Light light2;
 layout (location = 12) uniform vec3 viewPos;
+layout (location = 900) uniform sampler2D texture_diffuse[10];
+layout (location = 910) uniform sampler2D texture_specular[10];
+layout (location = 920) uniform sampler2D texture_ambient[10];
+layout (location = 930) uniform sampler2D texture_normals[10];
+layout (location = 940) uniform sampler2D texture_height[10];
 
 vec3 calculateColor(Light light) {
-    vec4 tex = texture(texture_diffuse1, TexCoords);
+    vec4 tex = texture(texture_diffuse[0], TexCoords);
     // ambient
     vec3 ambient = light.ambient * tex.rgb;
 
@@ -38,7 +42,12 @@ vec3 calculateColor(Light light) {
 }
 void main()
 {    
-    vec3 rlt1 = calculateColor(light1);
-    vec3 rlt2 = calculateColor(light2);
-    FragColor =  texture(texture_diffuse1, TexCoords);//vec4(rlt1 + rlt2, 1.0);
+    Light light;
+    light.position = vec3(500,500,500);
+    light.diffuse = vec3(0.4,0.4,0.4);
+    light.specular = vec3(0.2,0.2,0.2);
+    light.ambient = vec3(0.1,0.1,0.1);
+    vec3 rlt1 = calculateColor(light);
+    //vec3 rlt2 = calculateColor(light2);
+    FragColor =  vec4(rlt1,1.0);//texture(texture_diffuse[0], TexCoords);//vec4(rlt1 + rlt2, 1.0);
 }

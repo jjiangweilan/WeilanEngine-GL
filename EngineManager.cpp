@@ -73,15 +73,15 @@ void EngineManager::loop() {
 #if SETTINGS_ENGINEMODE
     while (!quit) {
         if (Settings::engineMode == Settings::EngineMode::Gameplay) {
-        currentScene->update();
+            currentScene->update();
             systemUpdate();
             Time::update();
         } else {
             AnimationSystem::get()->update();
+            currentScene->update();
+            InputSystem::get()->update();
             if (currentScene->camera)
                 RenderSystem::get()->update();
-            InputSystem::get()->update();
-            currentScene->update();
             Time::update();
         }
 

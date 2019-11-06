@@ -19,7 +19,6 @@ public:
     bool gammaCorrection;
     std::string directory;
 
-    Shader *shader;
 
     Model(Entity *go, const std::string &path, bool gamma = false) : Component(go), gammaCorrection(gamma)
     {
@@ -34,14 +33,14 @@ public:
         shader = Shader::collection.find(name)->second;
     }
 
+    Shader *shader;
     std::function<void()> beforeRenderFunc;
     std::function<void()> afterRenderFunc;
 
 private:
-    std::vector<Texture3D> loaded;
     void loadModel(const std::string &name);
     void processNode(aiNode *node, const aiScene *scene);
-    std::vector<Texture3D> loadMaterialTextures(aiMaterial *mat, aiTextureType textureType, std::string typeName, const aiScene *);
+    std::vector<Texture*> loadMaterialTextures(aiMaterial *mat, aiTextureType textureType, std::string typeName, const aiScene *);
     size_t TextureFromFile(const char *path, const std::string &directory, bool gamma);
 };
 } // namespace wlEngine

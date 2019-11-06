@@ -2,14 +2,14 @@
 
 namespace wlEngine
 {
-Mesh::Mesh(std::vector<Texture3D> &textures, std::vector<GLuint> &indices, std::vector<Vertex> &vertices) : textures(textures), indices(indices), vertices(vertices)
+Mesh::Mesh(std::vector<Texture*> &textures, std::vector<GLuint> &indices, std::vector<Vertex> &vertices) : textures(textures), indices(indices), vertices(vertices)
 {
   EBO = 0;
   VAO = 0;
   VBO = 0;
   setupMesh();
 }
-Mesh::Mesh(std::vector<Texture3D> &&textures, std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices) : textures(std::move(textures)), indices(std::move(indices)), vertices(std::move(vertices))
+Mesh::Mesh(std::vector<Texture*> &&textures, std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices) : textures(std::move(textures)), indices(std::move(indices)), vertices(std::move(vertices))
 {
   EBO = 0;
   VAO = 0;

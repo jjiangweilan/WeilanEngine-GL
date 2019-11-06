@@ -494,29 +494,36 @@ void RenderSystem::render(Model *model)
     for (auto &mesh : model->meshes)
     {
         // bind appropriate textures
-        unsigned int diffuseNr = 1;
-        unsigned int specularNr = 1;
-        unsigned int normalNr = 1;
-        unsigned int heightNr = 1;
+        unsigned int diffuseNr = 900;
+        unsigned int specularNr = 910;
+        unsigned int normalNr = 930;
+        unsigned int heightNr = 940;
         for (unsigned int i = 0; i < mesh.textures.size(); i++)
         {
             glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
             // retrieve texture number (the N in diffuse_textureN)
-            std::string number;
-            std::string name = mesh.textures[i].type;
-            if (name == "texture_diffuse")
-                number = std::to_string(diffuseNr++);
-            else if (name == "texture_specular")
-                number = std::to_string(specularNr++); // transfer unsigned int to stream
-            else if (name == "texture_normal")
-                number = std::to_string(normalNr++); // transfer unsigned int to stream
-            else if (name == "texture_height")
-                number = std::to_string(heightNr++); // transfer unsigned int to stream
+            auto& type = mesh.textures[i]->getType();
+            int loc = -1;
+            //this should be converted into enum and integer
+            switch (type)
+            {
+            case TextureType::Diffuse:
+                loc = diffuseNr++;
+                break;
+            case TextureType::Specular:
+                loc = specularNr++;
+            case TextureType::Normals:
+                loc = normalNr++;
+            case TextureType::Height:
+                loc = heightNr++;
+            default:
+                assert(0 && "texture type not surrpoted");
+            }
 
             // now set the sampler to the correct texture unit
-            glUniform1i(glGetUniformLocation(model->shader->ID, (name + number).c_str()), i);
+            Shader::setUniform(loc, i);
             // and finally bind the texture
-            glBindTexture(GL_TEXTURE_2D, mesh.textures[i].id);
+            glBindTexture(GL_TEXTURE_2D, mesh.textures[i]->getId());
         }
         //
         // draw mesh

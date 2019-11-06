@@ -26,12 +26,12 @@ namespace wlEngine {
         //mouse
         int relX;
         int relY;
-        float sensitivity = 0.03;
+        float sensitivity;
 		bool enableMouse = false;
         float pitch = 0;
         float yaw = -90;
 
-        float speed = 5000;
+        float speed;
         void setProjectionMatrix(const float &fovy, const float &aspect,
                                  const float &zNear, const float &zFar) override;
 

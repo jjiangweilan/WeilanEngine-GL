@@ -23,6 +23,7 @@ namespace wlEngine {
             void addGameplaySystem(System*);
 
             void start();
+            const unsigned long long& getFrameCount() const;
         private:
             void loop();
 			/**

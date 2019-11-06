@@ -23,7 +23,7 @@ public:
     static ResourceManager *get() { return resourceManager; };
     ~ResourceManager();
 
-    Texture *getTexture(const std::string &path);
+    Texture *getTexture(const std::string &path, const TextureType& type = TextureType::Diffuse);
 
     const TextureMap &getTextures();
     /* FreeType *************************************/
@@ -44,7 +44,7 @@ private:
     TextureMap textures;
     CharacterMap characters;
     std::map<std::wstring, Texture> textTextures;
-    Texture *loadTexture(const std::string &path);
+    Texture *loadTexture(const std::string &path, const TextureType &type = TextureType::Diffuse);
 
     Json npcJsonData;
     Json savedGameData;

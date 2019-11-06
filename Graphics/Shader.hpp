@@ -108,6 +108,10 @@ public:
     {
         glUniform1i(location, v);
     }
+    static void setUniform(const GLuint& location, const unsigned int& v)
+    {
+        glUniform1i(location, v);
+    }
     static void setUniform(const GLuint& location, const bool& v)
     {
         glUniform1i(location, v);

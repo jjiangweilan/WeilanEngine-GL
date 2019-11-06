@@ -43,6 +43,7 @@ public:
   SDL_Window *getSDL_Window() { return window; };
   glm::vec2 getWindowSize() { return {windowWidth, windowHeight}; };
   glm::vec2 getSceneSize() { return {sceneWidth, sceneHeight}; };
+  GameEditor* getGameEditor() { return gameEditor; };
 
 private:
 #if SETTINGS_ENGINEMODE

@@ -1,4 +1,5 @@
 #include "Model.hpp"
+#include "../Manager/ResourceManager.hpp"
 
 namespace wlEngine
 {
@@ -27,7 +28,7 @@ void Model::processNode(aiNode *node, const aiScene *scene)
 
         std::vector<Vertex> vertices;
         std::vector<GLuint> indices;
-        std::vector<Texture3D> textures;
+        std::vector<Texture*> textures;
 
         for (size_t i = 0; i < mesh->mNumVertices; i++)
         {
@@ -87,16 +88,16 @@ void Model::processNode(aiNode *node, const aiScene *scene)
 
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
 
-        std::vector<Texture3D> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", scene);
+        std::vector<Texture*> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse", scene);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         // 2. specular maps
-        std::vector<Texture3D> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", scene);
+        std::vector<Texture*> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular", scene);
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         // 3. normal maps
-        std::vector<Texture3D> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal", scene);
+        std::vector<Texture*> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal", scene);
         textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
         // 4. height maps
-        std::vector<Texture3D> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height", scene);
+        std::vector<Texture*> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height", scene);
         textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
         meshes.emplace_back(std::move(textures), std::move(indices), std::move(vertices));
@@ -108,36 +109,17 @@ void Model::processNode(aiNode *node, const aiScene *scene)
     }
 }
 
-std::vector<Texture3D> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName, const aiScene *scene)
+std::vector<Texture*> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName, const aiScene *scene)
 {
-    std::vector<Texture3D> textures;
+    std::vector<Texture*> textures;
 
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
     {
         aiString str;
         mat->GetTexture(type, i, &str);
         // check if texture was loaded before and if so, continue to next iteration: skip loading a new texture
-        Texture3D texture;
+        Texture* texture = ResourceManager::get()->getTexture(directory + "/" + str.C_Str());
         bool skip = false;
-        for (auto &i : loaded)
-        {
-            if (i.resourcePath.compare(str.C_Str()) == 0)
-            {
-                texture.id = i.id;
-                texture.type = i.type;
-                texture.resourcePath = i.resourcePath;
-                skip = true;
-                break;
-            }
-        }
-        if (!skip)
-        {
-            texture.resourcePath = str.C_Str();
-            texture.id = TextureFromFile(str.C_Str(), this->directory, gammaCorrection);
-            texture.type = typeName;
-            loaded.push_back(texture);
-        }
-
         textures.push_back(texture);
     }
     return textures;

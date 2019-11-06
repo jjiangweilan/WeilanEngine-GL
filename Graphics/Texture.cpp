@@ -4,12 +4,13 @@
 
 namespace wlEngine
 {
-Texture::Texture(const std::string &file)
+Texture::Texture(const std::string &file, const TextureType& textureType) : m_type(textureType)
 {
-    loadFromFile(file);
+    loadFromFile(file, textureType);
 }
 Texture::Texture(FT_GlyphSlot glyph)
 {
+    m_type = Diffuse;
     loadFromFTBitmap(glyph);
 }
 Texture *Texture::loadFromFTBitmap(FT_GlyphSlot glyph)
@@ -37,10 +38,11 @@ Texture *Texture::loadFromFTBitmap(FT_GlyphSlot glyph)
     return this;
 }
 
-Texture *Texture::loadFromFile(const std::string &path)
+Texture *Texture::loadFromFile(const std::string &path, const TextureType& textureType)
 {
     free();
     m_sourcePath = path;
+	m_type = textureType;
 
     unsigned char *imageData = stbi_load(path.c_str(), &m_width, &m_height, &m_nrChannel, 0);
     load(imageData);
@@ -83,5 +85,6 @@ const std::string &Texture::getSourcePath() const { return m_sourcePath; }
 const int &Texture::getWidth() const { return m_width; }
 const int &Texture::getHeight() const { return m_height; }
 const int &Texture::getNRChannel() const { return m_nrChannel; }
+const TextureType &Texture::getType() const { return m_type; }
 
 } // namespace wlEngine

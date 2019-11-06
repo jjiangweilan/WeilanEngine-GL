@@ -14,6 +14,7 @@
 #include "../Component/VolumetricLight.hpp"
 #include "../Component/Camera2D.hpp"
 #include "../Component/Camera3D.hpp"
+#include "../Component/Model.hpp"
 
 #include "../System/RenderSystem.hpp"
 #include "../System/InputSystem.hpp"
@@ -289,6 +290,9 @@ void GameEditor::showGameObjectInfo()
             else if(c->getId() == VolumetricLight::componentId) {
                 showComponent(go, c.get(), "Volumetric Light", std::bind(&GameEditor::showVolumetricLightInfo, this, std::placeholders::_1));
             }
+            else if (c->getId() == Model::componentId) {
+                showComponent(go, c.get(), "Model", std::bind(&GameEditor::showModelInfo, this,std::placeholders::_1));
+            }
             //else if (c->getId() == Sprite::componentId)showComponent(go, c.get(), "Sprite", std::bind(&GameEditor::showSpriteInfo, this, std::placeholders::_1));
             //else if (c->getId() == Animation::componentId)showComponent(go, c.get(), "Animation", std::bind(&GameEditor::showAnimationInfo, this, std::placeholders::_1));
             else
@@ -305,6 +309,11 @@ void GameEditor::showGameObjectInfo()
         }
     }
     ImGui::End();
+}
+void GameEditor::showModelInfo(Entity *entity)
+{
+    auto model = entity->getComponent<Model>();
+    
 }
 
 void GameEditor::showTRigidbodyInfo(Entity *entity)
@@ -605,7 +614,7 @@ void GameEditor::showMenu()
             }
             ImGui::EndMenu();
         }
-        if(ImGui::BeginMenu("Settings"))
+        if (ImGui::BeginMenu("Settings"))
         {
             static int dimension = 2;
             if (dimension = 2)
@@ -614,8 +623,8 @@ void GameEditor::showMenu()
                 if (ImGui::IsItemClicked())
                 {
                     auto cameraEntity = EngineManager::getwlEngine()->getCurrentScene()->getCamera();
-                    Json& j = scene->sceneData.getData(cameraEntity);
-                    auto& cameraComponentJson = *Utility::findComponentWithName(j, "Camera2D");
+                    Json &j = scene->sceneData.getData(cameraEntity);
+                    auto &cameraComponentJson = *Utility::findComponentWithName(j, "Camera2D");
                     //cameraComponentJson["name"] = "Camera3D";
                     cameraEntity->removeComponent<Camera2D>();
                     cameraEntity->addComponent<Camera3D>();
@@ -626,7 +635,6 @@ void GameEditor::showMenu()
                 ImGui::MenuItem("Switch To 2D");
                 if (ImGui::IsItemClicked())
                 {
-
                 }
             }
             ImGui::EndMenu();
@@ -675,7 +683,7 @@ void GameEditor::showTransformInfo(Entity *go)
         Json *transform = Utility::findComponentWithName(json, "Transform");
         if (transform)
         {
-			auto& t = *transform;
+            auto &t = *transform;
             t["params"][0] = pos.x;
             t["params"][1] = pos.y;
             t["params"][2] = pos.z;
@@ -695,7 +703,7 @@ void GameEditor::showTransformInfo(Entity *go)
     float rotate = transform->rotationData.degree;
     float axis[3] = {transform->rotationData.axis.x, transform->rotationData.axis.y, transform->rotationData.axis.z};
     edit0 = ImGui::InputFloat("rotate degree", &rotate, 1.0, 20.0, 0);
-    edit1 =  ImGui::InputFloat3("rotate axis", axis, 0);
+    edit1 = ImGui::InputFloat3("rotate axis", axis, 0);
     if (edit0 || edit1)
     {
         transform->rotate(glm::vec3{axis[0], axis[1], axis[2]}, rotate);
@@ -712,7 +720,7 @@ void GameEditor::showResourceWindow()
 void GameEditor::showSpriteInfo(Entity *go)
 {
     auto sprite = go->getComponent<Sprite>();
-	auto mainTexture = sprite->getMesh()->getTextures()->at(0);
+    auto mainTexture = sprite->getMesh()->getTextures()->at(0);
     ImGui::Image((void *)mainTexture->getId(), {(float)mainTexture->getWidth(), (float)mainTexture->getHeight()}, {0, 1}, {1, 0});
 }
 void GameEditor::showResourceInDirectory(const std::string &path)
@@ -837,7 +845,7 @@ void GameEditor::dragSprite()
 {
     static Transform *target = nullptr;
     static int lastX, lastY;
-    if (ImGui::IsMouseClicked(2)) 
+    if (ImGui::IsMouseClicked(2))
     {
         ImGui::SetWindowFocus("###GameScene");
     }
@@ -954,11 +962,11 @@ void GameEditor::makeDropDown(const char *selections[], const char *&selected, c
     {
         for (int n = 0; n < selectionsSize; n++)
         {
-            bool is_selected = (selected == selections[n]); 
+            bool is_selected = (selected == selections[n]);
             if (ImGui::Selectable(selections[n], is_selected))
                 selected = selections[n];
             if (is_selected)
-                ImGui::SetItemDefaultFocus(); 
+                ImGui::SetItemDefaultFocus();
         }
         ImGui::EndCombo();
     }
@@ -975,33 +983,35 @@ void GameEditor::createVolumetricLight()
         return;
     }
 
-    for (int i = 0; i < total ;i++) {
+    for (int i = 0; i < total; i++)
+    {
         char file[256];
         std::strcpy(file, files[i].data());
         ImGui::InputText((std::string("Texture") + std::to_string(i)).data(), file, 256);
         files[i] = file;
     }
 
-    if (ImGui::Button("Add texture")) 
+    if (ImGui::Button("Add texture"))
     {
-        total +=1;
+        total += 1;
         files.push_back("");
     }
     ImGui::SameLine(0, 5);
     if (ImGui::Button("Remove"))
     {
-        total -=1;
+        total -= 1;
         files.pop_back();
     };
 
-    if (ImGui::Button("Create")) 
+    if (ImGui::Button("Create"))
     {
         auto vl = selectedGameObject->addComponent<VolumetricLight>();
-        for (int i = 0; i < total; i++) {
+        for (int i = 0; i < total; i++)
+        {
             vl->loadTexture(files[i]);
         }
 
-		//TODO:
+        //TODO:
         //add json information to saveddata
         //Json trbJson = createComponentJson("VolumetricLight", fi, "polygon", Json::array(), Json::array({{-1, 0}, {1.0}}), Json::array({0.0}), false);
         //Json components = Json::array();
@@ -1015,17 +1025,19 @@ void GameEditor::createVolumetricLight()
     }
 }
 
-void GameEditor::showVolumetricLightInfo(Entity* entity) {
+void GameEditor::showVolumetricLightInfo(Entity *entity)
+{
     auto vl = entity->getComponent<VolumetricLight>();
     auto textures = vl->getMesh()->getTextures();
-    for (auto t : *textures) {
+    for (auto t : *textures)
+    {
         ImGui::LabelText("", t->getSourcePath().data());
     }
 }
 
-    void GameEditor::setHelperWindowFunc(std::function<void()> f)
-    {
-        helperWindowFunc = f;
-        ImGui::SetWindowFocus("Helper Window");
-    }
+void GameEditor::setHelperWindowFunc(std::function<void()> f)
+{
+    helperWindowFunc = f;
+    ImGui::SetWindowFocus("Helper Window");
+}
 } // namespace wlEngine

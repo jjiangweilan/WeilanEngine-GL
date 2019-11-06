@@ -57,17 +57,17 @@ void ResourceManager::init()
     setlocale(LC_ALL, "");
 }
 
-Texture *ResourceManager::loadTexture(const std::string &path)
+Texture *ResourceManager::loadTexture(const std::string &path, const TextureType &type)
 {
     return textures[path].loadFromFile(path);
 }
 
-Texture *ResourceManager::getTexture(const std::string &path)
+Texture *ResourceManager::getTexture(const std::string &path, const TextureType& type)
 {
     auto t = textures.find(path);
     if (t == textures.end())
     {
-        return loadTexture(path);
+        return loadTexture(path, type);
     }
     return &t->second;
 }

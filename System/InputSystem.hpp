@@ -51,6 +51,18 @@ enum class ComboInput : uint8_t
     L2 = 7,
 };
 
+namespace MouseButton
+{
+	enum MouseButton
+	{
+		Left = SDL_BUTTON(SDL_BUTTON_LEFT),
+		Middle = SDL_BUTTON(SDL_BUTTON_MIDDLE),
+		Right = SDL_BUTTON(SDL_BUTTON_RIGHT),
+		X1 = SDL_BUTTON(SDL_BUTTON_X1),
+		X2 = SDL_BUTTON(SDL_BUTTON_X2)
+	};
+}
+
 class InputSystem : System
 {
     SYSTEM_DECLARATION(InputSystem);
@@ -63,11 +75,6 @@ private:
     int mouseX = 0;
     int mouseY = 0;
 
-    bool leftMouseClicked = false;
-    bool leftMousePressing = false;
-    bool rightMouseClicked = false;
-    bool rightMousePresssing = false;
-
     int wheelX = 0;
     int wheelY = 0;
 
@@ -77,6 +84,7 @@ private:
          */
     std::vector<bool> buttonPressed;
     std::vector<bool> axisPressed;
+    std::vector<bool> mouseClickedState;
 
     void reset();
     void keyDown(const SDL_Event &);
