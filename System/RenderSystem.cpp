@@ -14,6 +14,7 @@
 #include "../Component/Camera3D.hpp"
 
 #include "../Graphics/Mesh2D.hpp"
+#include "../Graphics/Model3D.hpp"
 
 #include "../GameEditor/GameEditor.hpp"
 
@@ -481,7 +482,7 @@ void RenderSystem::render(Model *model)
 
     if (model->beforeRenderFunc)
         model->beforeRenderFunc();
-    auto shader = model->shader;
+    auto shader = model->getShader();
     auto transform = gameObject->getComponent<Transform>();
     auto modelMatrix = transform->getModel();
 
@@ -491,7 +492,7 @@ void RenderSystem::render(Model *model)
     Shader::setUniform(2, m_projMatrix); // projection
     Shader::setUniform(12, camera->entity->getComponent<Transform>()->position);
 
-    for (auto &mesh : model->meshes)
+    for (auto &mesh : *model->getModel3D()->getMeshes())
     {
         // bind appropriate textures
         unsigned int diffuseNr = 900;

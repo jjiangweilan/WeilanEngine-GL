@@ -6,7 +6,7 @@ class OnScreenText
 {
 public:
     static void init();
-    static void print(const std::string &);
+    //static void print(const std::string &);
 
 private:
     static Entity* m_entity;
