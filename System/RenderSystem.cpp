@@ -13,8 +13,10 @@
 #include "../Component/Camera2D.hpp"
 #include "../Component/Camera3D.hpp"
 
+#include "../Graphics/Mesh.hpp"
+#include "../Graphics/Material.hpp"
 #include "../Graphics/Mesh2D.hpp"
-#include "../Graphics/Model3D.hpp"
+#include "../Graphics/Model.hpp"
 
 #include "../GameEditor/GameEditor.hpp"
 
@@ -33,12 +35,9 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     SDLInit();
     ImGuiInit();
     initSceneFrambufferData();
-    Shader::loadShader("Scene", ROOT_DIR + "/Shader/Scene.vert", ROOT_DIR + "/Shader/Scene.frag");
-    Shader::loadShader("Basic", ROOT_DIR + "/Shader/Basic.vert", ROOT_DIR + "/Shader/Basic.frag");
-    Shader::loadShader("Sprite", ROOT_DIR + "/Shader/Sprite.vert", ROOT_DIR + "/Shader/Sprite.frag");
-    Shader::loadShader("Text", ROOT_DIR + "/Shader/Text.vert", ROOT_DIR + "/Shader/Text.frag");
-    Shader::loadShader("Model", ROOT_DIR + "/Shader/Model.vert", ROOT_DIR + "/Shader/Model.frag");
+    buildInResourceInit();
 
+	//uniform block
     auto modelShader = Shader::collection["Model"];
     auto matricesIndex = glGetUniformBlockIndex(modelShader->ID, "Matrices");
     glUniformBlockBinding(modelShader->ID, matricesIndex,UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS);
@@ -55,7 +54,7 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     projection = glm::perspective(glm::radians(45.0f), (float)sceneWidth / sceneHeight, 0.1f, 100000.0f);
 #endif
 #ifdef DEBUG
-    Shader::loadShader("PhysicsDebugDrawShader", ROOT_DIR + "/Shader/PhysicsDebugDraw.vert", ROOT_DIR + "/Shader/PhysicsDebugDraw.frag");
+    Shader::loadShader("PhysicsDebugDrawShader", ROOT_DIR + "/Graphics/Material/Shader/PhysicsDebugDraw.vert", ROOT_DIR + "/Graphics/Material/Shader/PhysicsDebugDraw.frag");
     physicsDebugDrawShader = Shader::collection["PhysicsDebugDrawShader"];
     glGenVertexArrays(1, &physicsDebugVAO);
     glGenBuffers(1, &physicsDebugVBO);
@@ -499,26 +498,29 @@ void RenderSystem::render(Model *model)
 
     if (model->beforeRenderFunc)
         model->beforeRenderFunc();
-    auto shader = model->getShader();
     auto transform = gameObject->getComponent<Transform>();
     auto modelMatrix = transform->getModel();
 
-    shader->use();
-    Shader::setUniform(0, modelMatrix);  //model
-    Shader::setUniform(12, camera->entity->getComponent<Transform>()->position);
+  //  auto shader = model->getShader();
+  //  shader->use();
 
-    for (auto &mesh : *model->getModel3D()->getMeshes())
+    for (auto &mesh : *model->getModel()->getMeshes())
     {
         // bind appropriate textures
         unsigned int diffuseNr = 900;
         unsigned int specularNr = 910;
         unsigned int normalNr = 930;
         unsigned int heightNr = 940;
-        for (unsigned int i = 0; i < mesh.textures.size(); i++)
+        mesh.m_material->useShader();
+        Shader::setUniform(0, modelMatrix); //model
+        Shader::setUniform(12, camera->entity->getComponent<Transform>()->position);
+        auto& textures = *mesh.m_material->getTextures();
+        for (unsigned int i = 0; i < textures.size(); i++)
         {
             glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
             // retrieve texture number (the N in diffuse_textureN)
-            auto& type = mesh.textures[i]->getType();
+            
+            auto& type = textures[i]->getType();
             int loc = -1;
             //this should be converted into enum and integer
             switch (type)
@@ -539,16 +541,18 @@ void RenderSystem::render(Model *model)
             // now set the sampler to the correct texture unit
             Shader::setUniform(loc, i);
             // and finally bind the texture
-            glBindTexture(GL_TEXTURE_2D, mesh.textures[i]->getId());
+            glBindTexture(GL_TEXTURE_2D, textures[i]->getId());
         }
         //
         // draw mesh
         glBindVertexArray(mesh.VAO);
-        glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
+
         glBindVertexArray(0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         // always good practice to set everything back to defaults once configured.
-        glActiveTexture(GL_TEXTURE0);
         if (model->afterRenderFunc)
             model->afterRenderFunc();
     }
@@ -624,5 +628,15 @@ void RenderSystem::combineTheFramebuffersToFramebuffer(const GLuint &framebuffer
 void RenderSystem::postInit()
 {
     m_engine = EngineManager::getwlEngine();
+}
+
+void RenderSystem::buildInResourceInit()
+{
+    //shader
+    Shader::loadShader("Scene", ROOT_DIR + "/Graphics/Material/Shader/Scene.vert", ROOT_DIR + "/Graphics/Material/Shader/Scene.frag");
+    Shader::loadShader("Basic", ROOT_DIR + "/Graphics/Material/Shader/Basic.vert", ROOT_DIR + "/Graphics/Material/Shader/Basic.frag");
+    Shader::loadShader("Sprite", ROOT_DIR + "/Graphics/Material/Shader/Sprite.vert", ROOT_DIR + "/Graphics/Material/Shader/Sprite.frag");
+    Shader::loadShader("Text", ROOT_DIR + "/Graphics/Material/Shader/Text.vert", ROOT_DIR + "/Graphics/Material/Shader/Text.frag");
+    Shader::loadShader("Model", ROOT_DIR + "/Graphics/Material/Shader/Model.vert", ROOT_DIR + "/Graphics/Material/Shader/Model.frag");
 }
 } // namespace wlEngine

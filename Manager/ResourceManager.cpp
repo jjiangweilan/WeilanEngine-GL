@@ -77,7 +77,7 @@ const TextureMap &ResourceManager::getTextures()
     return m_textures;
 }
 
-Model3D *ResourceManager::getModel(const std::string &path)
+Graphics::Model *ResourceManager::getModel(const std::string &path)
 {
     auto m = m_models.find(path);
     if (m == m_models.end())
@@ -134,6 +134,10 @@ Mix_Chunk *ResourceManager::getAudioChunk(const std::string &file)
     return rlt;
 }
 
+Material* ResourceManager::getMaterial(const std::string& name) {
+    return &m_materials[name];
+}
+
 void ResourceManager::freeAudioChunk(const std::string &file)
 {
     auto chunk = m_audioChunks[file];
@@ -156,4 +160,5 @@ void ResourceManager::freeAudioChunk()
     }
     m_audioChunks.clear();
 }
+
 } // namespace wlEngine

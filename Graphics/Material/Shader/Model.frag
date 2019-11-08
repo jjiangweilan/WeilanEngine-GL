@@ -23,6 +23,7 @@ layout (location = 940) uniform sampler2D texture_height[10];
 
 vec3 calculateColor(Light light) {
     vec4 tex = texture(texture_diffuse[0], TexCoords);
+    if (tex.x == 0 && tex.y == 0 && tex.z == 0) tex = vec4(0.5,0.5,0.5,1.0);
     // ambient
     vec3 ambient = light.ambient * tex.rgb;
 
@@ -43,10 +44,10 @@ vec3 calculateColor(Light light) {
 void main()
 {    
     Light light;
-    light.position = vec3(500,500,500);
-    light.diffuse = vec3(0.4,0.4,0.4);
+    light.position = vec3(5,5,5);
+    light.diffuse = vec3(0.2,0.2,0.2);
     light.specular = vec3(0.6,0.6,0.6);
-    light.ambient = vec3(0.1,0.1,0.1);
+    light.ambient = vec3(0.4,0.4,0.4);
     vec3 rlt1 = calculateColor(light);
     //vec3 rlt2 = calculateColor(light2);
     FragColor =  vec4(rlt1,1.0);//texture(texture_diffuse[0], TexCoords);//vec4(rlt1 + rlt2, 1.0);

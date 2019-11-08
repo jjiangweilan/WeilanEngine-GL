@@ -54,6 +54,8 @@ private:
     float gameplayWindowOffsetY;
     bool m_isGameSceneFocused;
 
+	void setSelectedGameObject(Entity* newOne);
+
     void showGameObjectInfo();
     void showAllGameObjects();
     void pushGameObject(std::set<Entity *>::iterator iter, const std::set<Entity *> *gameObjects);
@@ -100,9 +102,10 @@ private:
     void dragSprite();
 
     void setHelperWindowFunc(std::function<void()> f);
-    void makeDropDown(const char *selections[], const char *&selected, const int &selectionsSize, const int &widgetId);
+    void makeDropDown(const char *selections[], const char **&selected, const int &selectionsSize, const int &widgetId);
     void createTRigidbody();
     void createVolumetricLight();
+    void createMaterial();
 
 
     template <typename... Args>

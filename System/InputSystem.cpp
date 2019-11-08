@@ -40,7 +40,6 @@ void InputSystem::update()
         case SDL_MOUSEWHEEL:
             wheelX = event.wheel.x;
             wheelY = event.wheel.y;
-            std::cout << wheelX << std::endl;
             break;
         }
     }

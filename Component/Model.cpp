@@ -15,7 +15,7 @@ Model::Model(Entity *go, const std::string &path): Model(go)
     m_model = ResourceManager::get()->getModel(path);
 }
 
-const Model3D *Model::getModel3D() const
+const Graphics::Model* Model::getModel() const
 {
     return m_model;
 }

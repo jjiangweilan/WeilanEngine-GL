@@ -120,5 +120,7 @@ private:
 
   /* Uniform Buffers */
   GLuint m_projectionUBO;
+
+  void buildInResourceInit();
 };
 } // namespace wlEngine

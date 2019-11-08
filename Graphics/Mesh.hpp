@@ -1,14 +1,14 @@
 #pragma once
-#include "Shader.hpp"
-#include "Texture.hpp"
 
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
-#include <assimp/material.h>
+#include <assimp/mesh.h>
+#include <glad/glad.h>
 
 namespace wlEngine
 {
+class Material;
 struct Vertex
 {
     glm::vec3 position;
@@ -18,26 +18,55 @@ struct Vertex
     glm::vec3 bitangent;
 };
 
+enum PrimitiveMeshType
+{
+    Cube, Sphere
+};
+
 class Mesh
 {
 public:
-    Mesh(std::vector<Texture*> &textures, std::vector<GLuint> &indices, std::vector<Vertex> &vertices);
-    Mesh(std::vector<Texture*> &&textures, std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices);
+/**
+ * @brief Construct a new Mesh object with a predefined mesh type
+ * 
+ * @param meshType 
+ */
+    Mesh(const PrimitiveMeshType& meshType);
+    Mesh(std::vector<GLuint> &indices, std::vector<Vertex> &vertices);
+    Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices);
     Mesh(const Mesh &mesh) = default;
     Mesh(Mesh &&mesh) noexcept;
+    Mesh(aiMesh *mesh, Material* m = nullptr, const std::string& name="");
 
+    /**
+     * @brief load mesh's vertex data using assimp
+     * 
+     * @param mesh the assimp mesh
+     */
+    void loadFromAssimp(aiMesh *mesh);
+
+    /**
+     * @brief Set the Material object
+     * 
+     * @param material 
+     */
+    void setMaterial(Material *material) const;
+	void setMaterial(const std::string& name) const;
+
+    std::string name;
     ~Mesh(){};
 
 private:
-    std::vector<Texture*> textures;
-    std::vector<GLuint> indices;
-    std::vector<Vertex> vertices;
+    std::vector<GLuint> m_indices;
+    std::vector<Vertex> m_vertices;
 
     GLuint VAO;
     GLuint VBO;
     GLuint EBO;
 
     void setupMesh();
+
+    mutable Material *m_material;
 
     friend class RenderSystem;
 };

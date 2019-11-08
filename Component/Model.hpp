@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.hpp"
-#include "../Graphics/Model3D.hpp"
+#include "../Graphics/Model.hpp"
 
 #include <vector>
 #include <functional>
@@ -19,11 +19,11 @@ public:
     std::function<void()> beforeRenderFunc;
     std::function<void()> afterRenderFunc;
     
-    const Model3D * getModel3D() const;
+    const Graphics::Model * getModel() const;
     const Shader* getShader() const;
 
 private:
-    Model3D *m_model;
+	Graphics::Model* m_model;
     Shader *m_shader;
 };
 } // namespace wlEngine

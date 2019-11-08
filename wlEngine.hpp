@@ -5,6 +5,7 @@
 
 #include <glm/glm.hpp>
 #include <memory>
+#include "Component/Component.hpp"
 #include "Component/Transform.hpp"
 #include "Component/Sprite.hpp"
 #include "Component/Script.hpp"
@@ -20,11 +21,16 @@
 #include "Component/Audio.hpp"
 #include "Component/VolumetricLight.hpp"
 
-#include "Component/Component.hpp"
 #include "System/System.hpp"
 
 #include "GameObject/Scene.hpp"
 #include "GameObject/Entity.hpp"
+
+#include "Manager/ResourceManager.hpp"
+
+#include "Graphics/Mesh.hpp"
+#include "Graphics/Model.hpp"
+#include "Graphics/Material.hpp"
 
 #include "Time.hpp"
 #include "Input.hpp"

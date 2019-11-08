@@ -34,9 +34,9 @@ GLuint Shader::createProgram(const GLuint &vertexShader,
     glAttachShader(ID, geometryShader);
     glAttachShader(ID, fragmentShader);
     glLinkProgram(ID);
-    int success;
+    int success = 1;
     char infoLog[1024];
-    glGetShaderiv(ID, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(ID, GL_LINK_STATUS, &success);
     if (!success)
     {
         glGetShaderInfoLog(ID, 1024, NULL, infoLog);
@@ -57,9 +57,9 @@ GLuint Shader::createProgram(const GLuint &vertexShader, const GLuint &fragmentS
     glAttachShader(ID, vertexShader);
     glAttachShader(ID, fragmentShader);
     glLinkProgram(ID);
-    int success;
+    int success = 1;
     char infoLog[1024];
-    glGetShaderiv(ID, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(ID, GL_LINK_STATUS, &success);
     if (!success)
     {
         glGetShaderInfoLog(ID, 1024, NULL, infoLog);
@@ -123,6 +123,7 @@ GLuint Shader::createShaderFromFile(const std::string &path, const GLenum &type)
 {
     std::ifstream shaderFile;
     std::string shaderCode;
+	shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try
     {
         shaderFile.open(path);
@@ -144,9 +145,9 @@ GLuint Shader::createShaderFromFile(const std::string &path, const GLenum &type)
     glCompileShader(shader);
 
     //check if compiling successed
-    int success;
+    int success = 1;
     char infoLog[1024];
-    glGetProgramiv(shader, GL_LINK_STATUS, &success);
+    glGetProgramiv(shader, GL_COMPILE_STATUS, &success);
     if (!success)
     {
         glGetProgramInfoLog(shader, 1024, NULL, infoLog);

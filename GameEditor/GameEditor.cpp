@@ -51,7 +51,6 @@ void GameEditor::render(void **data)
     ImGui::SetNextWindowPos({160, 415}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({275, 350}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Helper Window");
-    if (!ImGui::IsWindowFocused()) helperWindowFunc = nullptr;
     if (helperWindowFunc)
         helperWindowFunc();
     ImGui::End();
@@ -84,8 +83,8 @@ void GameEditor::removeGameObjects()
     {
         scene->destroyGameObject(iter);
         scene->sceneData.destroyGameObject(iter);
-        if (iter == selectedGameObject)
-            selectedGameObject = nullptr;
+		if (iter == selectedGameObject)
+			setSelectedGameObject(nullptr);
     }
     objectToRemove.clear();
 }
@@ -192,7 +191,7 @@ void GameEditor::pushGameObject(std::set<Entity *>::iterator iter, const std::se
         //select game object
         if (ImGui::IsItemClicked() && (ImGui::GetMousePos().x - ImGui::GetItemRectMin().x) > ImGui::GetTreeNodeToLabelSpacing())
         {
-            selectedGameObject = *iter;
+			setSelectedGameObject(*iter);
         }
 
         if (open)
@@ -615,6 +614,14 @@ void GameEditor::showMenu()
             }
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("Tool"))
+        {
+            if (ImGui::MenuItem("Create Material"))
+            {
+                setHelperWindowFunc([this]() {this->createMaterial();});
+            }
+            ImGui::EndMenu();
+        }
         if (ImGui::BeginMenu("Settings"))
         {
             static int dimension = 2;
@@ -865,7 +872,7 @@ void GameEditor::dragSprite()
             if (go && !target)
             {
                 target = go->getComponent<Transform>();
-                selectedGameObject = go;
+				setSelectedGameObject(go);
                 lastX = mouseX;
                 lastY = mouseY;
             }
@@ -926,19 +933,19 @@ void GameEditor::createTRigidbody()
         return;
     }
     const char *bodyTypeSelections[] = {"dynamic", "static"};
-    static const char *selectedBodyType = bodyTypeSelections[0];
+    static const char **selectedBodyType = &bodyTypeSelections[0];
     makeDropDown(bodyTypeSelections, selectedBodyType, IM_ARRAYSIZE(bodyTypeSelections), 0);
     const char *shapeSelections[] = {"polygon", "circle", "line"};
-    static const char *selectedShape = shapeSelections[0];
+    static const char **selectedShape = &shapeSelections[0];
     makeDropDown(shapeSelections, selectedShape, IM_ARRAYSIZE(shapeSelections), 1);
 
     if (ImGui::Button("Create"))
     {
-        auto bodyType = selectedBodyType == bodyTypeSelections[0] ? BodyType::Dynamic : BodyType::Static;
+        auto bodyType = selectedBodyType == &bodyTypeSelections[0] ? BodyType::Dynamic : BodyType::Static;
         Shape *shape;
-        if (selectedShape == shapeSelections[0])
+        if (selectedShape == &shapeSelections[0])
             shape = new PolygonShape({});
-        else if (selectedShape == shapeSelections[1])
+        else if (selectedShape == &shapeSelections[1])
             shape = new CircleShape({0, 0}, 0);
         else
             shape = new LineShape({});
@@ -956,16 +963,16 @@ void GameEditor::createTRigidbody()
     }
 }
 
-void GameEditor::makeDropDown(const char *selections[], const char *&selected, const int &selectionsSize, const int &widgetId)
+void GameEditor::makeDropDown(const char *selections[], const char **&selected, const int &selectionsSize, const int &widgetId)
 {
     ImGui::PushID(widgetId);
-    if (ImGui::BeginCombo("##combo", selected))
+    if (ImGui::BeginCombo("##combo", *selected))
     {
         for (int n = 0; n < selectionsSize; n++)
         {
-            bool is_selected = (selected == selections[n]);
+            bool is_selected = (selected == &selections[n]);
             if (ImGui::Selectable(selections[n], is_selected))
-                selected = selections[n];
+                selected = &selections[n];
             if (is_selected)
                 ImGui::SetItemDefaultFocus();
         }
@@ -1046,4 +1053,94 @@ bool GameEditor::isGameSceneFocused() const
 {
     return m_isGameSceneFocused;
 }
+
+void GameEditor::createMaterial() 
+{
+    char buf[256];
+    ImGui::InputText("Name", buf, 256);
+    static std::string selectedShader = "";
+    if (ImGui::BeginCombo("Shader", selectedShader.data()))
+    {
+        for (auto k : Shader::collection)
+        {
+            bool is_selected= (selectedShader == k.first);
+            if (ImGui::Selectable(k.first.data(), is_selected))
+                selectedShader = k.first;
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    static int total = 0;
+    static std::vector<std::string> files;
+    static std::vector<int> textureType;
+    static std::vector<const char**> selectedTypes;
+    static const char *textureTypeSelections[] =
+        {
+            "Diffuse",
+            "Specular",
+            "Ambient",
+            "Emissive",
+            "Height",
+            "Normals",
+            "Shininess",
+            "Opacity",
+            "Displacement",
+            "Lightmap",
+            "Reflection",
+            "Unknown",
+        };
+    for (int i = 0; i < total; i++)
+    {
+        char file[256];
+        std::strcpy(file, files[i].data());
+        ImGui::InputText((std::string("Texture") + std::to_string(i)).data(), file, 256);
+        makeDropDown(textureTypeSelections, selectedTypes[i], IM_ARRAYSIZE(textureTypeSelections), i);
+        textureType[i] = selectedTypes[i] - textureTypeSelections + 1;
+        files[i] = file;
+    }
+
+    if (ImGui::Button("Add texture"))
+    {
+        total += 1;
+        files.push_back("");
+        textureType.push_back(1);
+        selectedTypes.push_back(&textureTypeSelections[0]);
+    }
+    ImGui::SameLine(0, 5);
+    if (ImGui::Button("Remove"))
+    {
+        total -= 1;
+        files.pop_back();
+        textureType.pop_back();
+        selectedTypes.pop_back();
+    };
+
+    if (ImGui::Button("Create"))
+    {
+        std::vector<Texture *> textures(total);
+        for (int i = 0; i < total;i++)
+        {
+            textures[i] = ResourceManager::get()->getTexture(files[i], static_cast<TextureType>(textureType[i]));
+        }
+        auto mat = ResourceManager::get()->getMaterial(buf);
+        mat->setShader(selectedShader);
+        mat->changeTextures(std::move(textures));
+
+        //clean up
+        files.clear();
+        textureType.clear();
+        selectedTypes.clear();
+        total = 0;
+        helperWindowFunc = nullptr;
+    }
+}
+
+void GameEditor::setSelectedGameObject(Entity *newOne)
+{
+    helperWindowFunc = nullptr;
+    selectedGameObject = newOne;
+}
+
 } // namespace wlEngine
