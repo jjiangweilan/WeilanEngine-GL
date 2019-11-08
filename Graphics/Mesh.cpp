@@ -2,7 +2,7 @@
 #include "../Manager/ResourceManager.hpp"
 namespace wlEngine
 {
-Mesh::Mesh(const PrimitiveMeshType &meshType)
+Mesh::Mesh(const PrimitiveMeshType &meshType, Material* mat, const std::string& name) : m_material(mat), name(name)
 {
     switch (meshType)
     {
@@ -13,14 +13,14 @@ Mesh::Mesh(const PrimitiveMeshType &meshType)
         break;
     }
 }
-Mesh::Mesh(std::vector<GLuint> &indices, std::vector<Vertex> &vertices) : m_indices(indices), m_vertices(vertices), m_material(nullptr), name()
+Mesh::Mesh(std::vector<GLuint> &indices, std::vector<Vertex> &vertices, Material* mat, const std::string& name) : m_indices(indices), m_vertices(vertices), m_material(mat), name(name)
 {
     EBO = 0;
     VAO = 0;
     VBO = 0;
     setupMesh();
 }
-Mesh::Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices) : m_indices(indices), m_vertices(vertices), m_material(nullptr), name()
+Mesh::Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices, Material* mat, const std::string& name) : m_indices(indices), m_vertices(vertices), m_material(mat), name(name)
 {
     EBO = 0;
     VAO = 0;

@@ -5,10 +5,6 @@ namespace wlEngine
 
 Material::Material() : m_shader(nullptr){};
 
-Material::Material(const std::string& shader, std::vector<Texture*>&& textures){
-    setShader(shader);
-    changeTextures(std::move(textures));
-};
 
 void Material::setShader(const std::string& name)
 {
@@ -18,6 +14,11 @@ void Material::setShader(const std::string& name)
 void Material::useShader() const
 {
     m_shader->use();
+}
+
+const Shader* Material::getShader()const
+{
+	return m_shader;
 }
 
 } // namespace wlEngine

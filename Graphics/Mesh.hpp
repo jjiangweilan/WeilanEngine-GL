@@ -31,9 +31,9 @@ public:
  * 
  * @param meshType 
  */
-    Mesh(const PrimitiveMeshType& meshType);
-    Mesh(std::vector<GLuint> &indices, std::vector<Vertex> &vertices);
-    Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices);
+    Mesh(const PrimitiveMeshType& meshType, Material* mat, const std::string& name = "");
+    Mesh(std::vector<GLuint> &indices, std::vector<Vertex> &vertices, Material* mat, const std::string& name = "");
+    Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices, Material* mat, const std::string& name = "");
     Mesh(const Mesh &mesh) = default;
     Mesh(Mesh &&mesh) noexcept;
     Mesh(aiMesh *mesh, Material* m = nullptr, const std::string& name="");
@@ -53,7 +53,12 @@ public:
     void setMaterial(Material *material) const;
 	void setMaterial(const std::string& name) const;
 
+/**
+ * @brief used in model to identify the material
+ * 
+ */
     std::string name;
+
     ~Mesh(){};
 
 private:

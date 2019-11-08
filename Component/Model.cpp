@@ -23,4 +23,9 @@ const Shader *Model::getShader() const
 {
     return m_shader;
 }
+
+void Model::setModel(Graphics::Model *model)
+{
+    m_model = model;
+}
 } // namespace wlEngine

@@ -504,7 +504,9 @@ void RenderSystem::render(Model *model)
   //  auto shader = model->getShader();
   //  shader->use();
 
-    for (auto &mesh : *model->getModel()->getMeshes())
+	auto modelM = model->getModel();
+	if (!modelM) return;
+    for (auto mesh : *modelM->getMeshes())
     {
         // bind appropriate textures
         unsigned int diffuseNr = 900;
@@ -546,7 +548,11 @@ void RenderSystem::render(Model *model)
         //
         // draw mesh
         glBindVertexArray(mesh.VAO);
-        glDrawElements(GL_TRIANGLES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
+        auto shader = mesh.m_material->getShader();
+        if(shader->hasTess())
+            glDrawElements(GL_PATCHES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
+        else
+            glDrawElements(GL_TRIANGLES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);

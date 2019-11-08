@@ -31,6 +31,7 @@
 #include "Graphics/Mesh.hpp"
 #include "Graphics/Model.hpp"
 #include "Graphics/Material.hpp"
+#include "Graphics/Texture.hpp"
 
 #include "Time.hpp"
 #include "Input.hpp"

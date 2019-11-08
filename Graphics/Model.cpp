@@ -82,5 +82,14 @@ const Mesh *Model::getMesh(const std::string &name) const
     return nullptr;
 }
 
+void Model::addMesh(Mesh &&mesh)
+{
+    m_meshes.emplace_back(std::move(mesh));
+}
+
+void Model::addMesh(const Mesh &mesh)
+{
+    m_meshes.push_back(mesh);
+}
 } // namespace Graphics
 } // namespace wlEngine

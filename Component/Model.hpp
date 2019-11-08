@@ -22,6 +22,8 @@ public:
     const Graphics::Model * getModel() const;
     const Shader* getShader() const;
 
+    void setModel(Graphics::Model* model);
+
 private:
 	Graphics::Model* m_model;
     Shader *m_shader;

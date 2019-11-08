@@ -2,9 +2,9 @@
 
 #include <vector>
 #include <glad/glad.h>
-#include <assimp/material.h>
+#include <string>
 
-namespace wlEngine 
+namespace wlEngine
 {
 class Texture;
 class Shader;
@@ -20,7 +20,17 @@ public:
      * @param shader shader name
      * @param textures textures
      */
-    Material(const std::string& shader, std::vector<Texture*>&& textures);
+    Material(const std::string& shader, std::vector<Texture*>&& textures)
+	{
+		setShader(shader);
+		changeTextures(std::move(textures));
+	};
+	Material(const std::string& shader, const std::vector<Texture*>& textures)
+	{
+		setShader(shader);
+		m_textures = textures;
+	}
+
     /**
      * @brief change the used shader
      * 
@@ -33,10 +43,10 @@ public:
      * 
      * @param newTextures the textures to be moved
      */
-    void changeTextures(std::vector<Texture*>&& newTextures)
-    {
-        m_textures = std::move(newTextures);
-    }
+	void changeTextures(std::vector<Texture*>&& newTextures)
+	{
+		m_textures = std::move(newTextures);
+	}
 
     /**
      * @brief Get the Textures object
@@ -48,7 +58,8 @@ public:
         return &m_textures;
     }
 
-    void useShader()const;
+    void useShader() const;
+	const Shader* getShader()const;
 private:
     std::vector<Texture*> m_textures;
     Shader* m_shader;

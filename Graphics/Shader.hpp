@@ -17,20 +17,34 @@ class Shader
 {
 public:
     static std::map<std::string, Shader *> collection;
-    static void loadShader(const std::string &name, const std::string &vertexPath, const std::string& geometryPath, const std::string &fragmentPath);
-    static void loadShader(const std::string &name, const std::string &vertexPath, const std::string &fragmentPath);
+    static void loadShader(const std::string &name,
+                           const std::string &vertexPath,
+                           const std::string &fragmentPath);
+
+    static void loadShader(const std::string &name,
+                           const std::string &vertexPath,
+                           const std::string &geometryPath,
+                           const std::string &fragmentPath);
+
+    static void loadShader(const std::string &name,
+                           const std::string &vertexPath,
+                           const std::string &tessCtrlPath,
+                           const std::string &tessEvalPath,
+                           const std::string &geometryPath,
+                           const std::string &fragmentPath);
+
+    static void loadShader(const std::string &name,
+                           const std::string &vertexPath,
+                           const std::string &tessEvalPath,
+                           const std::string &geometryPath,
+                           const std::string &fragmentPath);
+
     static void deleteShader(const std::string &name);
     unsigned int ID;
-    Shader(const std::string &vertexPath,
-           const std::string &fragmentPath);
-    Shader(const std::string &vertexPath,
-           const std::string &geometryPath,
-           const std::string &fragmentPath);
-    Shader();
     ~Shader();
 
     void use() const;
-
+	bool hasTess() const;
     void setBool(const std::string &name, bool value) const;
     void setInt(const std::string &name, int value) const;
     void setFloat(const std::string &name, float value) const;
@@ -122,8 +136,17 @@ public:
     }
 
 private:
+    Shader(const std::string &vertexPath,
+           const std::string &fragmentPath);
+    Shader(const std::string &vertexPath,
+           const std::string &tessCtrlPath,
+           const std::string &tessEvalPath,
+           const std::string &geometryPath,
+           const std::string &fragmentPath);
+    Shader();
     GLuint createShaderFromFile(const std::string &path, const GLenum &type);
-    GLuint createProgram(const GLuint &vertexShader, const GLuint &geometryShader, const GLuint &fragmentShader);
-    GLuint createProgram(const GLuint &vertexShader, const GLuint &fragmentShader);
+    GLuint createProgram(const GLuint &vertexShader, const GLuint &tessCtrlPath, const GLuint &tessEvalPath, const GLuint &geometryShader, const GLuint &fragmentShader);
+
+    bool hasTessellation;
 };
 } // namespace wlEngine

@@ -25,6 +25,18 @@ public:
      * @return const Mesh* 
      */
     const Mesh* getMesh(const std::string& name) const;
+    /**
+     * @brief move a mesh to the meshes
+     * 
+     * @param mesh 
+     */
+	void addMesh(Mesh&& mesh);
+    /**
+     * @brief copy a mesh to the meshes
+     * 
+     * @param mesh 
+     */
+	void addMesh(const Mesh& mesh);
 
 private:
     std::vector<Mesh> m_meshes;

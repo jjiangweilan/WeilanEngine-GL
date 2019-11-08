@@ -4,36 +4,51 @@ namespace wlEngine
 {
 std::map<std::string, Shader *> Shader::collection;
 
-Shader::Shader() : Shader("texture.vert", "texture.frag")
+Shader::Shader() : Shader("texture.vert", "", "", "", "texture.frag")
 {
-}
-
-Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath)
-{
-    
-    auto vertex = createShaderFromFile(vertexPath, GL_VERTEX_SHADER);
-    auto fragment = createShaderFromFile(fragmentPath, GL_FRAGMENT_SHADER);
-    ID = createProgram(vertex, fragment);
 }
 
 Shader::Shader(const std::string &vertexPath,
+               const std::string &tessCtrlPath,
+               const std::string &tessEvalPath,
                const std::string &geometryPath,
                const std::string &fragmentPath)
 {
-    auto vertex = createShaderFromFile(vertexPath, GL_VERTEX_SHADER);
-    auto geometry = createShaderFromFile(vertexPath, GL_GEOMETRY_SHADER);
-    auto fragment = createShaderFromFile(fragmentPath, GL_FRAGMENT_SHADER);
-    ID = createProgram(vertex, geometry, fragment);
+    GLuint vertex = 0, tessCtrl = 0, tessEval = 0, geometry = 0, fragment = 0;
+    vertex = createShaderFromFile(vertexPath, GL_VERTEX_SHADER);
+    fragment = createShaderFromFile(fragmentPath, GL_FRAGMENT_SHADER);
+
+    tessCtrl = tessCtrlPath.size() == 0 ? 0 : createShaderFromFile(tessCtrlPath, GL_TESS_CONTROL_SHADER);
+    tessEval = tessEvalPath.size() == 0 ? 0 : createShaderFromFile(tessEvalPath, GL_TESS_EVALUATION_SHADER);
+    geometry = geometryPath.size() == 0 ? 0 : createShaderFromFile(geometryPath, GL_GEOMETRY_SHADER);
+    ID = createProgram(vertex, tessCtrl, tessEval, geometry, fragment);
 }
 GLuint Shader::createProgram(const GLuint &vertexShader,
+                             const GLuint &tessCtrlShader,
+                             const GLuint &tessEvalShader,
                              const GLuint &geometryShader,
                              const GLuint &fragmentShader)
 {
     GLuint ID = glCreateProgram();
     glAttachShader(ID, vertexShader);
-    glAttachShader(ID, geometryShader);
     glAttachShader(ID, fragmentShader);
+
+	if (tessCtrlShader != 0)
+	{
+		glAttachShader(ID, tessCtrlShader);
+	}
+     
+    if (tessEvalShader != 0)
+    {
+        glAttachShader(ID, tessEvalShader);
+		hasTessellation = true;
+    }
+    if (geometryShader != 0)
+        glAttachShader(ID, geometryShader);
+
     glLinkProgram(ID);
+
+    //error check
     int success = 1;
     char infoLog[1024];
     glGetShaderiv(ID, GL_LINK_STATUS, &success);
@@ -45,36 +60,26 @@ GLuint Shader::createProgram(const GLuint &vertexShader,
                   << "\n"
                   << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
     }
+
+    //clean up
     glDeleteShader(vertexShader);
-    glDeleteShader(geometryShader);
     glDeleteShader(fragmentShader);
+
+    if (geometryShader)
+        glDeleteShader(geometryShader);
+    if (tessCtrlShader)
+        glDeleteShader(tessCtrlShader);
+    if (tessEvalShader)
+        glDeleteShader(tessEvalShader);
+
     return ID;
 }
 
-GLuint Shader::createProgram(const GLuint &vertexShader, const GLuint &fragmentShader)
-{
-    GLuint ID = glCreateProgram();
-    glAttachShader(ID, vertexShader);
-    glAttachShader(ID, fragmentShader);
-    glLinkProgram(ID);
-    int success = 1;
-    char infoLog[1024];
-    glGetShaderiv(ID, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(ID, 1024, NULL, infoLog);
-        std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: "
-                  << "PROGRAME"
-                  << "\n"
-                  << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-    return ID;
-}
 void Shader::loadShader(const std::string &name, const std::string &vertexPath, const std::string &fragmentPath)
 {
-    collection.insert({name, new Shader(vertexPath, fragmentPath)});
+
+    auto shader = new Shader(vertexPath, "", "", "", fragmentPath);
+    collection.insert({name, shader});
 }
 
 void Shader::deleteShader(const std::string &name)
@@ -123,7 +128,7 @@ GLuint Shader::createShaderFromFile(const std::string &path, const GLenum &type)
 {
     std::ifstream shaderFile;
     std::string shaderCode;
-	shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     try
     {
         shaderFile.open(path);
@@ -157,5 +162,31 @@ GLuint Shader::createShaderFromFile(const std::string &path, const GLenum &type)
     }
 
     return shader;
+}
+
+void Shader::loadShader(const std::string &name,
+                        const std::string &vertexPath,
+                        const std::string &tessCtrlPath,
+                        const std::string &tessEvalPath,
+                        const std::string &geometryPath,
+                        const std::string &fragmentPath)
+{
+    auto shader = new Shader(vertexPath, tessCtrlPath, tessEvalPath, geometryPath, fragmentPath);
+    collection[name] = shader;
+}
+
+void Shader::loadShader(const std::string &name,
+                        const std::string &vertexPath,
+                        const std::string &tessEvalPath,
+                        const std::string &geometryPath,
+                        const std::string &fragmentPath)
+{
+    auto shader = new Shader(vertexPath, "", tessEvalPath, geometryPath, fragmentPath);
+    collection[name] = shader;
+}
+
+bool Shader::hasTess() const
+{
+	return hasTessellation;
 }
 } // namespace wlEngine
