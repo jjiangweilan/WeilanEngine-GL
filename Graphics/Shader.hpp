@@ -11,6 +11,7 @@
 #include <string>
 #include <map>
 
+#define UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS 0
 namespace wlEngine
 {
 class Shader
@@ -19,11 +20,6 @@ public:
     static std::map<std::string, Shader *> collection;
     static void loadShader(const std::string &name,
                            const std::string &vertexPath,
-                           const std::string &fragmentPath);
-
-    static void loadShader(const std::string &name,
-                           const std::string &vertexPath,
-                           const std::string &geometryPath,
                            const std::string &fragmentPath);
 
     static void loadShader(const std::string &name,

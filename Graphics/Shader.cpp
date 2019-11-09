@@ -12,7 +12,7 @@ Shader::Shader(const std::string &vertexPath,
                const std::string &tessCtrlPath,
                const std::string &tessEvalPath,
                const std::string &geometryPath,
-               const std::string &fragmentPath)
+               const std::string &fragmentPath) : hasTessellation(false)
 {
     GLuint vertex = 0, tessCtrl = 0, tessEval = 0, geometry = 0, fragment = 0;
     vertex = createShaderFromFile(vertexPath, GL_VERTEX_SHADER);
@@ -22,6 +22,9 @@ Shader::Shader(const std::string &vertexPath,
     tessEval = tessEvalPath.size() == 0 ? 0 : createShaderFromFile(tessEvalPath, GL_TESS_EVALUATION_SHADER);
     geometry = geometryPath.size() == 0 ? 0 : createShaderFromFile(geometryPath, GL_GEOMETRY_SHADER);
     ID = createProgram(vertex, tessCtrl, tessEval, geometry, fragment);
+	//uniform block
+    auto matricesIndex = glGetUniformBlockIndex(ID, "_ProjMatrices");
+    if(matricesIndex != GL_INVALID_INDEX) glUniformBlockBinding(ID, matricesIndex,UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS);
 }
 GLuint Shader::createProgram(const GLuint &vertexShader,
                              const GLuint &tessCtrlShader,
@@ -49,16 +52,16 @@ GLuint Shader::createProgram(const GLuint &vertexShader,
     glLinkProgram(ID);
 
     //error check
-    int success = 1;
+    GLint success = GL_FALSE;
     char infoLog[1024];
     glGetShaderiv(ID, GL_LINK_STATUS, &success);
-    if (!success)
+    if (success == GL_TRUE)
     {
         glGetShaderInfoLog(ID, 1024, NULL, infoLog);
         std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: "
                   << "PROGRAME"
                   << "\n"
-                  << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+                  << infoLog << "------------------------------------------------------- " << std::endl;
     }
 
     //clean up
@@ -96,33 +99,7 @@ void Shader::deleteShader(const std::string &name)
     }
 }
 
-void Shader::use() const
-{
-    glUseProgram(ID);
-}
 
-void Shader::setBool(const std::string &name, bool value) const
-{
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
-}
-
-void Shader::setInt(const std::string &name, int value) const
-{
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
-}
-
-void Shader::setFloat(const std::string &name, float value) const
-{
-    glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
-}
-
-void Shader::loadShader(const std::string &name, const std::string &vertexPath, const std::string &geometryPath, const std::string &fragmentPath)
-{
-}
-Shader::~Shader()
-{
-    glDeleteProgram(ID);
-}
 
 GLuint Shader::createShaderFromFile(const std::string &path, const GLenum &type)
 {
@@ -150,14 +127,15 @@ GLuint Shader::createShaderFromFile(const std::string &path, const GLenum &type)
     glCompileShader(shader);
 
     //check if compiling successed
-    int success = 1;
+    GLint success = GL_FALSE;
     char infoLog[1024];
-    glGetProgramiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success)
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (success != GL_TRUE)
     {
-        glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+        glGetShaderInfoLog(shader, 1024, NULL, infoLog);
         std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
-                  << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+                  << infoLog << "file: " << path << std::endl
+                  << "------------------------------------------------------- " << std::endl;
         return 0;
     }
 
@@ -188,5 +166,30 @@ void Shader::loadShader(const std::string &name,
 bool Shader::hasTess() const
 {
 	return hasTessellation;
+}
+
+void Shader::use() const
+{
+    glUseProgram(ID);
+}
+
+void Shader::setBool(const std::string &name, bool value) const
+{
+    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
+}
+
+void Shader::setInt(const std::string &name, int value) const
+{
+    glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+void Shader::setFloat(const std::string &name, float value) const
+{
+    glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+Shader::~Shader()
+{
+    glDeleteProgram(ID);
 }
 } // namespace wlEngine

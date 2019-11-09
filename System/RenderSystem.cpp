@@ -24,7 +24,6 @@
 #include "../imgui/imgui_impl_sdl.h"
 #include "../imgui/imgui_impl_opengl3.h"
 
-#define UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS 0
 namespace wlEngine
 {
 RenderSystem *RenderSystem::renderSystem = nullptr;
@@ -37,10 +36,6 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     initSceneFrambufferData();
     buildInResourceInit();
 
-	//uniform block
-    auto modelShader = Shader::collection["Model"];
-    auto matricesIndex = glGetUniformBlockIndex(modelShader->ID, "Matrices");
-    glUniformBlockBinding(modelShader->ID, matricesIndex,UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS);
 
     sceneShader = Shader::collection["Scene"];
 
@@ -549,10 +544,17 @@ void RenderSystem::render(Model *model)
         // draw mesh
         glBindVertexArray(mesh.VAO);
         auto shader = mesh.m_material->getShader();
-        if(shader->hasTess())
-            glDrawElements(GL_PATCHES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
+		if (shader->hasTess())
+		{
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			glPatchParameteri(GL_PATCH_VERTICES, 2);
+			glDrawElements(GL_PATCHES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
         else
+        {
             glDrawElements(GL_TRIANGLES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
+        }
 
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
@@ -561,6 +563,7 @@ void RenderSystem::render(Model *model)
         // always good practice to set everything back to defaults once configured.
         if (model->afterRenderFunc)
             model->afterRenderFunc();
+
     }
 }
 
