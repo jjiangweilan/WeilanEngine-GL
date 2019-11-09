@@ -30,7 +30,10 @@ public:
 		setShader(shader);
 		m_textures = textures;
 	}
-
+	Material(const std::string& shader) : m_textures()
+	{
+		setShader(shader);
+	}
     /**
      * @brief change the used shader
      * 

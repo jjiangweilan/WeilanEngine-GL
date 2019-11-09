@@ -546,10 +546,8 @@ void RenderSystem::render(Model *model)
         auto shader = mesh.m_material->getShader();
 		if (shader->hasTess())
 		{
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			glPatchParameteri(GL_PATCH_VERTICES, 2);
+			glPatchParameteri(GL_PATCH_VERTICES, 4);
 			glDrawElements(GL_PATCHES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
         else
         {

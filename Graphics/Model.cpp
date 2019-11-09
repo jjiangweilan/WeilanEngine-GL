@@ -1,19 +1,41 @@
 #include "Model.hpp"
+
 #include "../Manager/ResourceManager.hpp"
 namespace wlEngine
 {
 namespace Graphics
 {
 
-Model::Model(const std::string &path) : m_path(path)
+Model::Model(std::vector<Mesh>&& meshes) {
+    m_meshes = std::move(meshes);
+}
+
+Model::Model(const std::vector<Mesh>& meshes) {
+    m_meshes = meshes;
+}
+
+Model::Model(const std::string &path) : m_id(path)
 {
     loadModel(path);
 }
 
+Model::Model(Model&& model) {
+	m_meshes = std::move(model.m_meshes);
+	m_id = model.m_id;
+	m_gammaCorrection = m_gammaCorrection;
+}
+
+Model::Model(const Model& model) {
+	m_meshes = model.m_meshes;
+	m_id = model.m_id;
+	m_gammaCorrection = m_gammaCorrection;
+}
+
+
 Model *Model::loadModel(const std::string &path)
 {
     Assimp::Importer importer;
-    m_path = path;
+    m_id = path;
     const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -28,7 +50,7 @@ Model *Model::loadModel(const std::string &path)
 
 void Model::processNode(aiNode *node, const aiScene *scene)
 {
-    auto m_directory = m_path.substr(0, m_path.find_last_of('/'));
+    auto m_directory = m_id.substr(0, m_id.find_last_of('/'));
     for (size_t i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
@@ -54,7 +76,7 @@ void Model::processNode(aiNode *node, const aiScene *scene)
         if (ptr == materialName.npos)
             ptr = materialName.find_first_of(" ");
         materialName = materialName.substr(0, ptr);
-        auto mat = ResourceManager::get()->getMaterial(m_path + "-" + materialName);
+        auto mat = ResourceManager::get()->getMaterial(m_id + "-" + materialName);
         mat->setShader("Model");
         mat->changeTextures(std::move(textures));
 
@@ -91,5 +113,17 @@ void Model::addMesh(const Mesh &mesh)
 {
     m_meshes.push_back(mesh);
 }
+
+Model *Model::get(const std::string &id)
+{
+    return &collection[id];
+}
+
+void Model::remove(const std::string &id)
+{
+    collection.erase(id);
+}
+
+std::unordered_map<std::string, Model> Model::collection = std::unordered_map<std::string, Model>();
 } // namespace Graphics
 } // namespace wlEngine

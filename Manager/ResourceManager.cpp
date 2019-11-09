@@ -77,16 +77,6 @@ const TextureMap &ResourceManager::getTextures()
     return m_textures;
 }
 
-Graphics::Model *ResourceManager::getModel(const std::string &path)
-{
-    auto m = m_models.find(path);
-    if (m == m_models.end())
-    {
-        return m_models[path].loadModel(path);
-    }
-    return &m->second;
-}
-
 Character *ResourceManager::getCharacter(const wchar_t &wideCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight)
 {
     std::wstring id = std::wstring(1, wideCharacter) + L"_" + std::to_wstring(pixelSizeWidth) + L"_" + std::to_wstring(pixelSizeHeight); // IMPROVE: we can write this as a struct to improve performance

@@ -2,7 +2,6 @@
 #include "../Graphics/Texture.hpp"
 #include "../Graphics/Material.hpp"
 #include "../Graphics/Character.hpp"
-#include "../Graphics/Model.hpp"
 
 #include <unordered_map>
 #include <string>
@@ -18,7 +17,6 @@ using Json = nlohmann::json;
 //seperate texture and text texture because of they use different kinds of keys
 using TextureMap = std::unordered_map<std::string, Texture>;
 using CharacterMap = std::unordered_map<std::wstring, Character>;
-using ModelMap = std::unordered_map<std::string, Graphics::Model>;
 using MaterialMap = std::unordered_map<std::string, Material>;
 class ResourceManager
 {
@@ -29,8 +27,6 @@ public:
 
     Texture *getTexture(const std::string &path, const TextureType& type = TextureType::Diffuse);
     Material* getMaterial(const std::string& name);
-
-    Graphics::Model* getModel(const std::string& path);
 
     const TextureMap &getTextures();
     /* FreeType *************************************/
@@ -50,7 +46,6 @@ private:
     ResourceManager();
     TextureMap m_textures;
     CharacterMap m_characters;
-    ModelMap m_models;
     MaterialMap m_materials;
     std::map<std::wstring, Texture> m_textTextures;
     Texture *loadTexture(const std::string &path, const TextureType &type = TextureType::Diffuse);

@@ -10,9 +10,9 @@ Model::Model(Entity* go) : Component(go), m_model(nullptr)
     m_shader = Shader::collection["Model"];
 }
 
-Model::Model(Entity *go, const std::string &path): Model(go)
+Model::Model(Entity *go, const std::string &id): Model(go)
 {
-    m_model = ResourceManager::get()->getModel(path);
+	m_model = Graphics::Model::get(id);
 }
 
 const Graphics::Model* Model::getModel() const

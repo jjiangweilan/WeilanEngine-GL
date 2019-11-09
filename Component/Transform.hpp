@@ -41,7 +41,7 @@ public:
     void setToPreviousPosition();
     glm::vec3 getLocalPosition();
 
-    void rotate(const glm::vec3 &axis, const float &radius, const glm::mat4 &preRotate = glm::mat4(1.0));
+    void rotate(const glm::vec3 &axis, const float &radius);
     void setRotation(const glm::mat4 &ro);
     void setScale(const float &x, const float &y, const float &z);
     void rotateAround(const glm::vec3 &axis, const float &radius);

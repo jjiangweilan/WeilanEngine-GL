@@ -12,7 +12,7 @@ class Model : public Component
 
 public:
     Model(Entity *go);
-    Model(Entity *go, const std::string &path);
+    Model(Entity *go, const std::string &id);
 
     void useShader(const std::string &name);
 

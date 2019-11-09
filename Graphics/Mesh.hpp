@@ -38,6 +38,8 @@ public:
     Mesh(Mesh &&mesh) noexcept;
     Mesh(aiMesh *mesh, Material* m = nullptr, const std::string& name="");
 
+    Mesh& operator=(const Mesh& mesh) = default;
+    Mesh& operator=(Mesh&& mesh);
     /**
      * @brief load mesh's vertex data using assimp
      * 

@@ -53,10 +53,10 @@ void Transform::setScale(const float &x, const float &y, const float &z) {
     scale = {x, y, z};
     scaleMat4 = glm::scale(glm::mat4(1.0), {x, y, z});
 }
-void Transform::rotate(const glm::vec3 &axis, const float &degree, const glm::mat4& preRotate) {
+void Transform::rotate(const glm::vec3 &axis, const float &degree) {
     rotationData.axis = axis;
     rotationData.degree = degree;
-    rotation = glm::rotate(preRotate, glm::radians(degree), axis);
+    rotation = glm::rotate(rotation, glm::radians(degree), axis);
 }
 
 void Transform::setRotation(const glm::mat4 &ro) { rotation = ro; }

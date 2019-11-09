@@ -69,6 +69,17 @@ Mesh::Mesh(Mesh &&mesh) noexcept
     this->m_material = mesh.m_material;
     this->name = mesh.name;
 }
+Mesh &Mesh::operator=(Mesh &&mesh)
+{
+    this->m_vertices = std::move(mesh.m_vertices);
+    this->m_indices = std::move(mesh.m_indices);
+    this->EBO = mesh.EBO;
+    this->VAO = mesh.VAO;
+    this->VBO = mesh.VBO;
+    this->m_material = mesh.m_material;
+    this->name = mesh.name;
+    return *this;
+}
 Mesh::Mesh(aiMesh *mesh, Material *m, const std::string &name) : m_material(m), name(name)
 {
     EBO = 0;

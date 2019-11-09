@@ -64,7 +64,7 @@ namespace wlEngine {
 
     template<typename ComponentType, typename... Args>
 	ComponentType* Entity::addComponent(Args&&... params) {
-		auto p = ComponentType::createComponent(this, params...);
+		auto p = ComponentType::createComponent(this, std::forward<Args>(params)...);
 		auto raw = p.get();
         components.insert(p);
 		return raw;
