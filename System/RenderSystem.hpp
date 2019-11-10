@@ -11,12 +11,16 @@
 //NOTE: The G-Syn is limiting the frame rate to 60!
 namespace wlEngine
 {
-class Sprite;
+namespace Graphics {
+		class Shader;
+}
 class Model;
+class Sprite;
+
 class Text;
 class GameEditor;
 class Camera;
-class Shader;
+
 class VolumetricLight;
 namespace FramebuffersIndex
 {
@@ -54,7 +58,7 @@ private:
 #endif
 #ifdef DEBUG
   void debugRender();
-  Shader *physicsDebugDrawShader;
+  Graphics::Shader *physicsDebugDrawShader;
   GLuint physicsDebugVAO;
   GLuint physicsDebugVBO;
 #endif
@@ -74,7 +78,7 @@ private:
   std::vector<GLuint> framebuffers;
   std::vector<GLuint> framebufferTextures;
   std::vector<GLuint> depthAndStencilTextures;
-  Shader *sceneShader;
+  Graphics::Shader *sceneShader;
   GLuint sceneVAO;
   GLuint sceneVBO;
   GLuint sceneEBO;

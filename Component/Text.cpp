@@ -8,7 +8,7 @@ namespace wlEngine
 COMPONENT_DEFINATION(Component, Text, 32);
 Text::Text(Entity *entity) : Component(entity), language(Language::English), animated(true), textRenderIndex(0), renderStarted(false), m_timePassed(0), animationSpeed(0.02)
 {
-    m_shader = Shader::collection["Text"];
+    m_shader = Graphics::Shader::get("Text");
 }
 
 /* Text Loading ***********************************************************************/
@@ -111,7 +111,7 @@ void Text::loadEnglish(const std::wstring &textStr, const int &maxLineWidth, con
             }
 
             // build this word, used to test maximum line width
-            std::vector<Character *> word;
+            std::vector<Graphics::Character *> word;
             int wordWidth = 0;
             while (textStr[i] != L'\n' && i < textStr.size())
             {
@@ -171,9 +171,9 @@ glm::mat4 Text::CharacterETX::getTextTransform() { return glm::translate(glm::ma
 
 void Text::setLanguage(const Language &choice) { language = choice; }
 
-Text::CharacterETX::CharacterETX(Character *c, const int &x, const int &offsetY) : character(c), x(x), offsetY(offsetY) {}
+Text::CharacterETX::CharacterETX(Graphics::Character *c, const int &x, const int &offsetY) : character(c), x(x), offsetY(offsetY) {}
 
-const Shader *Text::getShader() const
+const Graphics::Shader *Text::getShader() const
 {
     return m_shader;
 }

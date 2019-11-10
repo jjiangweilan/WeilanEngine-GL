@@ -1,9 +1,11 @@
 #include "Character.hpp"
 #include "../Manager/ResourceManager.hpp"
 
-namespace wlEngine {
-
-Character::Character(): m_mesh(), m_face()
+namespace wlEngine
+{
+namespace Graphics
+{
+Character::Character() : m_mesh(), m_face()
 {
     std::cout << "called" << std::endl;
 }
@@ -25,4 +27,5 @@ const Mesh2D *Character::getMesh() const
 {
     return &m_mesh;
 }
+} // namespace Graphics
 } // namespace wlEngine

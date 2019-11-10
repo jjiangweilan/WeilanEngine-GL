@@ -8,6 +8,8 @@
 
 namespace wlEngine
 {
+namespace Graphics
+{
 class Material;
 struct Vertex
 {
@@ -20,26 +22,27 @@ struct Vertex
 
 enum PrimitiveMeshType
 {
-    Cube, Sphere
+    Cube,
+    Sphere
 };
 
 class Mesh
 {
 public:
-/**
+    /**
  * @brief Construct a new Mesh object with a predefined mesh type
  * 
  * @param meshType 
  */
-    Mesh(const PrimitiveMeshType& meshType, Material* mat, const std::string& name = "");
-    Mesh(std::vector<GLuint> &indices, std::vector<Vertex> &vertices, Material* mat, const std::string& name = "");
-    Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices, Material* mat, const std::string& name = "");
+    Mesh(const PrimitiveMeshType &meshType, Material *mat, const std::string &name = "");
+    Mesh(std::vector<GLuint> &indices, std::vector<Vertex> &vertices, Material *mat, const std::string &name = "");
+    Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices, Material *mat, const std::string &name = "");
     Mesh(const Mesh &mesh) = default;
     Mesh(Mesh &&mesh) noexcept;
-    Mesh(aiMesh *mesh, Material* m = nullptr, const std::string& name="");
+    Mesh(aiMesh *mesh, Material *m = nullptr, const std::string &name = "");
 
-    Mesh& operator=(const Mesh& mesh) = default;
-    Mesh& operator=(Mesh&& mesh);
+    Mesh &operator=(const Mesh &mesh) = default;
+    Mesh &operator=(Mesh &&mesh);
     /**
      * @brief load mesh's vertex data using assimp
      * 
@@ -53,9 +56,9 @@ public:
      * @param material 
      */
     void setMaterial(Material *material) const;
-	void setMaterial(const std::string& name) const;
+    void setMaterial(const std::string &name) const;
 
-/**
+    /**
  * @brief used in model to identify the material
  * 
  */
@@ -77,4 +80,5 @@ private:
 
     friend class RenderSystem;
 };
+} // namespace Graphics
 } // namespace wlEngine

@@ -57,27 +57,7 @@ void ResourceManager::init()
     setlocale(LC_ALL, "");
 }
 
-Texture *ResourceManager::loadTexture(const std::string &path, const TextureType &type)
-{
-    return m_textures[path].loadFromFile(path);
-}
-
-Texture *ResourceManager::getTexture(const std::string &path, const TextureType& type)
-{
-    auto t = m_textures.find(path);
-    if (t == m_textures.end())
-    {
-        return loadTexture(path, type);
-    }
-    return &t->second;
-}
-
-const TextureMap &ResourceManager::getTextures()
-{
-    return m_textures;
-}
-
-Character *ResourceManager::getCharacter(const wchar_t &wideCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight)
+Graphics::Character *ResourceManager::getCharacter(const wchar_t &wideCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight)
 {
     std::wstring id = std::wstring(1, wideCharacter) + L"_" + std::to_wstring(pixelSizeWidth) + L"_" + std::to_wstring(pixelSizeHeight); // IMPROVE: we can write this as a struct to improve performance
     auto iter = m_characters.find(id);
@@ -92,7 +72,7 @@ Character *ResourceManager::getCharacter(const wchar_t &wideCharacter, const int
     error = FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL);
 
     auto characterTexture = m_textTextures[id].loadFromFTBitmap(m_face->glyph);
-    m_characters[id] = Character(m_face, characterTexture);
+    m_characters[id] = Graphics::Character(m_face, characterTexture);
     return &m_characters[id];
 }
 
@@ -122,10 +102,6 @@ Mix_Chunk *ResourceManager::getAudioChunk(const std::string &file)
     else
         std::cerr << "audio chunk loads failed: " << file << std::endl;
     return rlt;
-}
-
-Material* ResourceManager::getMaterial(const std::string& name) {
-    return &m_materials[name];
 }
 
 void ResourceManager::freeAudioChunk(const std::string &file)

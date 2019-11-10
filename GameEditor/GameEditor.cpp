@@ -777,14 +777,14 @@ void GameEditor::showResourceInDirectory(const std::string &path)
                     std::string name = filePath.substr(filePath.find_last_of("/") + 1, filePath.length());
                     if (ImGui::TreeNodeEx(name.data()))
                     {
-                        auto texture = ResourceManager::get()->getTexture(filePath);
+                        auto texture = Graphics::Texture::add(filePath, filePath);
                         ImGui::Image((void *)texture->getId(), {(float)texture->getWidth(), (float)texture->getHeight()}, {0, 1}, {1, 0});
                         ImGui::TreePop();
                     }
                     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
                     {
-                        Texture *texture = ResourceManager::get()->getTexture(filePath);
-                        ImGui::SetDragDropPayload("Sprite", &texture, sizeof(Texture *)); // Set payload to carry the index of our item (could be anything)
+                        auto texture = Graphics::Texture::add(filePath, filePath);
+                        ImGui::SetDragDropPayload("Sprite", &texture, sizeof(Graphics::Texture *)); // Set payload to carry the index of our item (could be anything)
                         ImGui::Text("%s", filePath.data());
                         ImGui::EndDragDropSource();
                     }
@@ -807,7 +807,7 @@ void GameEditor::dropSprite(Entity *parent)
     {
         if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("Sprite"))
         {
-            Texture *texture_ptr = *static_cast<Texture **>(payload->Data);
+            Graphics::Texture *texture_ptr = *static_cast<Graphics::Texture **>(payload->Data);
             Json go_json;
             auto &sourcePath = texture_ptr->getSourcePath();
             go_json["name"] = sourcePath.substr(sourcePath.find_last_of("/") + 1, sourcePath.size() - 4); // being lazy here, -4 becuase .jpg and .png all have 4 characters
@@ -1061,7 +1061,7 @@ void GameEditor::createMaterial()
     static std::string selectedShader = "";
     if (ImGui::BeginCombo("Shader", selectedShader.data()))
     {
-        for (auto k : Shader::collection)
+        for (auto k : Graphics::Shader::collection)
         {
             bool is_selected= (selectedShader == k.first);
             if (ImGui::Selectable(k.first.data(), is_selected))
@@ -1119,14 +1119,12 @@ void GameEditor::createMaterial()
 
     if (ImGui::Button("Create"))
     {
-        std::vector<Texture *> textures(total);
+        std::vector<Graphics::Texture *> textures(total);
         for (int i = 0; i < total;i++)
         {
-            textures[i] = ResourceManager::get()->getTexture(files[i], static_cast<TextureType>(textureType[i]));
+            textures[i] = Graphics::Texture::add(files[i], files[i], static_cast<Graphics::TextureType>(textureType[i]));
         }
-        auto mat = ResourceManager::get()->getMaterial(buf);
-        mat->setShader(selectedShader);
-        mat->changeTextures(std::move(textures));
+        auto mat = Graphics::Material::add(buf, selectedShader, std::move(textures));
 
         //clean up
         files.clear();

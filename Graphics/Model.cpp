@@ -64,7 +64,8 @@ void Model::processNode(aiNode *node, const aiScene *scene)
             for (size_t i = 0; i < material->GetTextureCount((aiTextureType)aiType); i++)
             {
                 material->GetTexture((aiTextureType)aiType, i, &name);
-                Texture *texture = ResourceManager::get()->getTexture(m_directory + "/" + name.C_Str(), (TextureType)aiType);
+                auto path = m_directory + "/" + name.C_Str();
+                Texture *texture = Texture::add(path, path, (TextureType)aiType);
                 textures.push_back(texture);
             }
         }
@@ -76,9 +77,7 @@ void Model::processNode(aiNode *node, const aiScene *scene)
         if (ptr == materialName.npos)
             ptr = materialName.find_first_of(" ");
         materialName = materialName.substr(0, ptr);
-        auto mat = ResourceManager::get()->getMaterial(m_id + "-" + materialName);
-        mat->setShader("Model");
-        mat->changeTextures(std::move(textures));
+        auto mat = Material::add(m_id + "-" + materialName, "Model", std::move(textures));
 
         m_meshes.emplace_back(mesh, mat, materialName);
     }
@@ -116,7 +115,9 @@ void Model::addMesh(const Mesh &mesh)
 
 Model *Model::get(const std::string &id)
 {
-    return &collection[id];
+    auto iter = collection.find(id);
+    if (iter == collection.end()) return nullptr;
+    return &iter->second;
 }
 
 void Model::remove(const std::string &id)

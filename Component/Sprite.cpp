@@ -56,24 +56,24 @@ Sprite::Sprite(Entity *go, const std::string &path, const std::string &shader) :
 
 void Sprite::useShader(const std::string &name) 
 { 
-	m_shader = Shader::collection[name];
+	m_shader = Graphics::Shader::get(name);
 }
-const Shader *Sprite::getShader() const 
+const Graphics::Shader *Sprite::getShader() const 
 { 
 	return m_shader;
 }
 
-const Mesh2D* Sprite::getMesh() const
+const Graphics::Mesh2D* Sprite::getMesh() const
 {
 	return &m_mesh;
 }
 
-void Sprite::changeTexture(const int &loc, Texture *texture)
+void Sprite::changeTexture(const int &loc, Graphics::Texture *texture)
 {
     m_mesh.changeTexture(loc, texture);
 }
 
-Texture *Sprite::getMainTexture() const
+Graphics::Texture *Sprite::getMainTexture() const
 {
     return m_mesh.getTextures()->at(0);
 }

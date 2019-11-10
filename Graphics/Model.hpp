@@ -52,7 +52,7 @@ private:
 
     Model *loadModel(const std::string &path);
     void processNode(aiNode *node, const aiScene *scene);
-    std::vector<Texture *> loadMaterialTextures(aiMaterial *mat, aiTextureType textureType, const TextureType &type, const aiScene *);
+    //std::vector<Texture *> loadMaterialTextures(aiMaterial *mat, aiTextureType textureType, const TextureType &type, const aiScene *);
 
 /* Static ----*/
 public:
@@ -67,8 +67,10 @@ private:
 template<typename ...Args>
 Model* Model::add(const std::string& id, Args&& ... args)
 {
-    auto pair = collection.emplace(std::make_pair(id, Model(std::forward<Args>(args)...)));
-    if (pair.second == false) return nullptr;
+	auto has = collection.find(id);
+	if (has != collection.end()) return &has->second;
+
+	auto pair = collection.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...));
 	return &pair.first->second;
 }
 

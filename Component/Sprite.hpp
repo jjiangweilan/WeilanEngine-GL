@@ -34,8 +34,8 @@ public:
   std::function<void()> beforeRenderFunc;
   std::function<void()> afterRenderFunc;
   void loadTexture(const std::string& path);
-  void changeTexture(const int& loc, Texture* texture);
-  Texture* getMainTexture() const;
+  void changeTexture(const int& loc, Graphics::Texture* texture);
+  Graphics::Texture* getMainTexture() const;
   /**
      * @brief the render system will use this to let user takes full control of the rendering
      * sequence, instead of using the defualt render sequence
@@ -46,14 +46,14 @@ public:
      */
   std::function<void(const glm::mat4 &, const glm::mat4 &)> draw;
 
-  const Shader *getShader() const;
-  const Mesh2D *getMesh() const;
+  const Graphics::Shader *getShader() const;
+  const Graphics::Mesh2D *getMesh() const;
 
   float transparency;
 
 private:
-  Mesh2D m_mesh;
-  Shader *m_shader;
+  Graphics::Mesh2D m_mesh;
+  Graphics::Shader *m_shader;
 };
 } // namespace wlEngine
 #endif

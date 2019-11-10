@@ -2,17 +2,16 @@
 
 namespace wlEngine
 {
-std::map<std::string, Shader *> Shader::collection;
-
-Shader::Shader() : Shader("texture.vert", "", "", "", "texture.frag")
+namespace Graphics
 {
-}
 
+std::unordered_map<std::string, Shader> Shader::collection;
 Shader::Shader(const std::string &vertexPath,
                const std::string &tessCtrlPath,
                const std::string &tessEvalPath,
                const std::string &geometryPath,
-               const std::string &fragmentPath) : hasTessellation(false)
+               const std::string &fragmentPath,
+               const GLuint &patches) : m_hasTessellation(false), m_patches(patches)
 {
     GLuint vertex = 0, tessCtrl = 0, tessEval = 0, geometry = 0, fragment = 0;
     vertex = createShaderFromFile(vertexPath, GL_VERTEX_SHADER);
@@ -21,43 +20,61 @@ Shader::Shader(const std::string &vertexPath,
     tessCtrl = tessCtrlPath.size() == 0 ? 0 : createShaderFromFile(tessCtrlPath, GL_TESS_CONTROL_SHADER);
     tessEval = tessEvalPath.size() == 0 ? 0 : createShaderFromFile(tessEvalPath, GL_TESS_EVALUATION_SHADER);
     geometry = geometryPath.size() == 0 ? 0 : createShaderFromFile(geometryPath, GL_GEOMETRY_SHADER);
-    ID = createProgram(vertex, tessCtrl, tessEval, geometry, fragment);
-	//uniform block
-    auto matricesIndex = glGetUniformBlockIndex(ID, "_ProjMatrices");
-    if(matricesIndex != GL_INVALID_INDEX) glUniformBlockBinding(ID, matricesIndex,UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS);
+    m_id = createProgram(vertex, tessCtrl, tessEval, geometry, fragment);
+    //uniform block
+    auto matricesIndex = glGetUniformBlockIndex(m_id, "_ProjMatrices");
+    if (matricesIndex != GL_INVALID_INDEX)
+        glUniformBlockBinding(m_id, matricesIndex, UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS);
 }
+
+Shader::Shader(Shader&& shader)
+{
+	m_hasTessellation = shader.m_hasTessellation;
+	m_patches = shader.m_patches;
+	m_id = shader.m_id;
+	shader.m_id = 0;
+	shader.m_patches = 0;
+	shader.m_hasTessellation = 0;
+}
+Shader::Shader(const Shader& shader)
+{
+	m_hasTessellation = shader.m_hasTessellation;
+	m_patches = shader.m_patches;
+	m_id = shader.m_id;
+}
+
 GLuint Shader::createProgram(const GLuint &vertexShader,
                              const GLuint &tessCtrlShader,
                              const GLuint &tessEvalShader,
                              const GLuint &geometryShader,
                              const GLuint &fragmentShader)
 {
-    GLuint ID = glCreateProgram();
-    glAttachShader(ID, vertexShader);
-    glAttachShader(ID, fragmentShader);
+    m_id = glCreateProgram();
+    glAttachShader(m_id, vertexShader);
+    glAttachShader(m_id, fragmentShader);
 
-	if (tessCtrlShader != 0)
-	{
-		glAttachShader(ID, tessCtrlShader);
-	}
-     
+    if (tessCtrlShader != 0)
+    {
+        glAttachShader(m_id, tessCtrlShader);
+    }
+
     if (tessEvalShader != 0)
     {
-        glAttachShader(ID, tessEvalShader);
-		hasTessellation = true;
+        glAttachShader(m_id, tessEvalShader);
+        m_hasTessellation = true;
     }
     if (geometryShader != 0)
-        glAttachShader(ID, geometryShader);
+        glAttachShader(m_id, geometryShader);
 
-    glLinkProgram(ID);
+    glLinkProgram(m_id);
 
     //error check
     GLint success = GL_FALSE;
     char infoLog[1024];
-    glGetShaderiv(ID, GL_LINK_STATUS, &success);
+    glGetShaderiv(m_id, GL_LINK_STATUS, &success);
     if (success == GL_TRUE)
     {
-        glGetShaderInfoLog(ID, 1024, NULL, infoLog);
+        glGetShaderInfoLog(m_id, 1024, NULL, infoLog);
         std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: "
                   << "PROGRAME"
                   << "\n"
@@ -75,31 +92,8 @@ GLuint Shader::createProgram(const GLuint &vertexShader,
     if (tessEvalShader)
         glDeleteShader(tessEvalShader);
 
-    return ID;
+    return m_id;
 }
-
-void Shader::loadShader(const std::string &name, const std::string &vertexPath, const std::string &fragmentPath)
-{
-
-    auto shader = new Shader(vertexPath, "", "", "", fragmentPath);
-    collection.insert({name, shader});
-}
-
-void Shader::deleteShader(const std::string &name)
-{
-    auto iter = collection.find(name);
-    if (iter != collection.end())
-    {
-        delete iter->second;
-        collection.erase(iter);
-    }
-    else
-    {
-        assert(0 && "deleteShader: no such shader");
-    }
-}
-
-
 
 GLuint Shader::createShaderFromFile(const std::string &path, const GLenum &type)
 {
@@ -142,54 +136,74 @@ GLuint Shader::createShaderFromFile(const std::string &path, const GLenum &type)
     return shader;
 }
 
-void Shader::loadShader(const std::string &name,
-                        const std::string &vertexPath,
-                        const std::string &tessCtrlPath,
-                        const std::string &tessEvalPath,
-                        const std::string &geometryPath,
-                        const std::string &fragmentPath)
-{
-    auto shader = new Shader(vertexPath, tessCtrlPath, tessEvalPath, geometryPath, fragmentPath);
-    collection[name] = shader;
-}
-
-void Shader::loadShader(const std::string &name,
-                        const std::string &vertexPath,
-                        const std::string &tessEvalPath,
-                        const std::string &geometryPath,
-                        const std::string &fragmentPath)
-{
-    auto shader = new Shader(vertexPath, "", tessEvalPath, geometryPath, fragmentPath);
-    collection[name] = shader;
-}
-
 bool Shader::hasTess() const
 {
-	return hasTessellation;
+    return m_hasTessellation;
 }
 
 void Shader::use() const
 {
-    glUseProgram(ID);
+    glUseProgram(m_id);
 }
 
 void Shader::setBool(const std::string &name, bool value) const
 {
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
+    glUniform1i(glGetUniformLocation(m_id, name.c_str()), (int)value);
 }
 
 void Shader::setInt(const std::string &name, int value) const
 {
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+    glUniform1i(glGetUniformLocation(m_id, name.c_str()), value);
 }
 
 void Shader::setFloat(const std::string &name, float value) const
 {
-    glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
+    glUniform1f(glGetUniformLocation(m_id, name.c_str()), value);
 }
 
 Shader::~Shader()
 {
-    glDeleteProgram(ID);
+    glDeleteProgram(m_id);
 }
+
+Shader *Shader::add(const std::string &id,
+                    const std::string &vertexPath,
+                    const std::string &fragmentPath)
+{
+	auto has = collection.find(id);
+	if (has != collection.end()) return &has->second;
+
+    auto pair = collection.emplace(std::make_pair(id, Shader(vertexPath, "", "", "", fragmentPath, 0)));
+    return &pair.first->second;
+}
+Shader *Shader::get(const std::string &id)
+{
+    auto iter = collection.find(id);
+    if (iter == collection.end()) return nullptr;
+    return &iter->second;
+}
+Shader *Shader::add(const std::string &id,
+                    const std::string &vertexPath,
+                    const std::string &tessCtrlPath,
+                    const std::string &tessEvalPath,
+                    const std::string &geometryPath,
+                    const std::string &fragmentPath,
+                    const GLuint patches)
+{
+	auto has = collection.find(id);
+	if (has != collection.end()) return &has->second;
+
+    auto pair = collection.emplace(std::make_pair(id, Shader(vertexPath, tessCtrlPath,tessEvalPath,geometryPath, fragmentPath, patches)));
+    return &pair.first->second;
+}
+
+void Shader::remove(const std::string &id)
+{
+    collection.erase(id);
+}
+
+const GLuint& Shader::getId() const {
+	return m_id;
+}
+} // namespace Graphics
 } // namespace wlEngine

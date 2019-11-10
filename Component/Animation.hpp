@@ -9,11 +9,14 @@
 
 namespace wlEngine
 {
-class Texture;
+	namespace Graphics {
+		class Texture;
+}
+
 struct OneAnimationInfo
 {
   std::string name;
-  Texture *atlas;
+  Graphics::Texture *atlas;
   std::vector<Frame> frames;
 };
 using FilePath = std::string;

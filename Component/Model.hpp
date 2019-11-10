@@ -20,12 +20,12 @@ public:
     std::function<void()> afterRenderFunc;
     
     const Graphics::Model * getModel() const;
-    const Shader* getShader() const;
+    const Graphics::Shader* getShader() const;
 
     void setModel(Graphics::Model* model);
 
 private:
 	Graphics::Model* m_model;
-    Shader *m_shader;
+    Graphics::Shader *m_shader;
 };
 } // namespace wlEngine

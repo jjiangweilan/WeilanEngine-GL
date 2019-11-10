@@ -6,11 +6,13 @@
 #include <glad/glad.h>
 #include <stb_image.hpp>
 #include <assimp/material.h>
+#include <unordered_map>
 #include FT_FREETYPE_H
 
 namespace wlEngine
 {
-
+namespace Graphics
+{
 enum TextureType
 {
     None = aiTextureType_NONE,
@@ -28,14 +30,14 @@ enum TextureType
     Unknown = aiTextureType_UNKNOWN,
 };
 
-struct Texture
+class Texture
 {
 public:
     Texture() = default;
-    Texture(const std::string &file, const TextureType& type=TextureType::Diffuse);
+    Texture(const std::string &file, const TextureType &type = TextureType::Diffuse);
     Texture(FT_GlyphSlot glyph);
     ~Texture();
-    Texture *loadFromFile(const std::string &path, const TextureType& textureType = TextureType::Diffuse);
+    Texture *loadFromFile(const std::string &path, const TextureType &textureType = TextureType::Diffuse);
     Texture *loadFromFTBitmap(FT_GlyphSlot bitmap_FT);
     void free();
 
@@ -44,7 +46,7 @@ public:
     const int &getWidth() const;
     const int &getHeight() const;
     const int &getNRChannel() const;
-    const TextureType& getType() const;
+    const TextureType &getType() const;
 
 private:
     unsigned int m_textureId = 0;
@@ -55,7 +57,27 @@ private:
     int m_height;
     int m_nrChannel;
 
-private:
     void load(unsigned char *data);
+
+    /* Static ----*/
+public:
+    static Texture *get(const std::string &id);
+    template <typename... Args>
+    static Texture *add(const std::string &id, Args &&... args);
+    static void remove(const std::string &id);
+
+private:
+    static std::unordered_map<std::string, Texture> collection;
 };
+
+template <typename... Args>
+Texture *Texture::add(const std::string &id, Args &&... args)
+{
+	auto has = collection.find(id);
+	if (has != collection.end()) return &has->second;
+
+    auto pair = collection.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...));
+	return &pair.first->second;
+}
+} // namespace Graphics
 } // namespace wlEngine

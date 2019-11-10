@@ -2,25 +2,27 @@
 #include "../Manager/ResourceManager.hpp"
 namespace wlEngine
 {
-Mesh::Mesh(const PrimitiveMeshType &meshType, Material* mat, const std::string& name) : m_material(mat), name(name)
+namespace Graphics
+{
+Mesh::Mesh(const PrimitiveMeshType &meshType, Material *mat, const std::string &name) : m_material(mat), name(name)
 {
     switch (meshType)
     {
     case Cube:
-        
+
         break;
     case Sphere:
         break;
     }
 }
-Mesh::Mesh(std::vector<GLuint> &indices, std::vector<Vertex> &vertices, Material* mat, const std::string& name) : m_indices(indices), m_vertices(vertices), m_material(mat), name(name)
+Mesh::Mesh(std::vector<GLuint> &indices, std::vector<Vertex> &vertices, Material *mat, const std::string &name) : m_indices(indices), m_vertices(vertices), m_material(mat), name(name)
 {
     EBO = 0;
     VAO = 0;
     VBO = 0;
     setupMesh();
 }
-Mesh::Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices, Material* mat, const std::string& name) : m_indices(indices), m_vertices(vertices), m_material(mat), name(name)
+Mesh::Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices, Material *mat, const std::string &name) : m_indices(indices), m_vertices(vertices), m_material(mat), name(name)
 {
     EBO = 0;
     VAO = 0;
@@ -152,6 +154,7 @@ void Mesh::setMaterial(Material *material) const
 }
 void Mesh::setMaterial(const std::string &name) const
 {
-    m_material = ResourceManager::get()->getMaterial(name);
+    m_material = Material::get(name);
 }
+} // namespace Graphics
 } // namespace wlEngine

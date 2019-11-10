@@ -45,8 +45,8 @@ public:
 	/* structs *************************************/
 	struct CharacterETX
 	{
-		CharacterETX(Character *c, const int &x, const int &rows);
-		Character *character;
+		CharacterETX(Graphics::Character *c, const int &x, const int &rows);
+		Graphics::Character *character;
 		int x;
 		int offsetY;
 		glm::mat4 getTextTransform();
@@ -58,7 +58,7 @@ public:
 	float animationSpeed;
 	size_t renderUntilCharacter();
 
-	const Shader *getShader() const;
+	const Graphics::Shader *getShader() const;
 
 	/**
 	 * @brief Get the Time Passed object
@@ -68,7 +68,7 @@ public:
 	const float &getTimePassed() const;
 
 private:
-	Shader *m_shader;
+	Graphics::Shader *m_shader;
 	float m_timePassed;
 
 	std::vector<CharacterETX> text;

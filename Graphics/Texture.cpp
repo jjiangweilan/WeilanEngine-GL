@@ -4,11 +4,14 @@
 
 namespace wlEngine
 {
-Texture::Texture(const std::string &file, const TextureType& textureType) : m_type(textureType)
+namespace Graphics
+{
+std::unordered_map<std::string, Texture> Texture::collection = std::unordered_map<std::string, Texture>();
+Texture::Texture(const std::string &file, const TextureType &textureType) : m_type(textureType), m_textureId(0)
 {
     loadFromFile(file, textureType);
 }
-Texture::Texture(FT_GlyphSlot glyph)
+Texture::Texture(FT_GlyphSlot glyph): m_textureId(0)
 {
     m_type = Diffuse;
     loadFromFTBitmap(glyph);
@@ -38,11 +41,11 @@ Texture *Texture::loadFromFTBitmap(FT_GlyphSlot glyph)
     return this;
 }
 
-Texture *Texture::loadFromFile(const std::string &path, const TextureType& textureType)
+Texture *Texture::loadFromFile(const std::string &path, const TextureType &textureType)
 {
     free();
     m_sourcePath = path;
-	m_type = textureType;
+    m_type = textureType;
 
     unsigned char *imageData = stbi_load(path.c_str(), &m_width, &m_height, &m_nrChannel, 0);
     load(imageData);
@@ -87,4 +90,17 @@ const int &Texture::getHeight() const { return m_height; }
 const int &Texture::getNRChannel() const { return m_nrChannel; }
 const TextureType &Texture::getType() const { return m_type; }
 
+Texture *Texture::get(const std::string &id)
+{
+    auto iter = collection.find(id);
+    if (iter == collection.end())
+        return nullptr;
+    return &iter->second;
+}
+
+void Texture::remove(const std::string &id)
+{
+    collection.erase(id);
+}
+} // namespace Graphics
 } // namespace wlEngine

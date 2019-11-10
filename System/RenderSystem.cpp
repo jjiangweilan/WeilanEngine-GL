@@ -36,8 +36,7 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     initSceneFrambufferData();
     buildInResourceInit();
 
-
-    sceneShader = Shader::collection["Scene"];
+    sceneShader = Graphics::Shader::get("Scene");
 
     gameEditor = new GameEditor;
     for (int i = 0; i < FramebufferSize; i++)
@@ -49,12 +48,12 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     projection = glm::perspective(glm::radians(45.0f), (float)sceneWidth / sceneHeight, 0.1f, 100000.0f);
 #endif
 #ifdef DEBUG
-    Shader::loadShader("PhysicsDebugDrawShader", ROOT_DIR + "/Graphics/Material/Shader/PhysicsDebugDraw.vert", ROOT_DIR + "/Graphics/Material/Shader/PhysicsDebugDraw.frag");
-    physicsDebugDrawShader = Shader::collection["PhysicsDebugDrawShader"];
+    physicsDebugDrawShader = Graphics::Shader::add("PhysicsDebugDrawShader",
+                                                   ROOT_DIR + "/Graphics/Material/Shader/PhysicsDebugDraw.vert",
+                                                   ROOT_DIR + "/Graphics/Material/Shader/PhysicsDebugDraw.frag");
     glGenVertexArrays(1, &physicsDebugVAO);
     glGenBuffers(1, &physicsDebugVBO);
 #endif
-
 
     //uniform buffers
     glGenBuffers(1, &m_projectionUBO);
@@ -162,7 +161,7 @@ void RenderSystem::debugRender()
             proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
 #endif
             physicsDebugDrawShader->setMat4("view", m_viewMatrix);
-            physicsDebugDrawShader->setMat4("projection",m_projMatrix);
+            physicsDebugDrawShader->setMat4("projection", m_projMatrix);
             glm::vec3 color;
             if (rb->type == BodyType::Dynamic)
                 color = {1, 0, 0};
@@ -206,7 +205,7 @@ void RenderSystem::debugRender()
             proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
 #endif
             physicsDebugDrawShader->setMat4("view", m_viewMatrix);
-            physicsDebugDrawShader->setMat4("projection",m_projMatrix);
+            physicsDebugDrawShader->setMat4("projection", m_projMatrix);
             glm::vec3 color;
             if (rb->type == BodyType::Dynamic)
                 color = {1, 0, 0};
@@ -246,7 +245,7 @@ void RenderSystem::debugRender()
             proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
 #endif
             physicsDebugDrawShader->setMat4("view", m_viewMatrix);
-            physicsDebugDrawShader->setMat4("projection",m_projMatrix);
+            physicsDebugDrawShader->setMat4("projection", m_projMatrix);
             glm::vec3 color;
             color = {0.3, 0.8, 0.8};
             physicsDebugDrawShader->setVec3("color", glm::vec3(color.r, color.g, color.b));
@@ -263,14 +262,15 @@ void RenderSystem::update()
     render();
 }
 
-void RenderSystem::updateFrameSettings() 
+void RenderSystem::updateFrameSettings()
 {
     //why we get the Camera2D then the Camera3D, instead of get the Camera?
     //this is a trick to force the isComponentRegs of Camera2D and Camera3D to initialize
     //the program will use dynamic initialization if no function of the class is called within the program (won't count lambda), this is wired...
     camera = m_engine->getCurrentScene()->getCamera()->getComponent<Camera2D>();
-    if (!camera) camera = m_engine->getCurrentScene()->getCamera()->getComponent<Camera3D>();
-    
+    if (!camera)
+        camera = m_engine->getCurrentScene()->getCamera()->getComponent<Camera3D>();
+
     m_viewMatrix = camera->getViewMatrix();
     m_projMatrix = camera->getProjMatrix();
 
@@ -392,7 +392,7 @@ void RenderSystem::render(VolumetricLight *vl)
 {
     auto vlShader = vl->getShader();
     auto mesh = vl->getMesh();
-    auto& vlTextures = *mesh->getTextures();
+    auto &vlTextures = *mesh->getTextures();
     vlShader->use();
     auto transform = vl->entity->getComponent<Transform>();
     vlShader->setMat4("model", transform->getModel());
@@ -451,7 +451,7 @@ void RenderSystem::render(Sprite *t)
     {
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, textures->at(i)->getId());
-        Shader::setUniform(1000 + i, i);
+        Graphics::Shader::setUniform(1000 + i, i);
     }
 
     auto animation = t->entity->getComponent<Animation>();
@@ -461,20 +461,20 @@ void RenderSystem::render(Sprite *t)
         t->getMesh()->clip(animation->getCurrentClip());
 
     //set the uniform values according to the shader
-    Shader::setUniform(0, transform->getModel());
-    Shader::setUniform(1, m_viewMatrix);
-    Shader::setUniform(2, m_projMatrix);
-    Shader::setUniform(7, t->transparency);
+    Graphics::Shader::setUniform(0, transform->getModel());
+    Graphics::Shader::setUniform(1, m_viewMatrix);
+    Graphics::Shader::setUniform(2, m_projMatrix);
+    Graphics::Shader::setUniform(7, t->transparency);
     if (tRigidbody)
     {
-        Shader::setUniform(3, 1); // shaTRigidbody;
+        Graphics::Shader::setUniform(3, 1); // shaTRigidbody;
         glm::vec2 pos = transform->position;
-        Shader::setUniform(4, tRigidbody->shape->leftPoint + pos);
-        Shader::setUniform(5, tRigidbody->shape->rightPoint + pos);
+        Graphics::Shader::setUniform(4, tRigidbody->shape->leftPoint + pos);
+        Graphics::Shader::setUniform(5, tRigidbody->shape->rightPoint + pos);
     }
     else
     {
-        Shader::setUniform(3, 0); // shaTRigidbody;
+        Graphics::Shader::setUniform(3, 0); // shaTRigidbody;
     }
     glBindVertexArray(mesh->getVAO());
 
@@ -496,11 +496,12 @@ void RenderSystem::render(Model *model)
     auto transform = gameObject->getComponent<Transform>();
     auto modelMatrix = transform->getModel();
 
-  //  auto shader = model->getShader();
-  //  shader->use();
+    //  auto shader = model->getShader();
+    //  shader->use();
 
-	auto modelM = model->getModel();
-	if (!modelM) return;
+    auto modelM = model->getModel();
+    if (!modelM)
+        return;
     for (auto mesh : *modelM->getMeshes())
     {
         // bind appropriate textures
@@ -509,34 +510,37 @@ void RenderSystem::render(Model *model)
         unsigned int normalNr = 930;
         unsigned int heightNr = 940;
         mesh.m_material->useShader();
-        Shader::setUniform(0, modelMatrix); //model
-        Shader::setUniform(12, camera->entity->getComponent<Transform>()->position);
-        auto& textures = *mesh.m_material->getTextures();
+        Graphics::Shader::setUniform(0, modelMatrix); //model
+        Graphics::Shader::setUniform(12, camera->entity->getComponent<Transform>()->position);
+        auto &textures = *mesh.m_material->getTextures();
         for (unsigned int i = 0; i < textures.size(); i++)
         {
             glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
             // retrieve texture number (the N in diffuse_textureN)
-            
-            auto& type = textures[i]->getType();
+
+            auto &type = textures[i]->getType();
             int loc = -1;
             //this should be converted into enum and integer
             switch (type)
             {
-            case TextureType::Diffuse:
+            case Graphics::TextureType::Diffuse:
                 loc = diffuseNr++;
                 break;
-            case TextureType::Specular:
+            case Graphics::TextureType::Specular:
                 loc = specularNr++;
-            case TextureType::Normals:
+				break;
+            case Graphics::TextureType::Normals:
                 loc = normalNr++;
-            case TextureType::Height:
+				break;
+            case Graphics::TextureType::Height:
                 loc = heightNr++;
+				break;
             default:
                 assert(0 && "texture type not surrpoted");
             }
 
             // now set the sampler to the correct texture unit
-            Shader::setUniform(loc, i);
+            Graphics::Shader::setUniform(loc, i);
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, textures[i]->getId());
         }
@@ -544,11 +548,11 @@ void RenderSystem::render(Model *model)
         // draw mesh
         glBindVertexArray(mesh.VAO);
         auto shader = mesh.m_material->getShader();
-		if (shader->hasTess())
-		{
-			glPatchParameteri(GL_PATCH_VERTICES, 4);
-			glDrawElements(GL_PATCHES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
-		}
+        if (shader->hasTess())
+        {
+            glPatchParameteri(GL_PATCH_VERTICES, 4);
+            glDrawElements(GL_PATCHES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
+        }
         else
         {
             glDrawElements(GL_TRIANGLES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
@@ -561,7 +565,6 @@ void RenderSystem::render(Model *model)
         // always good practice to set everything back to defaults once configured.
         if (model->afterRenderFunc)
             model->afterRenderFunc();
-
     }
 }
 
@@ -640,10 +643,10 @@ void RenderSystem::postInit()
 void RenderSystem::buildInResourceInit()
 {
     //shader
-    Shader::loadShader("Scene", ROOT_DIR + "/Graphics/Material/Shader/Scene.vert", ROOT_DIR + "/Graphics/Material/Shader/Scene.frag");
-    Shader::loadShader("Basic", ROOT_DIR + "/Graphics/Material/Shader/Basic.vert", ROOT_DIR + "/Graphics/Material/Shader/Basic.frag");
-    Shader::loadShader("Sprite", ROOT_DIR + "/Graphics/Material/Shader/Sprite.vert", ROOT_DIR + "/Graphics/Material/Shader/Sprite.frag");
-    Shader::loadShader("Text", ROOT_DIR + "/Graphics/Material/Shader/Text.vert", ROOT_DIR + "/Graphics/Material/Shader/Text.frag");
-    Shader::loadShader("Model", ROOT_DIR + "/Graphics/Material/Shader/Model.vert", ROOT_DIR + "/Graphics/Material/Shader/Model.frag");
+    Graphics::Shader::add("Scene", ROOT_DIR + "/Graphics/Material/Shader/Scene.vert", ROOT_DIR + "/Graphics/Material/Shader/Scene.frag");
+    Graphics::Shader::add("Basic", ROOT_DIR + "/Graphics/Material/Shader/Basic.vert", ROOT_DIR + "/Graphics/Material/Shader/Basic.frag");
+    Graphics::Shader::add("Sprite", ROOT_DIR + "/Graphics/Material/Shader/Sprite.vert", ROOT_DIR + "/Graphics/Material/Shader/Sprite.frag");
+    Graphics::Shader::add("Text", ROOT_DIR + "/Graphics/Material/Shader/Text.vert", ROOT_DIR + "/Graphics/Material/Shader/Text.frag");
+    Graphics::Shader::add("Model", ROOT_DIR + "/Graphics/Material/Shader/Model.vert", ROOT_DIR + "/Graphics/Material/Shader/Model.frag");
 }
 } // namespace wlEngine

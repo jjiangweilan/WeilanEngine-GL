@@ -14,12 +14,12 @@ public:
     VolumetricLight(Entity *, void **args);
     void loadTexture(const std::string &file);
 
-    const Mesh2D* getMesh() const;
-    const Shader *getShader() const;
+    const Graphics::Mesh2D* getMesh() const;
+    const Graphics::Shader *getShader() const;
 
 private:
-    Mesh2D m_mesh;
-    Shader *m_shader;
+    Graphics::Mesh2D m_mesh;
+    Graphics::Shader *m_shader;
 };
 
 } // namespace wlEngine

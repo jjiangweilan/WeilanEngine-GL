@@ -7,7 +7,7 @@ COMPONENT_DEFINATION(Component, Model, 32);
 
 Model::Model(Entity* go) : Component(go), m_model(nullptr)
 {
-    m_shader = Shader::collection["Model"];
+    m_shader = Graphics::Shader::get("Model");
 }
 
 Model::Model(Entity *go, const std::string &id): Model(go)
@@ -19,7 +19,7 @@ const Graphics::Model* Model::getModel() const
 {
     return m_model;
 }
-const Shader *Model::getShader() const
+const Graphics::Shader *Model::getShader() const
 {
     return m_shader;
 }
