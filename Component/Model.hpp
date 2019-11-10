@@ -23,7 +23,7 @@ public:
     const Graphics::Shader* getShader() const;
 
     void setModel(Graphics::Model* model);
-
+	void setAllMaterials(const std::string& id);
 private:
 	Graphics::Model* m_model;
     Graphics::Shader *m_shader;

@@ -28,4 +28,10 @@ void Model::setModel(Graphics::Model *model)
 {
     m_model = model;
 }
+void Model::setAllMaterials(const std::string& id) {
+	for (auto& m : *m_model->getMeshes())
+	{
+		m.setMaterial(id);
+	}
+}
 } // namespace wlEngine

@@ -104,7 +104,7 @@ void GameEditor::showGameWindow(void **data)
     if (selectedTRigidbody && editLine)
         windowName += " Editing Render Line";
     windowName += "###GameScene";
-    ImGui::SetNextWindowPos({450, 30}, ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos({450, 30});
     ImGui::Begin(windowName.data(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
     m_isGameSceneFocused = ImGui::IsWindowFocused();
     gameplayWindowOffsetX = ImGui::GetWindowPos().x;

@@ -550,7 +550,7 @@ void RenderSystem::render(Model *model)
         auto shader = mesh.m_material->getShader();
         if (shader->hasTess())
         {
-            glPatchParameteri(GL_PATCH_VERTICES, 4);
+            glPatchParameteri(GL_PATCH_VERTICES, shader->getPatches());
             glDrawElements(GL_PATCHES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
         }
         else

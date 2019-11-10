@@ -25,6 +25,7 @@ public:
 	Shader(const Shader& shader);
     void use() const;
     bool hasTess() const;
+    const GLuint& getPatches() const;
 	const GLuint& getId() const;
     void setBool(const std::string &name, bool value) const;
     void setInt(const std::string &name, int value) const;

@@ -27,20 +27,20 @@ Shader::Shader(const std::string &vertexPath,
         glUniformBlockBinding(m_id, matricesIndex, UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS);
 }
 
-Shader::Shader(Shader&& shader)
+Shader::Shader(Shader &&shader)
 {
-	m_hasTessellation = shader.m_hasTessellation;
-	m_patches = shader.m_patches;
-	m_id = shader.m_id;
-	shader.m_id = 0;
-	shader.m_patches = 0;
-	shader.m_hasTessellation = 0;
+    m_hasTessellation = shader.m_hasTessellation;
+    m_patches = shader.m_patches;
+    m_id = shader.m_id;
+    shader.m_id = 0;
+    shader.m_patches = 0;
+    shader.m_hasTessellation = 0;
 }
-Shader::Shader(const Shader& shader)
+Shader::Shader(const Shader &shader)
 {
-	m_hasTessellation = shader.m_hasTessellation;
-	m_patches = shader.m_patches;
-	m_id = shader.m_id;
+    m_hasTessellation = shader.m_hasTessellation;
+    m_patches = shader.m_patches;
+    m_id = shader.m_id;
 }
 
 GLuint Shader::createProgram(const GLuint &vertexShader,
@@ -170,8 +170,9 @@ Shader *Shader::add(const std::string &id,
                     const std::string &vertexPath,
                     const std::string &fragmentPath)
 {
-	auto has = collection.find(id);
-	if (has != collection.end()) return &has->second;
+    auto has = collection.find(id);
+    if (has != collection.end())
+        return &has->second;
 
     auto pair = collection.emplace(std::make_pair(id, Shader(vertexPath, "", "", "", fragmentPath, 0)));
     return &pair.first->second;
@@ -179,7 +180,8 @@ Shader *Shader::add(const std::string &id,
 Shader *Shader::get(const std::string &id)
 {
     auto iter = collection.find(id);
-    if (iter == collection.end()) return nullptr;
+    if (iter == collection.end())
+        return nullptr;
     return &iter->second;
 }
 Shader *Shader::add(const std::string &id,
@@ -190,10 +192,11 @@ Shader *Shader::add(const std::string &id,
                     const std::string &fragmentPath,
                     const GLuint patches)
 {
-	auto has = collection.find(id);
-	if (has != collection.end()) return &has->second;
+    auto has = collection.find(id);
+    if (has != collection.end())
+        return &has->second;
 
-    auto pair = collection.emplace(std::make_pair(id, Shader(vertexPath, tessCtrlPath,tessEvalPath,geometryPath, fragmentPath, patches)));
+    auto pair = collection.emplace(std::make_pair(id, Shader(vertexPath, tessCtrlPath, tessEvalPath, geometryPath, fragmentPath, patches)));
     return &pair.first->second;
 }
 
@@ -202,8 +205,14 @@ void Shader::remove(const std::string &id)
     collection.erase(id);
 }
 
-const GLuint& Shader::getId() const {
-	return m_id;
+const GLuint &Shader::getId() const
+{
+    return m_id;
+}
+
+const GLuint &Shader::getPatches() const
+{
+    return m_patches;
 }
 } // namespace Graphics
 } // namespace wlEngine
