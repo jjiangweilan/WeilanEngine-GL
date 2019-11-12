@@ -36,6 +36,7 @@ public:
     } rotationData;
 
     void moveBy(const float &x, const float &y, const float &z = 0);
+    void moveBy(const glm::vec3& vec);
     void setPosition(const glm::vec3 &pos);
     void setLocalPosition(const glm::vec3 &pos);
     void setToPreviousPosition();

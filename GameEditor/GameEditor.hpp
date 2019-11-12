@@ -20,7 +20,7 @@ struct GameObjectPack
 class GameEditor
 {
 public:
-    GameEditor();
+    static GameEditor* get();
     ~GameEditor();
 
     /**
@@ -43,6 +43,8 @@ public:
 
     bool isGameSceneFocused() const;
 private:
+    static GameEditor* instance;
+    GameEditor();
     /********************** Data ***************************/
     Entity *selectedGameObject;
     TRigidbody *selectedTRigidbody;

@@ -13,6 +13,6 @@ EngineMode engineMode = EngineMode::Editor;
 EngineMode engineMode = EngineMode::Gameplay;
 #endif
 DebugRender debugRender = DebugRender::On;
-GameDimension gameDimension = GameDimension::Two;
+GameDimension gameDimension = GameDimension::Three;
 } // namespace Settings
 } // namespace wlEngine

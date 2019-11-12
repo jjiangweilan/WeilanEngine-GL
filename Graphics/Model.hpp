@@ -11,6 +11,7 @@
 
 namespace wlEngine
 {
+class GameEditor;
 namespace Graphics
 {
 struct AABB {
@@ -67,6 +68,8 @@ public:
     static void remove(const std::string& id);
 private:
     static std::unordered_map<std::string, Model> collection;
+
+    friend class GameEditor;
 };
 
 template<typename ...Args>

@@ -18,7 +18,6 @@ class Model;
 class Sprite;
 
 class Text;
-class GameEditor;
 class Camera;
 
 class VolumetricLight;
@@ -47,7 +46,6 @@ public:
   SDL_Window *getSDL_Window() { return window; };
   glm::vec2 getWindowSize() { return {windowWidth, windowHeight}; };
   glm::vec2 getSceneSize() { return {sceneWidth, sceneHeight}; };
-  GameEditor* getGameEditor() { return gameEditor; };
 
 private:
 #if SETTINGS_ENGINEMODE
@@ -97,7 +95,6 @@ private:
 
   SDL_GLContext glContext;
   SDL_Window *window;
-  GameEditor *gameEditor;
   Camera *camera = nullptr;
 
   glm::mat4 projection;

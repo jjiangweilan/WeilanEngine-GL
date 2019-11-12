@@ -19,6 +19,8 @@
 #include "../System/RenderSystem.hpp"
 #include "../System/InputSystem.hpp"
 
+#include "Graphics/Model.hpp"
+
 #include "../Utility/Utility.hpp"
 
 #include <fstream>
@@ -69,12 +71,67 @@ void GameEditor::render(void **data)
         transformJson["params"][1] = pos.y;
         transformJson["params"][2] = pos.z;
     }
-
 }
 
 void GameEditor::pickObject()
 {
-    
+    if (Settings::gameDimension == Settings::GameDimension::Two) return; 
+    static int x,y;
+    static bool pressing = false;
+    if (Input::isMouseClicked(MouseButton::Left))
+    {
+        glm::vec3 origin;
+        glm::vec3 end;
+        Utility::getRayFromScreenToWorld(x, y, origin, end);
+        float min = FLT_MAX;
+        for (auto model : Model::collection)
+        {
+            auto gModel = model->getModel();
+            auto aabb = gModel->getAABB();
+            float distance;
+            bool interact = Utility::TestRayOBBIntersection(origin, end - origin,
+                                                            aabb.min, aabb.max,
+                                                            model->entity->getComponent<Transform>()->getModel(),
+                                                            distance);
+            if (interact && distance < min) {
+                min = distance;
+                setSelectedGameObject(model->entity);
+            }
+        }
+    }
+
+    if (pressing && selectedGameObject) 
+    {
+        int relX, relY;
+        mousePressingOnScene(relX, relY);
+        relX = relX - x;
+        relY = relY - y;
+        auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera()->getComponent<Camera3D>();
+        auto front = camera->front;
+        auto right = camera->right;
+
+        front = {front.x, 0.0, front.z};
+        right = {right.x, 0.0, right.z};
+
+        auto transform =selectedGameObject->getComponent<Transform>();
+		
+        transform->moveBy(right *= (float)relX * Time::deltaTime * 2.0f);
+        if (Input::getKeyStatus(SDL_SCANCODE_LCTRL)) 
+        {   
+            transform->moveBy(0,relY * Time::deltaTime * 2.0f,0);
+        }
+        else
+        {
+            transform->moveBy(front * (float)relY *  Time::deltaTime  * 2.0f);
+        }
+		//Input::enableRelativeMouse(true);
+    }
+	else
+	{
+		//Input::enableRelativeMouse(false);
+	}
+
+	pressing = mousePressingOnScene(x, y);
 }
 
 void GameEditor::removeComponents()
@@ -92,8 +149,8 @@ void GameEditor::removeGameObjects()
     {
         scene->destroyGameObject(iter);
         scene->sceneData.destroyGameObject(iter);
-		if (iter == selectedGameObject)
-			setSelectedGameObject(nullptr);
+        if (iter == selectedGameObject)
+            setSelectedGameObject(nullptr);
     }
     objectToRemove.clear();
 }
@@ -200,7 +257,7 @@ void GameEditor::pushGameObject(std::set<Entity *>::iterator iter, const std::se
         //select game object
         if (ImGui::IsItemClicked() && (ImGui::GetMousePos().x - ImGui::GetItemRectMin().x) > ImGui::GetTreeNodeToLabelSpacing())
         {
-			setSelectedGameObject(*iter);
+            setSelectedGameObject(*iter);
         }
 
         if (open)
@@ -272,7 +329,7 @@ void GameEditor::showGameObjectInfo()
             }
             if (ImGui::Button("Add VolumetricLight"))
             {
-                setHelperWindowFunc([this]() { this->createVolumetricLight();});
+                setHelperWindowFunc([this]() { this->createVolumetricLight(); });
             }
             //remove gameobject
             if (ImGui::Button("Remove"))
@@ -296,11 +353,13 @@ void GameEditor::showGameObjectInfo()
                 showComponent(go, c.get(), "Transform", std::bind(&GameEditor::showTransformInfo, this, std::placeholders::_1));
             else if (c->getId() == TRigidbody::componentId)
                 showComponent(go, c.get(), "TRigidbody", std::bind(&GameEditor::showTRigidbodyInfo, this, std::placeholders::_1));
-            else if(c->getId() == VolumetricLight::componentId) {
+            else if (c->getId() == VolumetricLight::componentId)
+            {
                 showComponent(go, c.get(), "Volumetric Light", std::bind(&GameEditor::showVolumetricLightInfo, this, std::placeholders::_1));
             }
-            else if (c->getId() == Model::componentId) {
-                showComponent(go, c.get(), "Model", std::bind(&GameEditor::showModelInfo, this,std::placeholders::_1));
+            else if (c->getId() == Model::componentId)
+            {
+                showComponent(go, c.get(), "Model", std::bind(&GameEditor::showModelInfo, this, std::placeholders::_1));
             }
             //else if (c->getId() == Sprite::componentId)showComponent(go, c.get(), "Sprite", std::bind(&GameEditor::showSpriteInfo, this, std::placeholders::_1));
             //else if (c->getId() == Animation::componentId)showComponent(go, c.get(), "Animation", std::bind(&GameEditor::showAnimationInfo, this, std::placeholders::_1));
@@ -322,7 +381,7 @@ void GameEditor::showGameObjectInfo()
 void GameEditor::showModelInfo(Entity *entity)
 {
     auto model = entity->getComponent<Model>();
-    
+    auto gModel = model->getModel();
 }
 
 void GameEditor::showTRigidbodyInfo(Entity *entity)
@@ -627,7 +686,7 @@ void GameEditor::showMenu()
         {
             if (ImGui::MenuItem("Create Material"))
             {
-                setHelperWindowFunc([this]() {this->createMaterial();});
+                setHelperWindowFunc([this]() { this->createMaterial(); });
             }
             ImGui::EndMenu();
         }
@@ -860,7 +919,8 @@ void GameEditor::removeComponent(Entity *go, Component *c, const std::string &na
 
 void GameEditor::dragSprite()
 {
-	if (Settings::gameDimension == Settings::GameDimension::Three) return;
+    if (Settings::gameDimension == Settings::GameDimension::Three)
+        return;
     static Transform *target = nullptr;
     static int lastX, lastY;
     if (ImGui::IsMouseClicked(2))
@@ -882,7 +942,7 @@ void GameEditor::dragSprite()
             if (go && !target)
             {
                 target = go->getComponent<Transform>();
-				setSelectedGameObject(go);
+                setSelectedGameObject(go);
                 lastX = mouseX;
                 lastY = mouseY;
             }
@@ -901,10 +961,19 @@ void GameEditor::dragSprite()
     }
 }
 
+GameEditor *GameEditor::instance = nullptr;
+GameEditor *GameEditor::get()
+{
+    if (instance)
+        return instance;
+    instance = new GameEditor();
+    return instance;
+}
 /********************** Helper ****************************/
 bool GameEditor::mousePressingOnScene(int &x, int &y, bool world, int mouse)
 {
-    if(!scene) return false;
+    if (!scene)
+        return false;
     auto sceneSize = RenderSystem::get()->getSceneSize();
 
     auto mousePos = ImGui::GetMousePos();
@@ -1060,12 +1129,12 @@ void GameEditor::setHelperWindowFunc(std::function<void()> f)
     ImGui::SetWindowFocus("Helper Window");
 }
 
-bool GameEditor::isGameSceneFocused() const 
+bool GameEditor::isGameSceneFocused() const
 {
     return m_isGameSceneFocused;
 }
 
-void GameEditor::createMaterial() 
+void GameEditor::createMaterial()
 {
     char buf[256];
     ImGui::InputText("Name", buf, 256);
@@ -1074,7 +1143,7 @@ void GameEditor::createMaterial()
     {
         for (auto k : Graphics::Shader::collection)
         {
-            bool is_selected= (selectedShader == k.first);
+            bool is_selected = (selectedShader == k.first);
             if (ImGui::Selectable(k.first.data(), is_selected))
                 selectedShader = k.first;
             if (is_selected)
@@ -1086,7 +1155,7 @@ void GameEditor::createMaterial()
     static int total = 0;
     static std::vector<std::string> files;
     static std::vector<int> textureType;
-    static std::vector<const char**> selectedTypes;
+    static std::vector<const char **> selectedTypes;
     static const char *textureTypeSelections[] =
         {
             "Diffuse",
@@ -1131,7 +1200,7 @@ void GameEditor::createMaterial()
     if (ImGui::Button("Create"))
     {
         std::vector<Graphics::Texture *> textures(total);
-        for (int i = 0; i < total;i++)
+        for (int i = 0; i < total; i++)
         {
             textures[i] = Graphics::Texture::add(files[i], files[i], static_cast<Graphics::TextureType>(textureType[i]));
         }

@@ -30,7 +30,22 @@ Transform::Transform(Entity *gm, const float &x, const float &y, const float &z)
 Transform::Transform(Entity *go, const glm::vec3 &coord)
     : Transform(go, coord.x, coord.y, coord.z){};
 
-void Transform::moveBy(const float &x, const float &y, const float &z) {
+void Transform::moveBy(const glm::vec3 &vec)
+{
+    prePosition = position;
+    position += vec;
+
+    positionMat4 = glm::translate(glm::mat4(1.0), position);
+
+    for (auto iter = entity->children.begin(); iter != entity->children.end();
+         iter++)
+    {
+        auto t = (*iter)->getComponent<Transform>();
+        t->moveBy(vec);
+    }
+}
+void Transform::moveBy(const float &x, const float &y, const float &z)
+{
     prePosition = position;
     position.x += x;
     position.y += y;
@@ -39,17 +54,20 @@ void Transform::moveBy(const float &x, const float &y, const float &z) {
     positionMat4 = glm::translate(glm::mat4(1.0), position);
 
     for (auto iter = entity->children.begin(); iter != entity->children.end();
-         iter++) {
+         iter++)
+    {
         auto t = (*iter)->getComponent<Transform>();
         t->moveBy(x, y, z);
     }
 }
 
-glm::mat4 Transform::getModel() const {
+glm::mat4 Transform::getModel() const
+{
     return rotateArou * positionMat4 * rotation * scaleMat4;
 }
 
-void Transform::setScale(const float &x, const float &y, const float &z) {
+void Transform::setScale(const float &x, const float &y, const float &z)
+{
     scale = {x, y, z};
     scaleMat4 = glm::scale(glm::mat4(1.0), {x, y, z});
 }

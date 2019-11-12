@@ -37,6 +37,8 @@ template <typename T> T genRandomNumber(const T &min, const T &max) {
     return unif(re);
 }
 
+void getRayFromScreenToWorld(const float& x, const float& y, glm::vec3& origin, glm::vec3& end);
+
 bool TestRayOBBIntersection(
 	glm::vec3 ray_origin,        // Ray origin, in world space
 	glm::vec3 ray_direction,     // Ray direction (NOT target position!), in world space. Must be normalize()'d.

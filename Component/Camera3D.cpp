@@ -50,7 +50,7 @@ void Camera3D::update()
 
     updateEyeDirection();
     updatePosition();
-    if (Input::isMousePressing(MouseButton::Right) && RenderSystem::get()->getGameEditor()->isGameSceneFocused())
+    if (Input::isMousePressing(MouseButton::Right) && GameEditor::get()->isGameSceneFocused())
     {
         enableMouse = true;
         Input::getMouse(relX, relY);

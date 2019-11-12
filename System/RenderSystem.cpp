@@ -40,7 +40,6 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
 
     sceneShader = Graphics::Shader::get("Scene");
 
-    gameEditor = new GameEditor;
     for (int i = 0; i < FramebufferSize; i++)
     {
         genFramebuffer(framebuffers[i], framebufferTextures[i], depthAndStencilTextures[i]);
@@ -357,7 +356,7 @@ void RenderSystem::renderGameEditor()
     data[0] = &sceneTexture;
     data[1] = &sceneWidth;
     data[2] = &sceneHeight;
-    gameEditor->render(data);
+    GameEditor::get()->render(data);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -388,29 +387,6 @@ void RenderSystem::renderGame()
         if (!text->entity->isEnable())
             continue;
         render(text);
-    }
-
-    int x,y;
-	if (gameEditor->mousePressingOnScene(x, y)) {
-		auto sceneSize = RenderSystem::get()->getSceneSize();
-		auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera();
-		auto camera3d = camera->getComponent<Camera3D>();
-
-		float xf = (2.0 * x) / sceneSize.x - 1.0f;
-		float yf = (2.0 * y) / sceneSize.y - 1.0f;
-		glm::vec4 rayClipOrigin = { xf, yf, -1.0, 1.0 };
-		glm::vec4 rayClipEnd = { xf, yf, 1.0, 1.0 };
-
-		glm::mat4 inverseBack = glm::inverse(camera3d->getViewMatrix())* glm::inverse(camera3d->getProjMatrix());
-
-		glm::vec4 rayEyeOrigin = inverseBack * rayClipOrigin;
-		glm::vec4 rayEyeEnd = inverseBack * rayClipEnd;
-
-		glm::vec4 rayWorldOrigin = rayEyeOrigin / rayEyeOrigin.w;
-        glm::vec4 rayWorldEnd = rayEyeEnd /= rayEyeEnd.w;
-
-		Graphics::DebugDraw3D::get()->drawLine({ 0,0,0 }, rayWorldEnd, {0.8,0.4,0.3});
-		Graphics::DebugDraw3D::get()->drawLine({ 1,0,0 }, rayWorldOrigin, {0.2,0.6,0.5});
     }
 }
 void RenderSystem::render(VolumetricLight *vl)
