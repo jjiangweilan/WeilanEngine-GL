@@ -33,12 +33,12 @@ void OpenGLTest::drawSprite(const glm::mat4& view, const glm::mat4 proj) {
     glActiveTexture(GL_TEXTURE0);
     sprite->getShader()->use();
     glBindTexture(GL_TEXTURE_2D, sprite->getMainTexture()->getId());
-    glUniform1i(glGetUniformLocation(sprite->getShader()->ID, "texture0"), 0);
+    glUniform1i(glGetUniformLocation(sprite->getShader()->getId(), "texture0"), 0);
 
-    glUniformMatrix4fv(glGetUniformLocation(sprite->getShader()->ID, "model"), 1, GL_FALSE, &transform->getModel()[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(sprite->getShader()->ID, "view"), 1, GL_FALSE, &view[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(sprite->getShader()->ID, "projection"), 1, GL_FALSE, &proj[0][0]);
-    glUniform1i(glGetUniformLocation(sprite->getShader()->ID, "hasTRigidbody"), 1);
+    glUniformMatrix4fv(glGetUniformLocation(sprite->getShader()->getId(), "model"), 1, GL_FALSE, &transform->getModel()[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(sprite->getShader()->getId(), "view"), 1, GL_FALSE, &view[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(sprite->getShader()->getId(), "projection"), 1, GL_FALSE, &proj[0][0]);
+    glUniform1i(glGetUniformLocation(sprite->getShader()->getId(), "hasTRigidbody"), 1);
     glm::vec2 pos = transform->position;
     sprite->getShader()->setVec2("point1", body->shape->leftPoint + pos);
     sprite->getShader()->setVec2("point2", body->shape->rightPoint + pos);
@@ -54,16 +54,16 @@ void OpenGLTest::drawSprite(const glm::mat4& view, const glm::mat4 proj) {
 void OpenGLTest::drawOutline(const glm::mat4& view, const glm::mat4 proj) {
     glDepthFunc(GL_ALWAYS);
     glDepthMask(GL_FALSE);
-    auto outlineShader = Shader::collection["outline"];
+    auto outlineShader = Graphics::Shader::get("outline");
     outlineShader->use();
     outlineShader->setInt("texture0", 0);
 
     glBindTexture(GL_TEXTURE_2D, sprite->getMainTexture()->getId());
-    glUniform1i(glGetUniformLocation(outlineShader->ID, "texture0"), 0);
+    glUniform1i(glGetUniformLocation(outlineShader->getId(), "texture0"), 0);
 
-    glUniformMatrix4fv(glGetUniformLocation(outlineShader->ID, "model"), 1, GL_FALSE, &transform->getModel()[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(outlineShader->ID, "view"), 1, GL_FALSE, &view[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(outlineShader->ID, "projection"), 1, GL_FALSE, &proj[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(outlineShader->getId(), "model"), 1, GL_FALSE, &transform->getModel()[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(outlineShader->getId(), "view"), 1, GL_FALSE, &view[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(outlineShader->getId(), "projection"), 1, GL_FALSE, &proj[0][0]);
     glBindVertexArray(sprite->getMesh()->getVAO());
 
     glStencilFunc(GL_NOTEQUAL, 1, 0xff);

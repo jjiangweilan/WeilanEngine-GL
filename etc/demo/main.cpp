@@ -55,7 +55,6 @@ int main()
         Graphics::Shader::add("sphere", "../Shader/Sphere/Sphere.vert", "../Shader/Sphere/Sphere.tesc", "../Shader/Sphere/Sphere.tese", "", "../Shader/Sphere/Sphere.frag", 4);
         Graphics::Material::add("sphere", "sphere", std::vector<Graphics::Texture *>{Graphics::Texture::add("earth", "../resource/earth-cubemap.png")});
 		Graphics::Material::add("basicTree", "green");
-        Graphics::Model::add("nanosuit", "../../nano/nanosuit.obj");
         Graphics::Model::add("box", "../../box.fbx");
         Graphics::Model::add("Wood_Steps_Stucco", "../resource/Modular Collection/Modular Village/Wood_Steps_Stucco.obj");
         Graphics::Model::add("Bushes", "../resource/Modular Collection/Modular Terrain Hilly/Prop_Bush_2.obj");
@@ -124,10 +123,6 @@ int main()
     auto newMaterial = Graphics::Material::add("building",
                                                "Model",
                                                std::move(textures));
-
-  //  auto box = scene.createGameObject("nanosuit", nullptr);
-  //  box->addComponent<Transform>(0, 0, -8);
-  //  auto model2 = box->addComponent<Model>("nanosuit");
 
     auto earth = scene.createGameObject("sphere", nullptr);
     earth->addComponent<Transform>(4.5, 2, 0);

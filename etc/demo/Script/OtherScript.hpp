@@ -6,9 +6,9 @@ struct AnnoShader : public Script {
 	Transform* light1Transform = nullptr;
 	Transform* light2Transform = nullptr;
 
-	Shader* shader;
+	const Graphics::Shader* shader;
 	AnnoShader(Entity* go) : Script(go) {
-		shader = go->getComponent<Model>()->shader;
+		shader = go->getComponent<Model>()->getShader();
 		shader->use();
 		shader->setVec3("light1.ambient", 0.3f, 0.3f, 0.3f);
 		shader->setVec3("light1.diffuse", 0.8f, 0.8f, 0.8f);
@@ -28,22 +28,22 @@ struct AnnoShader : public Script {
 };
 SCRIPT_DEFINATION(Script, AnnoShader, 1);
 
-struct Rotate : public Script {
-	SCRIPT_DECLARATION(Script, Rotate, 1);
-
-	Transform* transform;
-	Rotate(Entity* go) : Script(go) {
-		transform = go->getComponent<Transform>();
-		transform->setScale(0.05, 0.05, 0.05);
-		transform->setPosition({ 0,0,0 });
-	}
-
-	void update() override {
-		transform->setPosition({ 1.0 * glm::sin(Time::timeAfterGameStart), 1 + 1.0 * glm::sin(Time::timeAfterGameStart), 1.0 * glm::cos(Time::timeAfterGameStart) });
-	}
-};
-
-SCRIPT_DEFINATION(Script, Rotate, 1);
+//struct Rotate : public Script {
+//	SCRIPT_DECLARATION(Script, Rotate, 1);
+//
+//	Transform* transform;
+//	Rotate(Entity* go) : Script(go) {
+//		transform = go->getComponent<Transform>();
+//		transform->setScale(0.05, 0.05, 0.05);
+//		transform->setPosition({ 0,0,0 });
+//	}
+//
+//	void update() override {
+//		transform->setPosition({ 1.0 * glm::sin(Time::timeAfterGameStart), 1 + 1.0 * glm::sin(Time::timeAfterGameStart), 1.0 * glm::cos(Time::timeAfterGameStart) });
+//	}
+//};
+//
+//SCRIPT_DEFINATION(Script, Rotate, 1);
 
 
 struct SpriteRotate : public Script {
@@ -64,9 +64,9 @@ struct Rotate1 : public Script {
 	SCRIPT_DECLARATION(Script, Rotate1, 1);
 
 	Transform* transform;
-	Shader* shader;
+	const Graphics::Shader* shader;
 	Rotate1(Entity* go) : Script(go) {
-		shader = go->getComponent<Model>()->shader;
+		shader = go->getComponent<Model>()->getShader();
 		transform = go->getComponent<Transform>();
 		transform->setScale(0.05, 0.05, 0.05);
 		transform->setPosition({ 0,0,0 });
