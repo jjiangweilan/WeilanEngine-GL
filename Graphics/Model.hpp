@@ -13,6 +13,10 @@ namespace wlEngine
 {
 namespace Graphics
 {
+struct AABB {
+    glm::vec3 min;
+    glm::vec3 max;
+};
 class Model
 {
 public:
@@ -45,6 +49,7 @@ public:
      */
 	void addMesh(const Mesh& mesh);
 
+    AABB getAABB() const;
 private:
     std::vector<Mesh> m_meshes;
     bool m_gammaCorrection;

@@ -26,8 +26,9 @@
 #include <dirent.h>
 namespace wlEngine
 {
-GameEditor::GameEditor() : selectedGameObject(nullptr), selectedTRigidbody(nullptr), editVertex(false), editLine(false), m_isGameSceneFocused(true)
+GameEditor::GameEditor() : selectedGameObject(nullptr), selectedTRigidbody(nullptr), editVertex(false), editLine(false), m_isGameSceneFocused(true), scene(nullptr)
 {
+	
 }
 
 GameEditor::~GameEditor()
@@ -48,6 +49,8 @@ void GameEditor::render(void **data)
     removeComponents();
     dragDropGameObject();
 
+    pickObject();
+
     ImGui::SetNextWindowPos({160, 415}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({275, 350}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Helper Window");
@@ -66,6 +69,12 @@ void GameEditor::render(void **data)
         transformJson["params"][1] = pos.y;
         transformJson["params"][2] = pos.z;
     }
+
+}
+
+void GameEditor::pickObject()
+{
+    
 }
 
 void GameEditor::removeComponents()
@@ -851,6 +860,7 @@ void GameEditor::removeComponent(Entity *go, Component *c, const std::string &na
 
 void GameEditor::dragSprite()
 {
+	if (Settings::gameDimension == Settings::GameDimension::Three) return;
     static Transform *target = nullptr;
     static int lastX, lastY;
     if (ImGui::IsMouseClicked(2))
@@ -894,6 +904,7 @@ void GameEditor::dragSprite()
 /********************** Helper ****************************/
 bool GameEditor::mousePressingOnScene(int &x, int &y, bool world, int mouse)
 {
+    if(!scene) return false;
     auto sceneSize = RenderSystem::get()->getSceneSize();
 
     auto mousePos = ImGui::GetMousePos();

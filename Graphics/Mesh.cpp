@@ -156,5 +156,23 @@ void Mesh::setMaterial(const std::string &name) const
 {
     m_material = Material::get(name);
 }
+
+void Mesh::setVertices(std::vector<Vertex>&& vertices, std::vector<GLuint>&& indices)
+{
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+    m_indices = std::move(indices);
+	m_vertices = std::move(vertices);
+	setupMesh();
+}
+const GLuint &Mesh::getVAO() const
+{
+    return VAO;
+}
+const Material *Mesh::getMaterial() const
+{
+    return m_material;
+}
 } // namespace Graphics
 } // namespace wlEngine

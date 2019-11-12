@@ -33,6 +33,10 @@ public:
         setShader(shader);
         m_textures = textures;
     }
+    Material(Shader* shader) : m_textures(), m_shader(shader)
+    {
+    }
+
     Material(const std::string &shader) : m_textures()
     {
         setShader(shader);

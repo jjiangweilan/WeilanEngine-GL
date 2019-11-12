@@ -44,6 +44,7 @@ public:
     void rotate(const glm::vec3 &axis, const float &radius);
     void setRotation(const glm::mat4 &ro);
     void setScale(const float &x, const float &y, const float &z);
+    void setScale(const float &ratio);
     void rotateAround(const glm::vec3 &axis, const float &radius);
     glm::mat4 getModel() const;
 

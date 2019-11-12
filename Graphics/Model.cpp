@@ -1,6 +1,8 @@
 #include "Model.hpp"
 
 #include "../Manager/ResourceManager.hpp"
+
+#include <cfloat>
 namespace wlEngine
 {
 namespace Graphics
@@ -125,6 +127,29 @@ void Model::remove(const std::string &id)
     collection.erase(id);
 }
 
+AABB Model::getAABB() const
+{
+    float top = FLT_MIN;
+    float down = FLT_MAX;
+    float front = FLT_MIN;
+    float back = FLT_MAX;
+    float left = FLT_MAX;
+    float right = FLT_MIN;
+
+    for (auto& m : m_meshes) {
+        for (auto& vert: m.m_vertices)
+        {
+            auto& pos = vert.position;
+            if (pos.x > right) right = pos.x;
+            if (pos.x < left) left = pos.x;
+            if (pos.y > top) top = pos.y;
+            if (pos.y < down) down = pos.y;
+            if (pos.z > front) front = pos.z;
+            if (pos.z < back) back = pos.z;
+        }
+    }
+    return {{left, top, back}, {right, down, front}};
+}
 std::unordered_map<std::string, Model> Model::collection = std::unordered_map<std::string, Model>();
 } // namespace Graphics
 } // namespace wlEngine

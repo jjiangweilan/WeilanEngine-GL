@@ -82,6 +82,7 @@ private:
     void showResourceWindow();
     void showResourceInDirectory(const std::string &path);
     void dropSprite(Entity *parent);
+    void pickObject();
 
     /**
          * @brief we can't remove game object when they are being iterating, this function is called

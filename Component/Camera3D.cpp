@@ -50,7 +50,7 @@ void Camera3D::update()
 
     updateEyeDirection();
     updatePosition();
-    if (Input::isMousePressing(MouseButton::Left) && RenderSystem::get()->getGameEditor()->isGameSceneFocused())
+    if (Input::isMousePressing(MouseButton::Right) && RenderSystem::get()->getGameEditor()->isGameSceneFocused())
     {
         enableMouse = true;
         Input::getMouse(relX, relY);
@@ -61,7 +61,7 @@ void Camera3D::update()
         enableMouse = false;
         Input::enableRelativeMouse(false);
     }
-    setProjectionMatrix(45.0f, sceneSize.x / sceneSize.y, 0.1, 500);
+    setProjectionMatrix(45.0f, sceneSize.x / sceneSize.y, 0.1, 100);
 }
 
 void Camera3D::updateEyeDirection()
@@ -114,7 +114,7 @@ void Camera3D::updatePosition()
 
 	//update y pos
 	if (enableMouse) {
-		if (Input::isMousePressing(MouseButton::Right))
+		if (Input::isMousePressing(MouseButton::Middle))
 		{
 			transform->position += (float)relY * glm::cross(right, front) * speedDelta * 0.4f;
 		}

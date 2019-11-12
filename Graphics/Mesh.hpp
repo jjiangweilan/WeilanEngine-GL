@@ -40,6 +40,7 @@ public:
     Mesh(const Mesh &mesh) = default;
     Mesh(Mesh &&mesh) noexcept;
     Mesh(aiMesh *mesh, Material *m = nullptr, const std::string &name = "");
+    Mesh() = default;
 
     Mesh &operator=(const Mesh &mesh) = default;
     Mesh &operator=(Mesh &&mesh);
@@ -57,7 +58,10 @@ public:
      */
     void setMaterial(Material *material) const;
     void setMaterial(const std::string &name) const;
+	void setVertices(std::vector<Vertex>&& vertices, std::vector<GLuint>&& indices);
 
+    const GLuint& getVAO() const;
+    const Material* getMaterial() const;
     /**
  * @brief used in model to identify the material
  * 
@@ -79,6 +83,7 @@ private:
     mutable Material *m_material;
 
     friend class RenderSystem;
+    friend class Model;
 };
 } // namespace Graphics
 } // namespace wlEngine

@@ -53,7 +53,13 @@ void Transform::setScale(const float &x, const float &y, const float &z) {
     scale = {x, y, z};
     scaleMat4 = glm::scale(glm::mat4(1.0), {x, y, z});
 }
-void Transform::rotate(const glm::vec3 &axis, const float &degree) {
+void Transform::setScale(const float &ratio)
+{
+    scale = {ratio, ratio, ratio};
+    scaleMat4 = glm::scale(glm::mat4(1.0), scale);
+}
+void Transform::rotate(const glm::vec3 &axis, const float &degree)
+{
     rotationData.axis = axis;
     rotationData.degree = degree;
     rotation = glm::rotate(rotation, glm::radians(degree), axis);
@@ -61,11 +67,13 @@ void Transform::rotate(const glm::vec3 &axis, const float &degree) {
 
 void Transform::setRotation(const glm::mat4 &ro) { rotation = ro; }
 
-void Transform::rotateAround(const glm::vec3 &axis, const float &degree) {
+void Transform::rotateAround(const glm::vec3 &axis, const float &degree)
+{
     rotateArou = glm::rotate(rotateArou, glm::radians(degree), axis);
 }
 
-void Transform::setPosition(const glm::vec3 &pos) {
+void Transform::setPosition(const glm::vec3 &pos)
+{
     prePosition = position;
     glm::vec3 moveVector = pos - position;
     position = pos;
@@ -73,28 +81,32 @@ void Transform::setPosition(const glm::vec3 &pos) {
     positionMat4 = glm::translate(glm::mat4(1.0), position);
 
     for (auto iter = entity->children.begin(); iter != entity->children.end();
-         iter++) {
+         iter++)
+    {
         auto t = (*iter)->getComponent<Transform>();
         if (t)
             t->moveBy(moveVector.x, moveVector.y, moveVector.z);
     }
 }
 
-void Transform::setToPreviousPosition() {
+void Transform::setToPreviousPosition()
+{
     glm::vec3 moveVector = prePosition - position;
     position = prePosition;
 
     positionMat4 = glm::translate(glm::mat4(1.0), position);
 
     for (auto iter = entity->children.begin(); iter != entity->children.end();
-         iter++) {
+         iter++)
+    {
         auto t = (*iter)->getComponent<Transform>();
         if (t)
             t->moveBy(moveVector.x, moveVector.y, moveVector.z);
     }
 }
 
-void Transform::setLocalPosition(const glm::vec3 &pos) {
+void Transform::setLocalPosition(const glm::vec3 &pos)
+{
     prePosition = position;
     glm::vec3 newPosition = (entity->parent ? entity->parent->getComponent<Transform>()->position : glm::vec3(0.0)) + pos;
     glm::vec3 moveVector = newPosition - position;
@@ -103,14 +115,16 @@ void Transform::setLocalPosition(const glm::vec3 &pos) {
 
     positionMat4 = glm::translate(glm::mat4(1.0), position);
 
-    for (auto iter = entity->children.begin(); iter != entity->children.end(); iter++) {
+    for (auto iter = entity->children.begin(); iter != entity->children.end(); iter++)
+    {
         auto t = (*iter)->getComponent<Transform>();
         if (t)
             t->moveBy(moveVector.x, moveVector.y, moveVector.z);
     }
 }
 
-glm::vec3 Transform::getLocalPosition() {
+glm::vec3 Transform::getLocalPosition()
+{
     if (entity->parent)
         return position - entity->parent->getComponent<Transform>()->position;
     else

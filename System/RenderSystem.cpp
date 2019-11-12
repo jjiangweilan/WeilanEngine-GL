@@ -17,12 +17,14 @@
 #include "../Graphics/Material.hpp"
 #include "../Graphics/Mesh2D.hpp"
 #include "../Graphics/Model.hpp"
+#include "../Graphics/DebugDraw3D.hpp"
 
 #include "../GameEditor/GameEditor.hpp"
 
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_sdl.h"
 #include "../imgui/imgui_impl_opengl3.h"
+
 
 namespace wlEngine
 {
@@ -387,6 +389,29 @@ void RenderSystem::renderGame()
             continue;
         render(text);
     }
+
+    int x,y;
+	if (gameEditor->mousePressingOnScene(x, y)) {
+		auto sceneSize = RenderSystem::get()->getSceneSize();
+		auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera();
+		auto camera3d = camera->getComponent<Camera3D>();
+
+		float xf = (2.0 * x) / sceneSize.x - 1.0f;
+		float yf = (2.0 * y) / sceneSize.y - 1.0f;
+		glm::vec4 rayClipOrigin = { xf, yf, -1.0, 1.0 };
+		glm::vec4 rayClipEnd = { xf, yf, 1.0, 1.0 };
+
+		glm::mat4 inverseBack = glm::inverse(camera3d->getViewMatrix())* glm::inverse(camera3d->getProjMatrix());
+
+		glm::vec4 rayEyeOrigin = inverseBack * rayClipOrigin;
+		glm::vec4 rayEyeEnd = inverseBack * rayClipEnd;
+
+		glm::vec4 rayWorldOrigin = rayEyeOrigin / rayEyeOrigin.w;
+        glm::vec4 rayWorldEnd = rayEyeEnd /= rayEyeEnd.w;
+
+		Graphics::DebugDraw3D::get()->drawLine({ 0,0,0 }, rayWorldEnd, {0.8,0.4,0.3});
+		Graphics::DebugDraw3D::get()->drawLine({ 1,0,0 }, rayWorldOrigin, {0.2,0.6,0.5});
+    }
 }
 void RenderSystem::render(VolumetricLight *vl)
 {
@@ -561,11 +586,14 @@ void RenderSystem::render(Model *model)
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
-
-        // always good practice to set everything back to defaults once configured.
-        if (model->afterRenderFunc)
-            model->afterRenderFunc();
     }
+    auto aabb = modelM->getAABB();
+    //small offset to prevent collision
+    const float offset = 0.001;
+    Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, transform->getModel());
+    // always good practice to set everything back to defaults once configured.
+    if (model->afterRenderFunc)
+        model->afterRenderFunc();
 }
 
 void RenderSystem::genFramebuffer(GLuint &fb, GLuint &ft, GLuint &ds)
