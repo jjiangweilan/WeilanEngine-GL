@@ -1,0 +1,27 @@
+{ "frames": [
+   {
+    "filename": "Tasta-idle.png",
+    "frame": { "x": 0, "y": 0, "w": 16, "h": 39 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 39 },
+    "sourceSize": { "w": 16, "h": 39 },
+    "duration": 100
+   }
+ ],
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.13-x64",
+  "image": "Tasta_idle.png",
+  "format": "RGBA8888",
+  "size": { "w": 128, "h": 39 },
+  "scale": "1",
+  "frameTags": [
+  ],
+  "layers": [
+   { "name": "Layer", "opacity": 255, "blendMode": "normal" }
+  ],
+  "slices": [
+  ]
+ }
+}
