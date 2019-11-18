@@ -7,7 +7,7 @@ out vec2 TexCoords;
 out vec3 Normal;
 out vec3 FragPos;
 
-layout (std140) uniform _ProjMatrices
+layout (std140) uniform GlobalProjMatrices
 {
     mat4 view;
     mat4 projection;

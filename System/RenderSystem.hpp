@@ -121,6 +121,7 @@ private:
 
   /* Uniform Buffers */
   GLuint m_projectionUBO;
+  GLuint m_mainCameraUBO;
 
   void buildInResourceInit();
 };

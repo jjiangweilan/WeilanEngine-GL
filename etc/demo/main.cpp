@@ -53,6 +53,7 @@ int main()
         Graphics::Shader::add("tess", "../Shader/Tess.vert", "../Shader/Tess.tesc", "../Shader/Tess.tese", "", "../Shader/Tess.frag");
         Graphics::Shader::add("green", "../Shader/green.vert", "../Shader/green.frag");
         Graphics::Shader::add("sphere", "../Shader/Sphere/Sphere.vert", "../Shader/Sphere/Sphere.tesc", "../Shader/Sphere/Sphere.tese", "", "../Shader/Sphere/Sphere.frag", 4);
+
         Graphics::Material::add("sphere", "sphere", std::vector<Graphics::Texture *>{Graphics::Texture::add("earth", "../resource/earth-cubemap.png")});
 		Graphics::Material::add("basicTree", "green");
         Graphics::Model::add("box", "../../box.fbx");
@@ -128,7 +129,6 @@ int main()
     earth->addComponent<Transform>(4.5, 2, 0);
     auto model3 = earth->addComponent<Model>("Sphere");
     earth->addComponent<Rotate>();
-
     engine->start();
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
@@ -9,17 +10,21 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <functional>
 
 #define UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS 0
+#define UNIFORM_BLOCK_INDEX_MAIN_CAMERA 1
 namespace wlEngine
 {
-	class GameEditor;
+class GameEditor;
+class Entity;
 namespace Graphics
 {
-
 class Shader
 {
 public:
+	std::function<void(Entity*)> paramUpdateFunc;
+
     ~Shader();
 	Shader(Shader&& shader);
 	Shader(const Shader& shader);
@@ -88,14 +93,18 @@ public:
     {
         glUniform2fv(location, 1, &vec[0]);
     }
-    static void setUniform(const GLuint &location, const float &x, const float &y)
-    {
-        glUniform2f(location, x, y);
-    }
     static void setUniform(const GLuint &location, const glm::vec3 &vec)
     {
         glUniform3fv(location, 1, &vec[0]);
     }
+	static void setUniform(const GLuint& location, const glm::vec4& vec)
+	{
+		glUniform4fv(location, 1, &vec[0]);
+	}
+	static void setUniform(const GLuint& location, const float& x, const float& y)
+	{
+		glUniform2f(location, x, y);
+	}
     static void setUniform(const GLuint &location, const float &x, const float &y, const float &z)
     {
         glUniform3f(location, x, y, z);
@@ -110,12 +119,16 @@ public:
     }
     static void setUniform(const GLuint &location, const unsigned int &v)
     {
-        glUniform1i(location, v);
+        glUniform1ui(location, v);
     }
     static void setUniform(const GLuint &location, const bool &v)
     {
         glUniform1i(location, v);
     }
+	static void setUniform(const GLuint& location, const double& v)
+	{
+		glUniform1d(location, v);
+	}
 
 private:
     Shader(const std::string &vertexPath,
@@ -123,7 +136,7 @@ private:
            const std::string &tessEvalPath,
            const std::string &geometryPath,
            const std::string &fragmentPath,
-           const GLuint &patches);
+           const GLuint &patches = 0);
 
 	
     GLuint createShaderFromFile(const std::string &path, const GLenum &type);
@@ -132,19 +145,22 @@ private:
     bool m_hasTessellation;
     GLuint m_patches;
 	unsigned int m_id;
+    
     /* Static ----*/
 public:
     static Shader *get(const std::string &id);
     static Shader *add(const std::string &id,
                        const std::string &vertexPath,
-                       const std::string &fragmentPath);
+                       const std::string &fragmentPath,
+                       const std::function<void(Entity*)>& parameterUpdateFunc = nullptr);
     static Shader *add(const std::string &name,
                        const std::string &vertexPath,
                        const std::string &tessCtrlPath,
                        const std::string &tessEvalPath,
                        const std::string &geometryPath,
                        const std::string &fragmentPath,
-                       const GLuint patches = 0);
+                       const GLuint& patches = 0, 
+                       const std::function<void(Entity*)>& parameterUpdateFunc = nullptr);
 
     static void remove(const std::string &id);
 

@@ -12,9 +12,13 @@ struct Light {
     vec3 ambient;
 };
 
+layout (std140) uniform MainCamera
+{
+    vec3 viewPos;
+};
+
 layout (location = 4) uniform Light light1;
 layout (location = 8) uniform Light light2;
-layout (location = 12) uniform vec3 viewPos;
 layout (location = 900) uniform sampler2D texture_diffuse[10];
 layout (location = 910) uniform sampler2D texture_specular[10];
 layout (location = 920) uniform sampler2D texture_ambient[10];

@@ -62,6 +62,12 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
     glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glBindBufferBase(GL_UNIFORM_BUFFER, UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS, m_projectionUBO);
+
+    glGenBuffers(1, &m_mainCameraUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, m_mainCameraUBO);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::vec3), nullptr, GL_STATIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBindBufferBase(GL_UNIFORM_BUFFER, UNIFORM_BLOCK_INDEX_MAIN_CAMERA, m_mainCameraUBO);
     registerSystem(this);
 }
 
@@ -277,7 +283,17 @@ void RenderSystem::updateFrameSettings()
 
     glBindBuffer(GL_UNIFORM_BUFFER, m_projectionUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &m_viewMatrix[0][0]);
-    glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), &m_projMatrix[0][0]);
+    glBufferSubData(GL_UNIFORM_BUFFER,
+                    sizeof(glm::mat4),
+                    sizeof(glm::mat4),
+                    &m_projMatrix[0][0]);
+
+    glBindBuffer(GL_UNIFORM_BUFFER, m_mainCameraUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER,
+                    0,
+                    sizeof(glm::vec3),
+                    &(camera->entity->getComponent<Transform>()->position[0]));
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 int RenderSystem::windowResizeCallbackWrapper(void *data, SDL_Event *event)
@@ -494,8 +510,6 @@ void RenderSystem::render(Model *model)
 
     if (model->beforeRenderFunc)
         model->beforeRenderFunc();
-    auto transform = gameObject->getComponent<Transform>();
-    auto modelMatrix = transform->getModel();
 
     //  auto shader = model->getShader();
     //  shader->use();
@@ -511,8 +525,9 @@ void RenderSystem::render(Model *model)
         unsigned int normalNr = 930;
         unsigned int heightNr = 940;
         mesh.m_material->useShader();
-        Graphics::Shader::setUniform(0, modelMatrix); //model
-        Graphics::Shader::setUniform(12, camera->entity->getComponent<Transform>()->position);
+        auto shader = mesh.m_material->getShader();
+        if (shader->paramUpdateFunc)
+            shader->paramUpdateFunc(model->entity);
         auto &textures = *mesh.m_material->getTextures();
         for (unsigned int i = 0; i < textures.size(); i++)
         {
@@ -529,13 +544,13 @@ void RenderSystem::render(Model *model)
                 break;
             case Graphics::TextureType::Specular:
                 loc = specularNr++;
-				break;
+                break;
             case Graphics::TextureType::Normals:
                 loc = normalNr++;
-				break;
+                break;
             case Graphics::TextureType::Height:
                 loc = heightNr++;
-				break;
+                break;
             default:
                 assert(0 && "texture type not surrpoted");
             }
@@ -548,11 +563,12 @@ void RenderSystem::render(Model *model)
         //
         // draw mesh
         glBindVertexArray(mesh.VAO);
-        auto shader = mesh.m_material->getShader();
         if (shader->hasTess())
         {
+            glPolygonMode(GL_FRONT_AND_BACK, model->GetDrawMode());
             glPatchParameteri(GL_PATCH_VERTICES, shader->getPatches());
             glDrawElements(GL_PATCHES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
         else
         {
@@ -563,10 +579,13 @@ void RenderSystem::render(Model *model)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
+
+#ifdef DEBUG
     auto aabb = modelM->getAABB();
     //small offset to prevent collision
     const float offset = 0.001;
-    Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, transform->getModel());
+    Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, model->entity->getComponent<Transform>()->getModel());
+#endif
     // always good practice to set everything back to defaults once configured.
     if (model->afterRenderFunc)
         model->afterRenderFunc();
@@ -646,11 +665,19 @@ void RenderSystem::postInit()
 
 void RenderSystem::buildInResourceInit()
 {
+    auto shaderPath = ROOT_DIR + "/Graphics/Material/Shader/";
     //shader
     Graphics::Shader::add("Scene", ROOT_DIR + "/Graphics/Material/Shader/Scene.vert", ROOT_DIR + "/Graphics/Material/Shader/Scene.frag");
-    Graphics::Shader::add("Basic", ROOT_DIR + "/Graphics/Material/Shader/Basic.vert", ROOT_DIR + "/Graphics/Material/Shader/Basic.frag");
     Graphics::Shader::add("Sprite", ROOT_DIR + "/Graphics/Material/Shader/Sprite.vert", ROOT_DIR + "/Graphics/Material/Shader/Sprite.frag");
     Graphics::Shader::add("Text", ROOT_DIR + "/Graphics/Material/Shader/Text.vert", ROOT_DIR + "/Graphics/Material/Shader/Text.frag");
-    Graphics::Shader::add("Model", ROOT_DIR + "/Graphics/Material/Shader/Model.vert", ROOT_DIR + "/Graphics/Material/Shader/Model.frag");
+    Graphics::Shader::add("Model", ROOT_DIR + "/Graphics/Material/Shader/Model.vert", ROOT_DIR + "/Graphics/Material/Shader/Model.frag", [&](Entity *entity) {
+        auto modelMatrix = entity->getComponent<Transform>()->getModel();
+        Graphics::Shader::setUniform(0, modelMatrix); //model
+    });
+    Graphics::Shader::add("water", shaderPath + "Water/Water.vert", shaderPath + "Water/Water.tesc", shaderPath + "Water/Water.tese", "", shaderPath + "Water/Water.frag", 4, [](Entity *entity) {
+        auto modelMatrix = entity->getComponent<Transform>()->getModel();
+        Graphics::Shader::setUniform(0, modelMatrix); //model
+        Graphics::Shader::setUniform(1, (float)Time::timeAfterGameStart);
+    });
 }
 } // namespace wlEngine

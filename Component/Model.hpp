@@ -6,6 +6,10 @@
 #include <functional>
 namespace wlEngine
 {
+
+enum DrawMode {
+    Line = GL_LINE, Fill = GL_FILL
+};
 class Model : public Component
 {
     COMPONENT_DECLARATION(Component, Model, 32);
@@ -24,7 +28,12 @@ public:
 
     void setModel(Graphics::Model* model);
 	void setAllMaterials(const std::string& id);
+
+    const DrawMode& GetDrawMode();
+
+    void SetDrawMode(const DrawMode& mode);
 private:
+    DrawMode m_drawMode;
 	Graphics::Model* m_model;
     Graphics::Shader *m_shader;
 };

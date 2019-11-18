@@ -5,7 +5,7 @@ namespace wlEngine
 {
 COMPONENT_DEFINATION(Component, Model, 32);
 
-Model::Model(Entity* go) : Component(go), m_model(nullptr)
+Model::Model(Entity* go) : Component(go), m_model(nullptr), m_drawMode(DrawMode::Fill)
 {
     m_shader = Graphics::Shader::get("Model");
 }
@@ -33,5 +33,15 @@ void Model::setAllMaterials(const std::string& id) {
 	{
 		m.setMaterial(id);
 	}
+}
+
+void Model::SetDrawMode(const DrawMode &mode)
+{
+	m_drawMode = mode;
+}
+
+const DrawMode &Model::GetDrawMode()
+{
+	return m_drawMode;
 }
 } // namespace wlEngine

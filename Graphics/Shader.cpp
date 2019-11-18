@@ -11,7 +11,7 @@ Shader::Shader(const std::string &vertexPath,
                const std::string &tessEvalPath,
                const std::string &geometryPath,
                const std::string &fragmentPath,
-               const GLuint &patches) : m_hasTessellation(false), m_patches(patches)
+               const GLuint &patches) : m_hasTessellation(false), m_patches(patches), paramUpdateFunc(nullptr)
 {
     GLuint vertex = 0, tessCtrl = 0, tessEval = 0, geometry = 0, fragment = 0;
     vertex = createShaderFromFile(vertexPath, GL_VERTEX_SHADER);
@@ -22,9 +22,12 @@ Shader::Shader(const std::string &vertexPath,
     geometry = geometryPath.size() == 0 ? 0 : createShaderFromFile(geometryPath, GL_GEOMETRY_SHADER);
     m_id = createProgram(vertex, tessCtrl, tessEval, geometry, fragment);
     //uniform block
-    auto matricesIndex = glGetUniformBlockIndex(m_id, "_ProjMatrices");
-    if (matricesIndex != GL_INVALID_INDEX)
-        glUniformBlockBinding(m_id, matricesIndex, UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS);
+    auto uniformBlockIndex = glGetUniformBlockIndex(m_id, "GlobalProjMaterices");
+    if (uniformBlockIndex != GL_INVALID_INDEX)
+        glUniformBlockBinding(m_id, uniformBlockIndex, UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS);
+    uniformBlockIndex = glGetUniformBlockIndex(m_id, "MainCamera");
+    if (uniformBlockIndex != GL_INVALID_INDEX)
+        glUniformBlockBinding(m_id, uniformBlockIndex, UNIFORM_BLOCK_INDEX_MAIN_CAMERA);
 }
 
 Shader::Shader(Shader &&shader)
@@ -168,13 +171,15 @@ Shader::~Shader()
 
 Shader *Shader::add(const std::string &id,
                     const std::string &vertexPath,
-                    const std::string &fragmentPath)
+                    const std::string &fragmentPath,
+                    const std::function<void(Entity*)>& paramUpdateFunc)
 {
     auto has = collection.find(id);
     if (has != collection.end())
         return &has->second;
 
     auto pair = collection.emplace(std::make_pair(id, Shader(vertexPath, "", "", "", fragmentPath, 0)));
+	pair.first->second.paramUpdateFunc = paramUpdateFunc; // std::function can't be moved
     return &pair.first->second;
 }
 Shader *Shader::get(const std::string &id)
@@ -184,19 +189,27 @@ Shader *Shader::get(const std::string &id)
         return nullptr;
     return &iter->second;
 }
+
 Shader *Shader::add(const std::string &id,
                     const std::string &vertexPath,
                     const std::string &tessCtrlPath,
                     const std::string &tessEvalPath,
                     const std::string &geometryPath,
                     const std::string &fragmentPath,
-                    const GLuint patches)
+                    const GLuint& patches,
+                    const std::function<void(Entity*)>& paramUpdateFunc)
 {
     auto has = collection.find(id);
     if (has != collection.end())
         return &has->second;
 
-    auto pair = collection.emplace(std::make_pair(id, Shader(vertexPath, tessCtrlPath, tessEvalPath, geometryPath, fragmentPath, patches)));
+    auto pair = collection.emplace(std::make_pair(id, Shader(vertexPath,
+                                                             tessCtrlPath,
+                                                             tessEvalPath,
+                                                             geometryPath,
+                                                             fragmentPath,
+                                                             patches)));
+	pair.first->second.paramUpdateFunc = paramUpdateFunc; // std::function can't be moved
     return &pair.first->second;
 }
 

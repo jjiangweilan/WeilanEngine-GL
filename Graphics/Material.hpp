@@ -1,4 +1,5 @@
 #pragma once
+#include "ShaderParameter.hpp"
 
 #include <vector>
 #include <glad/glad.h>
@@ -41,6 +42,9 @@ public:
     {
         setShader(shader);
     }
+
+    Material(const Material& other);
+    Material(Material&& other);
     /**
      * @brief change the used shader
      * 
@@ -58,6 +62,12 @@ public:
         m_textures = std::move(newTextures);
     }
 
+/**
+ * @brief return a copy of this material
+ * 
+ * @return Material 
+ */
+    Material Clone() const;
     /**
      * @brief Get the Textures object
      * 
@@ -70,8 +80,9 @@ public:
 
     void useShader() const;
     const Shader *getShader() const;
-
-private:
+    ShaderParameter* GetParameters() const;
+protected:
+    mutable ShaderParameter m_parameters;
     std::vector<Texture *> m_textures;
     Shader *m_shader;
 /* Static ----*/
