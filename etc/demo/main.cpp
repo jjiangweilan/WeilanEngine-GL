@@ -2,6 +2,7 @@
 #include "Script/Player/PlayerController.hpp"
 #include "Script/OpenGLTest.hpp"
 #include "System/MonsterSystem.hpp"
+#include "wlEngine/Graphics/ShaderParameter.hpp"
 #include <wlEngine/wlEngine.hpp>
 using namespace wlEngine;
 
@@ -45,17 +46,20 @@ public:
     }
 };
 SCRIPT_DEFINATION(Script, Rotate2, 2);
+
 int main()
 {
-
     engine = wlEngine::EngineManager::getwlEngine();
     {
-        Graphics::Shader::add("tess", "../Shader/Tess.vert", "../Shader/Tess.tesc", "../Shader/Tess.tese", "", "../Shader/Tess.frag");
+        Graphics::Shader::add("tess", "../Shader/Tess.vert", "../Shader/Tess.tesc", "../Shader/Tess.tese", "", "../Shader/Tess.frag", 0);
         Graphics::Shader::add("green", "../Shader/green.vert", "../Shader/green.frag");
+		auto shader = Graphics::Shader::get("green");
         Graphics::Shader::add("sphere", "../Shader/Sphere/Sphere.vert", "../Shader/Sphere/Sphere.tesc", "../Shader/Sphere/Sphere.tese", "", "../Shader/Sphere/Sphere.frag", 4);
-
         Graphics::Material::add("sphere", "sphere", std::vector<Graphics::Texture *>{Graphics::Texture::add("earth", "../resource/earth-cubemap.png")});
-		Graphics::Material::add("basicTree", "green");
+        Graphics::Material::add("basicTree", "green");
+        Graphics::Material::add("water", "water");
+
+        Graphics::Model::add("nanosuit", "../../nano/nanosuit.obj");
         Graphics::Model::add("box", "../../box.fbx");
         Graphics::Model::add("Wood_Steps_Stucco", "../resource/Modular Collection/Modular Village/Wood_Steps_Stucco.obj");
         Graphics::Model::add("Bushes", "../resource/Modular Collection/Modular Terrain Hilly/Prop_Bush_2.obj");
@@ -103,21 +107,35 @@ int main()
             }};
         Graphics::Mesh m(std::move(indices), std::move(vertices), Graphics::Material::get("sphere"));
         Graphics::Model::add("Sphere", std::vector<Graphics::Mesh>{m});
+
+        indices = {
+            {0,1,2,3}
+        };
+
+        vertices = {
+            {glm::vec3(3.0, 0, 3.0), glm::vec3(0, 0, 0), glm::vec2(3.0,3.0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+            {glm::vec3(3.0, 0, -3.0), glm::vec3(0, 0, 0), glm::vec2(3.0,0.0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+            {glm::vec3(-3.0, 0, -3.0), glm::vec3(0, 0, 0), glm::vec2(0,0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+            {glm::vec3(-3.0, 0, 3.0), glm::vec3(0, 0, 0), glm::vec2(0.0,3.0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+        };
+        Graphics::Mesh quadMesh(std::move(indices), std::move(vertices), Graphics::Material::get("water"), "water");
+        Graphics::Model::add("water", std::vector<Graphics::Mesh>{quadMesh});
     }
     wlEngine::Scene scene;
 
     engine->setScene(&scene);
     auto camera = scene.createGameObject("Camera", nullptr);
-    camera->addComponent<Transform>(0, 0, 0);
+    camera->addComponent<Transform>(0, 3, 12);
 
     camera->addComponent<Camera3D>();
+    
     scene.setCamera(camera);
 
-    auto test1 = scene.createGameObject("Test", nullptr);
-	test1->addComponent<Transform>(0, 0, 0);
-    test1->addComponent<Rotate2>();
-    auto model = test1->addComponent<Model>("Bushes");
-    model->setAllMaterials("basicTree");
+//    auto test1 = scene.createGameObject("Test", nullptr);
+//    test1->addComponent<Transform>(0, 0, 0);
+//    test1->addComponent<Rotate2>();
+//    auto model = test1->addComponent<Model>("Bushes");
+//    model->setAllMaterials("basicTree");
 
     std::vector<Graphics::Texture *> textures = {Graphics::Texture::add("building", "../resource/building.png")};
 
@@ -125,10 +143,37 @@ int main()
                                                "Model",
                                                std::move(textures));
 
+
+    //  auto box = scene.createGameObject("nanosuit", nullptr);
+    //  box->addComponent<Transform>(0, 0, -8);
+    //  auto model2 = box->addComponent<Model>("nanosuit");
+
     auto earth = scene.createGameObject("sphere", nullptr);
     earth->addComponent<Transform>(4.5, 2, 0);
     auto model3 = earth->addComponent<Model>("Sphere");
+    model3->ShaderParamUpdate = [](Model* model) {
+        auto& meshes = *model->getModel()->getMeshes();
+        auto transform = model->entity->getComponent<Transform>();
+        for (auto& mesh : meshes)
+        {
+            auto params = mesh.getMaterial()->GetParameters();
+            params->SetParameter("model", transform->getModel());
+        }
+    };
     earth->addComponent<Rotate>();
+
+    auto water = scene.createGameObject("water", nullptr);
+    water->addComponent<Transform>(0,0,0);
+    auto modelWater = water->addComponent<Model>("water");
+    modelWater->SetDrawMode(DrawMode::Line);
+    modelWater->ShaderParamUpdate = [](Model* model) {
+        auto& mesh = *model->getModel()->getMesh("water");
+		auto transform = model->entity->getComponent<Transform>();
+        auto parameters = mesh.getMaterial()->GetParameters();
+        parameters->SetParameter("model", transform->getModel());
+        parameters->SetParameter("t", (float)Time::timeAfterGameStart);
+    };
+    
     engine->start();
 }
 

@@ -8,16 +8,33 @@ namespace wlEngine
 {
 namespace Graphics
 {
+enum class ParameterType
+{
+    Vec2,
+    Vec3,
+    Vec4,
+    Float,
+    Double,
+    Int,
+    UInt,
+    Bool,
+    Mat2,
+    Mat3,
+    Mat4,
+    Sampler2D
+};
 class ShaderParameter
 {
+    friend class wlEngine::GameEditor;
+
 public:
     ShaderParameter(){};
-    ShaderParameter(const ShaderParameter&);
-    ShaderParameter(ShaderParameter&&);
+    ShaderParameter(const ShaderParameter &);
+    ShaderParameter(ShaderParameter &&);
     ~ShaderParameter(){};
 
-    ShaderParameter& operator=(const ShaderParameter&);
-    ShaderParameter& operator=(ShaderParameter&&);
+    ShaderParameter &operator=(const ShaderParameter &);
+    ShaderParameter &operator=(ShaderParameter &&);
 
     template <typename T>
     void AddParameter(const std::string &name, const T &val);
@@ -28,27 +45,31 @@ public:
     template <typename T>
     T *GetParameter(const std::string &name);
 
-    void UpdateParameters(Shader* shader);
+    void UpdateParameters(Shader *shader);
 
     void Use();
+
 protected:
     class ShaderParameterBase
     {
     public:
-        ShaderParameterBase(const unsigned int& loc);
-        ShaderParameterBase(const ShaderParameterBase&) = default;
-		
-		ShaderParameterBase& operator=(const ShaderParameterBase&) = default;
-		~ShaderParameterBase() {};
+        ShaderParameterBase(const unsigned int &loc, const ParameterType &type);
+        ShaderParameterBase(const ShaderParameterBase &) = default;
+
+        ShaderParameterBase &operator=(const ShaderParameterBase &) = default;
+        ~ShaderParameterBase(){};
 
         virtual void Set(void *data) = 0;
         virtual void Use() = 0;
         virtual void *Get() = 0;
+        ParameterType GetType();
         virtual std::unique_ptr<ShaderParameterBase> Clone() = 0;
 
-        void UpdateLocation(const unsigned int& loc);
+        void UpdateLocation(const unsigned int &loc);
+
     protected:
         unsigned int m_loc;
+        ParameterType m_type;
     };
 
     template <typename T>
@@ -56,10 +77,11 @@ protected:
     {
     public:
         ShaderParameterType();
-        ShaderParameterType(const ShaderParameterType&) = default;
-		ShaderParameterType& operator=(const ShaderParameterType&) = default;
-		~ShaderParameterType();
-        ShaderParameterType(const unsigned int& loc);
+        ~ShaderParameterType();
+        ShaderParameterType(const T& val, const unsigned int &loc, const ParameterType &type);
+
+        ShaderParameterType(const ShaderParameterType &) = default;
+        ShaderParameterType &operator=(const ShaderParameterType &) = default;
         void Set(const T &val);
 
         virtual void Set(void *data) override;
@@ -71,7 +93,6 @@ protected:
         T m_val;
     };
 
-
     std::unordered_map<std::string, std::unique_ptr<ShaderParameterBase>> m_parameters;
 };
 
@@ -80,6 +101,7 @@ void ShaderParameter::AddParameter(const std::string &name, const T &val)
 {
     m_parameters.emplace(name, new ShaderParameterType<T>(name, val));
 }
+
 
 template <typename T>
 bool ShaderParameter::SetParameter(const std::string &name, const T &val)
@@ -106,10 +128,10 @@ ShaderParameter::ShaderParameterType<T>::ShaderParameterType() : ShaderParameter
 }
 
 template <typename T>
-ShaderParameter::ShaderParameterType<T>::~ShaderParameterType() {};
+ShaderParameter::ShaderParameterType<T>::~ShaderParameterType(){};
 
 template <typename T>
-ShaderParameter::ShaderParameterType<T>::ShaderParameterType(const unsigned int& loc) : ShaderParameterBase(loc), m_val()
+ShaderParameter::ShaderParameterType<T>::ShaderParameterType(const T &val, const unsigned int &loc, const ParameterType &type) : ShaderParameterBase(loc, type), m_val(val)
 {
 }
 
@@ -124,7 +146,6 @@ void ShaderParameter::ShaderParameterType<T>::Use()
 {
     Shader::setUniform(m_loc, m_val);
 }
-
 
 template <typename T>
 void *ShaderParameter::ShaderParameterType<T>::Get()

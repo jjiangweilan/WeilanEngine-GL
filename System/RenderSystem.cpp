@@ -510,6 +510,8 @@ void RenderSystem::render(Model *model)
 
     if (model->beforeRenderFunc)
         model->beforeRenderFunc();
+    if (model->ShaderParamUpdate)
+        model->ShaderParamUpdate(model);
 
     //  auto shader = model->getShader();
     //  shader->use();
@@ -526,8 +528,6 @@ void RenderSystem::render(Model *model)
         unsigned int heightNr = 940;
         mesh.m_material->useShader();
         auto shader = mesh.m_material->getShader();
-        if (shader->paramUpdateFunc)
-            shader->paramUpdateFunc(model->entity);
         auto &textures = *mesh.m_material->getTextures();
         for (unsigned int i = 0; i < textures.size(); i++)
         {
@@ -560,6 +560,7 @@ void RenderSystem::render(Model *model)
             // and finally bind the texture
             glBindTexture(GL_TEXTURE_2D, textures[i]->getId());
         }
+        mesh.m_material->GetParameters()->Use();
         //
         // draw mesh
         glBindVertexArray(mesh.VAO);
@@ -670,14 +671,7 @@ void RenderSystem::buildInResourceInit()
     Graphics::Shader::add("Scene", ROOT_DIR + "/Graphics/Material/Shader/Scene.vert", ROOT_DIR + "/Graphics/Material/Shader/Scene.frag");
     Graphics::Shader::add("Sprite", ROOT_DIR + "/Graphics/Material/Shader/Sprite.vert", ROOT_DIR + "/Graphics/Material/Shader/Sprite.frag");
     Graphics::Shader::add("Text", ROOT_DIR + "/Graphics/Material/Shader/Text.vert", ROOT_DIR + "/Graphics/Material/Shader/Text.frag");
-    Graphics::Shader::add("Model", ROOT_DIR + "/Graphics/Material/Shader/Model.vert", ROOT_DIR + "/Graphics/Material/Shader/Model.frag", [&](Entity *entity) {
-        auto modelMatrix = entity->getComponent<Transform>()->getModel();
-        Graphics::Shader::setUniform(0, modelMatrix); //model
-    });
-    Graphics::Shader::add("water", shaderPath + "Water/Water.vert", shaderPath + "Water/Water.tesc", shaderPath + "Water/Water.tese", "", shaderPath + "Water/Water.frag", 4, [](Entity *entity) {
-        auto modelMatrix = entity->getComponent<Transform>()->getModel();
-        Graphics::Shader::setUniform(0, modelMatrix); //model
-        Graphics::Shader::setUniform(1, (float)Time::timeAfterGameStart);
-    });
+    Graphics::Shader::add("Model", ROOT_DIR + "/Graphics/Material/Shader/Model.vert", ROOT_DIR + "/Graphics/Material/Shader/Model.frag");
+    Graphics::Shader::add("water", shaderPath + "Water/Water.vert", shaderPath + "Water/Water.tesc", shaderPath + "Water/Water.tese", "", shaderPath + "Water/Water.frag", 4);
 }
 } // namespace wlEngine

@@ -20,6 +20,7 @@ public:
 
     void useShader(const std::string &name);
 
+    std::function<void(Model*)> ShaderParamUpdate;
     std::function<void()> beforeRenderFunc;
     std::function<void()> afterRenderFunc;
     

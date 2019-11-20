@@ -382,6 +382,21 @@ void GameEditor::showModelInfo(Entity *entity)
 {
     auto model = entity->getComponent<Model>();
     auto gModel = model->getModel();
+    for (auto& mesh : *gModel->getMeshes())
+    {
+        auto params = mesh.getMaterial()->GetParameters();
+        for (auto& param : params->m_parameters)
+        {
+			auto type = param.second->GetType();
+			switch (type)
+			{
+			case Graphics::ParameterType::Float:
+				float* val = static_cast<float*>(param.second->Get());
+				ImGui::InputFloat(param.first.data(), val, 0.05, 0.1, 3);
+				break;
+			}
+        }
+    }
 }
 
 void GameEditor::showTRigidbodyInfo(Entity *entity)
