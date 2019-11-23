@@ -382,7 +382,7 @@ void GameEditor::showModelInfo(Entity *entity)
 {
     auto model = entity->getComponent<Model>();
     auto gModel = model->getModel();
-    for (auto& mesh : *gModel->getMeshes())
+    for (auto& mesh : *gModel->GetMeshes())
     {
         auto params = mesh.getMaterial()->GetParameters();
         for (auto& param : params->m_parameters)

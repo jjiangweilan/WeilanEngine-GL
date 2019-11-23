@@ -19,28 +19,30 @@ public:
     Material();
     /**
      * @brief Construct a new Material object
-     * seems as calling useShader and changeTextures
+     * seems as calling UseShader and ChangeTextures
      * 
      * @param shader shader name
      * @param textures textures
      */
     Material(const std::string &shader, std::vector<Texture *> &&textures)
     {
-        setShader(shader);
-        changeTextures(std::move(textures));
+        SetShader(shader);
+        m_parameters.SetTextures(textures);
     };
+
     Material(const std::string &shader, const std::vector<Texture *> &textures)
     {
-        setShader(shader);
-        m_textures = textures;
+        SetShader(shader);
+		m_parameters.SetTextures(textures);
     }
-    Material(Shader* shader) : m_textures(), m_shader(shader)
+
+    Material(Shader* shader) :  m_shader(shader)
     {
     }
 
-    Material(const std::string &shader) : m_textures()
+    Material(const std::string &shader) 
     {
-        setShader(shader);
+        SetShader(shader);
     }
 
     Material(const Material& other);
@@ -50,59 +52,42 @@ public:
      * 
      * @param shader the name of the shader
      */
-    void setShader(const std::string &shader);
+    void SetShader(const std::string &shader);
+
 
     /**
-     * @brief change the current textures
-     * 
-     * @param newTextures the textures to be moved
-     */
-    void changeTextures(std::vector<Texture *> &&newTextures)
-    {
-        m_textures = std::move(newTextures);
-    }
-
-/**
  * @brief return a copy of this material
  * 
  * @return Material 
  */
     Material Clone() const;
-    /**
-     * @brief Get the Textures object
-     * 
-     * @return const std::vector<Texture*> 
-     */
-    const std::vector<Texture *> *getTextures() const
-    {
-        return &m_textures;
-    }
 
     void useShader() const;
     const Shader *getShader() const;
-    ShaderParameter* GetParameters() const;
+    ShaderParameter *GetParameters() const;
+
 protected:
     mutable ShaderParameter m_parameters;
-    std::vector<Texture *> m_textures;
     Shader *m_shader;
-/* Static ----*/
+    /* Static ----*/
 public:
-    static Material* get(const std::string& id);
-    template<typename ...Args>
-    static Material* add(const std::string& id, Args&& ... args);
-    static void remove(const std::string& id);
+    static Material *get(const std::string &id);
+    template <typename... Args>
+    static Material *add(const std::string &id, Args &&... args);
+    static void remove(const std::string &id);
+
 private:
     static std::unordered_map<std::string, Material> collection;
 };
 
-template<typename ...Args>
-Material* Material::add(const std::string& id, Args&& ... args)
+template <typename... Args>
+Material *Material::add(const std::string &id, Args &&... args)
 {
-	auto has = collection.find(id);
-	if (has != collection.end()) return &has->second;
-
-	auto pair = collection.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...));
-	return &pair.first->second;
+    auto has = collection.find(id);
+    if (has != collection.end())
+        return &has->second;
+    auto pair = collection.emplace(id, Material(args...));
+    return &pair.first->second;
 }
 } // namespace Graphics
 } // namespace wlEngine

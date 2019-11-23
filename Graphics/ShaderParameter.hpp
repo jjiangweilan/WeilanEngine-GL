@@ -1,9 +1,9 @@
 #pragma once
+#include "Texture.hpp"
 #include <string>
 #include <vector>
 #include <unordered_map>
 #include <functional>
-#include "Shader.hpp"
 namespace wlEngine
 {
 namespace Graphics
@@ -21,8 +21,16 @@ enum class ParameterType
     Mat2,
     Mat3,
     Mat4,
-    Sampler2D
+    Sampler
 };
+
+struct TextureUnitBinding
+{
+    GLint texUnit;
+    Texture *texture;
+    TextureUnitBinding(const GLint &texUnit, Texture *texture) : texUnit(texUnit), texture(texture) {}
+};
+
 class ShaderParameter
 {
     friend class wlEngine::GameEditor;
@@ -48,6 +56,13 @@ public:
     void UpdateParameters(Shader *shader);
 
     void Use();
+
+    /**
+     * @brief change the current textures using the default naming system(see implementation)
+     * 
+     * @param newTextures the textures to be moved
+     */
+    void SetTextures(const std::vector<Texture *> &newTextures);
 
 protected:
     class ShaderParameterBase
@@ -78,7 +93,7 @@ protected:
     public:
         ShaderParameterType();
         ~ShaderParameterType();
-        ShaderParameterType(const T& val, const unsigned int &loc, const ParameterType &type);
+        ShaderParameterType(const T &val, const unsigned int &loc, const ParameterType &type);
 
         ShaderParameterType(const ShaderParameterType &) = default;
         ShaderParameterType &operator=(const ShaderParameterType &) = default;
@@ -101,7 +116,6 @@ void ShaderParameter::AddParameter(const std::string &name, const T &val)
 {
     m_parameters.emplace(name, new ShaderParameterType<T>(name, val));
 }
-
 
 template <typename T>
 bool ShaderParameter::SetParameter(const std::string &name, const T &val)

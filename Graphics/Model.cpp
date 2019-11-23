@@ -8,11 +8,13 @@ namespace wlEngine
 namespace Graphics
 {
 
-Model::Model(std::vector<Mesh>&& meshes) {
+Model::Model(std::vector<Mesh> &&meshes)
+{
     m_meshes = std::move(meshes);
 }
 
-Model::Model(const std::vector<Mesh>& meshes) {
+Model::Model(const std::vector<Mesh> &meshes)
+{
     m_meshes = meshes;
 }
 
@@ -21,18 +23,19 @@ Model::Model(const std::string &path) : m_id(path)
     loadModel(path);
 }
 
-Model::Model(Model&& model) {
-	m_meshes = std::move(model.m_meshes);
-	m_id = model.m_id;
-	m_gammaCorrection = m_gammaCorrection;
+Model::Model(Model &&model)
+{
+    m_meshes = std::move(model.m_meshes);
+    m_id = model.m_id;
+    m_gammaCorrection = m_gammaCorrection;
 }
 
-Model::Model(const Model& model) {
-	m_meshes = model.m_meshes;
-	m_id = model.m_id;
-	m_gammaCorrection = m_gammaCorrection;
+Model::Model(const Model &model)
+{
+    m_meshes = model.m_meshes;
+    m_id = model.m_id;
+    m_gammaCorrection = m_gammaCorrection;
 }
-
 
 Model *Model::loadModel(const std::string &path)
 {
@@ -52,18 +55,21 @@ Model *Model::loadModel(const std::string &path)
 
 void Model::processNode(aiNode *node, const aiScene *scene)
 {
-    auto m_directory = m_id.substr(0, m_id.find_last_of('/'));
+	auto m_directory = m_id.substr(0, m_id.find_last_of('/'));
+
     for (size_t i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-
+        
         //process textures from aiMaterial
         std::vector<Texture *> textures;
         aiString name;
+        
         for (size_t aiType = aiTextureType_DIFFUSE; aiType < aiTextureType_UNKNOWN; aiType++)
         {
-            for (size_t i = 0; i < material->GetTextureCount((aiTextureType)aiType); i++)
+            int maxTextureCount = material->GetTextureCount((aiTextureType)aiType);
+            for (size_t i = 0; i < maxTextureCount; i++)
             {
                 material->GetTexture((aiTextureType)aiType, i, &name);
                 auto path = m_directory + "/" + name.C_Str();
@@ -72,28 +78,30 @@ void Model::processNode(aiNode *node, const aiScene *scene)
             }
         }
 
-        std::string materialName = name.C_Str();
-        auto ptr = materialName.find_first_of("_");
-        if (ptr == materialName.npos)
-            ptr = materialName.find_first_of("-");
-        if (ptr == materialName.npos)
-            ptr = materialName.find_first_of(" ");
-        materialName = materialName.substr(0, ptr);
-        auto mat = Material::add(m_id + "-" + materialName, "Model", std::move(textures));
+		std::string matName = name.C_Str();
+		auto pos = matName.find_last_of("_");
+		if (pos == matName.npos)
+			pos = matName.find_last_of("-");
+		if (pos == matName.npos)
+			pos == matName.find_last_of(" ");
+		if (pos == matName.npos) pos = matName.size();
+		matName = matName.substr(0, pos);
 
-        m_meshes.emplace_back(mesh, mat, materialName);
+		auto mat = Material::add(m_id + "-" + matName , "Model", textures);
+
+        m_meshes.emplace_back(mesh, mat, std::to_string(mesh->mMaterialIndex));
     }
     for (size_t i = 0; i < node->mNumChildren; i++)
     {
         processNode(node->mChildren[i], scene);
     }
 }
-const std::vector<Mesh> *Model::getMeshes() const
+const std::vector<Mesh> *Model::GetMeshes() const
 {
     return &m_meshes;
 }
 
-const Mesh *Model::getMesh(const std::string &name) const
+const Mesh *Model::GetMesh(const std::string &name) const
 {
     for (auto &m : m_meshes)
     {
@@ -118,7 +126,8 @@ void Model::addMesh(const Mesh &mesh)
 Model *Model::get(const std::string &id)
 {
     auto iter = collection.find(id);
-    if (iter == collection.end()) return nullptr;
+    if (iter == collection.end())
+        return nullptr;
     return &iter->second;
 }
 
@@ -136,16 +145,23 @@ AABB Model::getAABB() const
     float left = FLT_MAX;
     float right = FLT_MIN;
 
-    for (auto& m : m_meshes) {
-        for (auto& vert: m.m_vertices)
+    for (auto &m : m_meshes)
+    {
+        for (auto &vert : m.m_vertices)
         {
-            auto& pos = vert.position;
-            if (pos.x > right) right = pos.x;
-            if (pos.x < left) left = pos.x;
-            if (pos.y > top) top = pos.y;
-            if (pos.y < down) down = pos.y;
-            if (pos.z > front) front = pos.z;
-            if (pos.z < back) back = pos.z;
+            auto &pos = vert.position;
+            if (pos.x > right)
+                right = pos.x;
+            if (pos.x < left)
+                left = pos.x;
+            if (pos.y > top)
+                top = pos.y;
+            if (pos.y < down)
+                down = pos.y;
+            if (pos.z > front)
+                front = pos.z;
+            if (pos.z < back)
+                back = pos.z;
         }
     }
     return {{left, top, back}, {right, down, front}};

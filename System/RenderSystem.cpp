@@ -519,47 +519,10 @@ void RenderSystem::render(Model *model)
     auto modelM = model->getModel();
     if (!modelM)
         return;
-    for (auto mesh : *modelM->getMeshes())
+    for (auto mesh : *modelM->GetMeshes())
     {
-        // bind appropriate textures
-        unsigned int diffuseNr = 900;
-        unsigned int specularNr = 910;
-        unsigned int normalNr = 930;
-        unsigned int heightNr = 940;
-        mesh.m_material->useShader();
         auto shader = mesh.m_material->getShader();
-        auto &textures = *mesh.m_material->getTextures();
-        for (unsigned int i = 0; i < textures.size(); i++)
-        {
-            glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
-            // retrieve texture number (the N in diffuse_textureN)
-
-            auto &type = textures[i]->getType();
-            int loc = -1;
-            //this should be converted into enum and integer
-            switch (type)
-            {
-            case Graphics::TextureType::Diffuse:
-                loc = diffuseNr++;
-                break;
-            case Graphics::TextureType::Specular:
-                loc = specularNr++;
-                break;
-            case Graphics::TextureType::Normals:
-                loc = normalNr++;
-                break;
-            case Graphics::TextureType::Height:
-                loc = heightNr++;
-                break;
-            default:
-                assert(0 && "texture type not surrpoted");
-            }
-
-            // now set the sampler to the correct texture unit
-            Graphics::Shader::setUniform(loc, i);
-            // and finally bind the texture
-            glBindTexture(GL_TEXTURE_2D, textures[i]->getId());
-        }
+		shader->use();
         mesh.m_material->GetParameters()->Use();
         //
         // draw mesh
@@ -576,11 +539,10 @@ void RenderSystem::render(Model *model)
             glDrawElements(GL_TRIANGLES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
         }
 
-        glBindVertexArray(0);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
     }
-
+	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 #ifdef DEBUG
     auto aabb = modelM->getAABB();
     //small offset to prevent collision

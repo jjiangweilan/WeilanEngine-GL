@@ -29,14 +29,14 @@ public:
 	Model(const Model& model);
 
     
-    const std::vector<Mesh> *getMeshes() const;
+    const std::vector<Mesh> *GetMeshes() const;
     /**
      * @brief Get the Mesh object
      * 
      * @param name the name of the mesh
      * @return const Mesh* 
      */
-    const Mesh* getMesh(const std::string& name) const;
+    const Mesh* GetMesh(const std::string& name) const;
     /**
      * @brief move a mesh to the meshes
      * 

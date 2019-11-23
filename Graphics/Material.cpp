@@ -7,7 +7,7 @@ namespace Graphics
 std::unordered_map<std::string, Material> Material::collection;
 Material::Material() : m_shader(nullptr){};
 
-void Material::setShader(const std::string &name)
+void Material::SetShader(const std::string &name)
 {
     m_shader = Shader::get(name);
     m_parameters.UpdateParameters(m_shader);
@@ -43,13 +43,11 @@ void Material::remove(const std::string &id)
 Material::Material(const Material &other)
 {
     m_parameters = other.m_parameters;
-    m_textures = other.m_textures;
     m_shader = other.m_shader;
 }
 Material::Material(Material &&other)
 {
     m_parameters = std::move(other.m_parameters);
-    m_textures = std::move(other.m_textures);
     m_shader = other.m_shader;
 }
 

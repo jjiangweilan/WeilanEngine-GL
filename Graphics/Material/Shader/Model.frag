@@ -19,15 +19,11 @@ layout (std140) uniform MainCamera
 
 layout (location = 4) uniform Light light1;
 layout (location = 8) uniform Light light2;
-layout (location = 900) uniform sampler2D texture_diffuse[10];
-layout (location = 910) uniform sampler2D texture_specular[10];
-layout (location = 920) uniform sampler2D texture_ambient[10];
-layout (location = 930) uniform sampler2D texture_normals[10];
-layout (location = 940) uniform sampler2D texture_height[10];
+layout(location = 900) uniform sampler2D diffuseTex0;
 
 vec3 calculateColor(Light light) {
-    vec4 tex = texture(texture_diffuse[0], TexCoords);
-    if (tex.x == 0 && tex.y == 0 && tex.z == 0) tex = vec4(0.5,0.5,0.5,1.0);
+    vec4 tex = texture(diffuseTex0, TexCoords);
+
     // ambient
     vec3 ambient = light.ambient * tex.rgb;
 

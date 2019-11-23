@@ -88,7 +88,7 @@ const std::string &Texture::getSourcePath() const { return m_sourcePath; }
 const int &Texture::getWidth() const { return m_width; }
 const int &Texture::getHeight() const { return m_height; }
 const int &Texture::getNRChannel() const { return m_nrChannel; }
-const TextureType &Texture::getType() const { return m_type; }
+const TextureType &Texture::GetType() const { return m_type; }
 
 Texture *Texture::get(const std::string &id)
 {

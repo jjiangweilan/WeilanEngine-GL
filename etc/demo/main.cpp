@@ -152,7 +152,7 @@ int main()
     earth->addComponent<Transform>(4.5, 2, 0);
     auto model3 = earth->addComponent<Model>("Sphere");
     model3->ShaderParamUpdate = [](Model* model) {
-        auto& meshes = *model->getModel()->getMeshes();
+        auto& meshes = *model->getModel()->GetMeshes();
         auto transform = model->entity->getComponent<Transform>();
         for (auto& mesh : meshes)
         {
@@ -167,7 +167,7 @@ int main()
     auto modelWater = water->addComponent<Model>("water");
     modelWater->SetDrawMode(DrawMode::Line);
     modelWater->ShaderParamUpdate = [](Model* model) {
-        auto& mesh = *model->getModel()->getMesh("water");
+        auto& mesh = *model->getModel()->GetMesh("water");
 		auto transform = model->entity->getComponent<Transform>();
         auto parameters = mesh.getMaterial()->GetParameters();
         parameters->SetParameter("model", transform->getModel());

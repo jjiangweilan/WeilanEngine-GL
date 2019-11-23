@@ -46,7 +46,7 @@ public:
     const int &getWidth() const;
     const int &getHeight() const;
     const int &getNRChannel() const;
-    const TextureType &getType() const;
+    const TextureType &GetType() const;
 
 private:
     unsigned int m_textureId = 0;
