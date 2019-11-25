@@ -17,18 +17,18 @@ Camera2D::Camera2D(Entity *go, void **data) : Camera(go)
 {
 }
 
-glm::mat4 Camera2D::getViewMatrix() const
+glm::mat4 Camera2D::GetViewMatrix() const
 {
 	auto transform = entity->GetComponent<Transform>();
     return glm::lookAt(transform->position, transform->position + glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
 }
 
-glm::mat4 Camera2D::getProjMatrix() const
+glm::mat4 Camera2D::GetProjMatrix() const
 {
     return m_projMatrix;
 }
 
-void Camera2D::setProjectionMatrix(const float &left, const float &right,
+void Camera2D::SetProjectionMatrix(const float &left, const float &right,
                                    const float &bottom, const float &top, const float &zNear, const float &zFar)
 {
     m_projMatrix = glm::ortho(left, right, bottom, top, zNear, zFar);
@@ -58,6 +58,6 @@ void Camera2D::update()
 		transform->moveBy(Time::deltaTime * 3000 * (-left + right), Time::deltaTime * 3000 * (up - down), 0);
         
         auto size = RenderSystem::get()->getSceneSize();
-        setProjectionMatrix(0, size.x, 0, size.y, -100000,100000);
+        SetProjectionMatrix(0, size.x, 0, size.y, -100000,100000);
 	}
 } // namespace wlEngine

@@ -389,7 +389,7 @@ void GameEditor::showModelInfo(Entity *entity)
     auto gModel = model->getModel();
     for (auto& mesh : *gModel->GetMeshes())
     {
-        auto params = mesh.getMaterial()->GetParameters();
+        auto params = mesh.GetMaterial()->GetParameters();
         for (auto& param : params->m_parameters)
         {
 			auto type = param.second->GetType();
@@ -817,7 +817,7 @@ void GameEditor::showSpriteInfo(Entity *go)
 {
     auto sprite = go->GetComponent<Sprite>();
     auto mainTexture = sprite->getMesh()->getTextures()->at(0);
-    ImGui::Image((void *)mainTexture->getId(), {(float)mainTexture->getWidth(), (float)mainTexture->getHeight()}, {0, 1}, {1, 0});
+    ImGui::Image((void *)mainTexture->GetId(), {(float)mainTexture->getWidth(), (float)mainTexture->getHeight()}, {0, 1}, {1, 0});
 }
 void GameEditor::showResourceInDirectory(const std::string &path)
 {
@@ -866,7 +866,7 @@ void GameEditor::showResourceInDirectory(const std::string &path)
                     if (ImGui::TreeNodeEx(name.data()))
                     {
                         auto texture = Graphics::Texture::add(filePath, filePath);
-                        ImGui::Image((void *)texture->getId(), {(float)texture->getWidth(), (float)texture->getHeight()}, {0, 1}, {1, 0});
+                        ImGui::Image((void *)texture->GetId(), {(float)texture->getWidth(), (float)texture->getHeight()}, {0, 1}, {1, 0});
                         ImGui::TreePop();
                     }
                     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))

@@ -9,7 +9,7 @@ struct AnnoShader : public Script {
 	const Graphics::Shader* shader;
 	AnnoShader(Entity* go) : Script(go) {
 		shader = go->GetComponent<Model>()->getShader();
-		shader->use();
+		shader->Use();
 		shader->setVec3("light1.ambient", 0.3f, 0.3f, 0.3f);
 		shader->setVec3("light1.diffuse", 0.8f, 0.8f, 0.8f);
 		shader->setVec3("light1.specular", 1.0f, 1.0f, 1.0f);
@@ -20,7 +20,7 @@ struct AnnoShader : public Script {
 	}
 
 	void update() override {
-		shader->use();
+		shader->Use();
 		shader->setVec3("light1.position", light1Transform->position);
 		shader->setVec3("light2.position", light2Transform->position);
 

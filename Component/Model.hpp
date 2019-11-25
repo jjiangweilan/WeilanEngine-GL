@@ -12,9 +12,9 @@ enum DrawMode {
 };
 class Model : public Component
 {
+public:
     COMPONENT_DECLARATION(Component, Model, 32);
 
-public:
     Model(Entity *go);
     Model(Entity *go, const std::string &id);
 

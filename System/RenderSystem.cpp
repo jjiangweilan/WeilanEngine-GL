@@ -30,7 +30,7 @@ namespace wlEngine
 {
 RenderSystem *RenderSystem::renderSystem = nullptr;
 
-RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize), framebufferTextures(FramebufferSize), depthAndStencilTextures(FramebufferSize)
+RenderSystem::RenderSystem() 
 {
     // SDL and OpenGL init
     SDLInit();
@@ -40,14 +40,6 @@ RenderSystem::RenderSystem() : FramebufferSize(2), framebuffers(FramebufferSize)
 
     sceneShader = Graphics::Shader::get("Scene");
 
-    for (int i = 0; i < FramebufferSize; i++)
-    {
-        genFramebuffer(framebuffers[i], framebufferTextures[i], depthAndStencilTextures[i]);
-    }
-
-#if SETTINGS_GAME_DIMENSION == 1
-    projection = glm::perspective(glm::radians(45.0f), (float)sceneWidth / sceneHeight, 0.1f, 100000.0f);
-#endif
 #ifdef DEBUG
     physicsDebugDrawShader = Graphics::Shader::add("PhysicsDebugDrawShader",
                                                    ROOT_DIR + "/Graphics/Material/Shader/PhysicsDebugDraw.vert",
@@ -76,12 +68,6 @@ RenderSystem::~RenderSystem()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
-
-#if SETTINGS_ENGINEMODE
-    glDeleteFramebuffers(1, &sceneFramebuffer);
-    glDeleteTextures(1, &sceneTexture);
-    glDeleteTextures(1, &depthAndStencilTexture);
-#endif
 }
 
 RenderSystem *RenderSystem::get() { return renderSystem; }
@@ -90,41 +76,13 @@ void RenderSystem::init() { renderSystem = new RenderSystem(); }
 
 void RenderSystem::render()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffers[FramebuffersIndex::Main]);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
-    glViewport(0, 0, sceneWidth, sceneHeight);
-    renderGame();
+    auto attachment = m_mainCamera->GetRenderNode()->Render();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffers[FramebuffersIndex::VolumetricLight]);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
-    glViewport(0, 0, sceneWidth, sceneHeight);
-    glBlendFunc(GL_ONE, GL_ONE);
-    for (auto c : VolumetricLight::collection)
-    {
-        if (!c->entity->IsEnable())
-            continue;
-        render(c);
-    }
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glBlendFunc(GL_ONE, GL_ZERO);
-#if SETTINGS_ENGINEMODE
-    //glBindFramebuffer(GL_FRAMEBUFFER, sceneFramebuffer);
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
-    //glViewport(0, 0, sceneWidth, sceneHeight);
-    //renderGame();
-    combineTheFramebuffersToFramebuffer(sceneFramebuffer);
-#ifdef DEBUG
-    if (Settings::debugRender == Settings::DebugRender::On)
-        debugRender();
-#endif
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear main frambuffer
     glViewport(0, 0, windowWidth, windowHeight);
-    renderGameEditor();
-#else
-    combineTheFramebuffersToFramebuffer(0);
-#endif
+    unsigned int id = attachment->colors[0].GetId();
+    renderGameEditor(id);
 
     SDL_GL_SwapWindow(window);
 }
@@ -141,12 +99,12 @@ void RenderSystem::updateFrameSettings()
     //why we get the Camera2D then the Camera3D, instead of get the Camera?
     //this is a trick to force the isComponentRegs of Camera2D and Camera3D to initialize
     //the program will use dynamic initialization if no function of the class is called within the program (won't count lambda), this is wired...
-    camera = m_engine->getCurrentScene()->getCamera()->GetComponent<Camera2D>();
-    if (!camera)
-        camera = m_engine->getCurrentScene()->getCamera()->GetComponent<Camera3D>();
+    m_mainCamera = m_engine->getCurrentScene()->getCamera()->GetComponent<Camera2D>();
+    if (!m_mainCamera)
+        m_mainCamera = m_engine->getCurrentScene()->getCamera()->GetComponent<Camera3D>();
 
-    m_viewMatrix = camera->getViewMatrix();
-    m_projMatrix = camera->getProjMatrix();
+    m_viewMatrix = m_mainCamera->GetViewMatrix();
+    m_projMatrix = m_mainCamera->GetProjMatrix();
 
     glBindBuffer(GL_UNIFORM_BUFFER, m_projectionUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &m_viewMatrix[0][0]);
@@ -159,7 +117,7 @@ void RenderSystem::updateFrameSettings()
     glBufferSubData(GL_UNIFORM_BUFFER,
                     0,
                     sizeof(glm::vec3),
-                    &(camera->entity->GetComponent<Transform>()->position[0]));
+                    &(m_mainCamera->entity->GetComponent<Transform>()->position[0]));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -210,10 +168,6 @@ void RenderSystem::SDLInit()
     glEnable(GL_BLEND);
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-#if SETTINGS_ENGINEMODE
-    //scene frame buffer
-    genFramebuffer(sceneFramebuffer, sceneTexture, depthAndStencilTexture);
-#endif
 
     glClearStencil(0);
 }
@@ -229,14 +183,14 @@ void RenderSystem::ImGuiInit()
     ImGui_ImplOpenGL3_Init("#version 450");
 }
 #if SETTINGS_ENGINEMODE
-void RenderSystem::renderGameEditor()
+void RenderSystem::renderGameEditor(unsigned int& sceneTexId)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame(window);
     ImGui::NewFrame();
 
     void *data[3];
-    data[0] = &sceneTexture;
+    data[0] = &sceneTexId;
     data[1] = &sceneWidth;
     data[2] = &sceneHeight;
     GameEditor::get()->render(data);
@@ -277,13 +231,13 @@ void RenderSystem::render(VolumetricLight *vl)
     auto vlShader = vl->getShader();
     auto mesh = vl->getMesh();
     auto &vlTextures = *mesh->getTextures();
-    vlShader->use();
+    vlShader->Use();
     auto transform = vl->entity->GetComponent<Transform>();
     vlShader->setMat4("model", transform->getModel());
     vlShader->setMat4("view", m_viewMatrix);
     vlShader->setMat4("projection", m_projMatrix);
 
-    int t = vlTextures[0]->getId();
+    int t = vlTextures[0]->GetId();
     glBindVertexArray(mesh->getVAO());
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, t);
@@ -291,7 +245,7 @@ void RenderSystem::render(VolumetricLight *vl)
 }
 void RenderSystem::render(Text *t)
 {
-    t->getShader()->use();
+    t->getShader()->Use();
     //
     // main texture
     glActiveTexture(GL_TEXTURE0);
@@ -301,7 +255,7 @@ void RenderSystem::render(Text *t)
     {
         auto &characterETX = t->text[i];
         auto mesh = characterETX.character->getMesh();
-        glBindTexture(GL_TEXTURE_2D, mesh->getTextures()->at(0)->getId());
+        glBindTexture(GL_TEXTURE_2D, mesh->getTextures()->at(0)->GetId());
 
         t->getShader()->setMat4("model", model * characterETX.getTextTransform());
         t->getShader()->setMat4("view", m_viewMatrix);
@@ -325,7 +279,7 @@ void RenderSystem::render(Sprite *t)
         return;
     }
 
-    t->getShader()->use();
+    t->getShader()->Use();
     if (t->beforeRenderFunc)
         t->beforeRenderFunc();
 
@@ -334,7 +288,7 @@ void RenderSystem::render(Sprite *t)
     for (int i = 0; i < textures->size(); i++)
     {
         glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, textures->at(i)->getId());
+        glBindTexture(GL_TEXTURE_2D, textures->at(i)->GetId());
         Graphics::Shader::setUniform(1000 + i, i);
     }
 
@@ -379,8 +333,8 @@ void RenderSystem::render(Model *model)
         return;
     for (auto mesh : *modelM->GetMeshes())
     {
-        auto shader = mesh.m_material->getShader();
-		shader->use();
+        auto shader = mesh.m_material->GetShader();
+		shader->Use();
         mesh.m_material->GetParameters()->Use();
         //
         // draw mesh
@@ -409,27 +363,6 @@ void RenderSystem::render(Model *model)
 #endif
 }
 
-void RenderSystem::genFramebuffer(GLuint &fb, GLuint &ft, GLuint &ds)
-{
-    glGenFramebuffers(1, &fb);
-    glBindFramebuffer(GL_FRAMEBUFFER, fb);
-
-    glGenTextures(1, &ft);
-    glBindTexture(GL_TEXTURE_2D, ft);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, sceneWidth, sceneHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ft, 0);
-
-    glGenTextures(1, &ds);
-    glBindTexture(GL_TEXTURE_2D, ds);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, sceneWidth, sceneHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, ds, 0);
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_STENCIL_TEST);
-    glEnable(GL_BLEND);
-}
 void RenderSystem::initSceneFrambufferData()
 {
     GLfloat vertices[] = {
@@ -464,7 +397,7 @@ void RenderSystem::combineTheFramebuffersToFramebuffer(const GLuint &framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, framebufferTarget);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
     glViewport(0, 0, sceneWidth, sceneHeight);
-    sceneShader->use();
+    sceneShader->Use();
     // draw the main scene
     glBindVertexArray(sceneVAO);
     glActiveTexture(GL_TEXTURE0);
@@ -497,7 +430,7 @@ void RenderSystem::debugRender()
             else
                 vertices = static_cast<LineShape *>(rb->shape)->getPoints();
             std::vector<float> glVertices(vertices.size() * 2);
-            physicsDebugDrawShader->use();
+            physicsDebugDrawShader->Use();
             auto pos = rb->entity->GetComponent<Transform>()->position;
             for (int i = 0; i < vertices.size(); i++)
             {
@@ -541,7 +474,7 @@ void RenderSystem::debugRender()
             std::vector<glm::vec2> vertices = {{centerX + radius, centerY + radius}, {centerX + radius, centerY - radius}, {centerX - radius, centerY - radius}, {centerX - radius, centerY + radius}};
 
             std::vector<float> glVertices(vertices.size() * 2);
-            physicsDebugDrawShader->use();
+            physicsDebugDrawShader->Use();
             auto pos = rb->entity->GetComponent<Transform>()->position;
             for (int i = 0; i < vertices.size(); i++)
             {
@@ -581,7 +514,7 @@ void RenderSystem::debugRender()
             std::vector<glm::vec2> vertices = {shape->leftPoint, shape->rightPoint};
 
             std::vector<float> glVertices(vertices.size() * 2);
-            physicsDebugDrawShader->use();
+            physicsDebugDrawShader->Use();
             auto pos = rb->entity->GetComponent<Transform>()->position;
             for (int i = 0; i < vertices.size(); i++)
             {

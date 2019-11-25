@@ -39,14 +39,14 @@ vec3 calculateColor(Light light) {
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64.0);
     vec3 specular = light.specular * spec * tex.rgb;  
 
-    return ambient + diffuse + specular;
+    return ambient * 0.1 + diffuse + specular * 10;
 }
 void main()
 {    
     Light light;
-    light.position = vec3(5,5,5);
+    light.position = vec3(0,3,3);
     light.diffuse = vec3(0.2,0.2,0.2);
-    light.specular = vec3(0.6,0.6,0.6);
+    light.specular = vec3(1.0, 1.0, 1.0);
     light.ambient = vec3(0.4,0.4,0.4);
     vec3 rlt1 = calculateColor(light);
     //vec3 rlt2 = calculateColor(light2);

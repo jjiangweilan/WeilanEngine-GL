@@ -49,10 +49,7 @@ public:
 
 private:
 #if SETTINGS_ENGINEMODE
-  unsigned int sceneTexture;
-  unsigned int sceneFramebuffer;
-  unsigned int depthAndStencilTexture;
-  void renderGameEditor();
+  void renderGameEditor(unsigned int& sceneTexId);
 #endif
 #ifdef DEBUG
   void debugRender();
@@ -68,7 +65,6 @@ private:
   int sceneHeight = 720;
   const int topMenuHeight = 20;
 
-  const int FramebufferSize;
   /**
      * @brief the first framebuffer is the main scene, the other are used for post-processing
      * 
@@ -95,7 +91,7 @@ private:
 
   SDL_GLContext glContext;
   SDL_Window *window;
-  Camera *camera = nullptr;
+  Camera *m_mainCamera = nullptr;
 
   glm::mat4 projection;
 

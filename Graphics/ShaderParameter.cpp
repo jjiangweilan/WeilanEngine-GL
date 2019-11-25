@@ -49,7 +49,7 @@ void ShaderParameter::UpdateParameters(Shader *shader)
                         GLint val;
                         glGetUniformiv(program, loc, &val);
                         TextureUnitBinding actualVal(val, nullptr);
-                        m_parameters.emplace(nameStr, new ShaderParameterType<TextureUnitBinding>(actualVal, loc, ParameterType::Sampler));
+                        m_parameters.emplace(nameStr, new ShaderParameterType<TextureUnitBinding>(actualVal, loc, ParameterType::Sampler2D));
                     }
                 }
                 break;
@@ -186,8 +186,8 @@ void ShaderParameter::SetTextures(const std::vector<Texture *> &newTextures)
 template <>
 void ShaderParameter::ShaderParameterType<TextureUnitBinding>::Use()
 {
-    glActiveTexture(GL_TEXTURE0 + m_val.texUnit); // m_val.loc = Texture Unit
-    if(m_val.texture)glBindTexture(GL_TEXTURE_2D, m_val.texture->getId());
+    glActiveTexture(GL_TEXTURE0 + m_val.texUnit); 
+    if(m_val.texture)glBindTexture(GL_TEXTURE_2D, m_val.texture->GetId());
     else glBindTexture(GL_TEXTURE_2D, 0);
 	Shader::setUniform(m_loc, m_val.texUnit);
 }

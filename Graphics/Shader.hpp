@@ -28,7 +28,7 @@ public:
     ~Shader();
 	Shader(Shader&& shader);
 	Shader(const Shader& shader);
-    void use() const;
+    void Use() const;
     bool hasTess() const;
     const GLuint& getPatches() const;
 	const GLuint& getId() const;
