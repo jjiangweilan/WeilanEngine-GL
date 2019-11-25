@@ -33,7 +33,7 @@ struct PlayerController : public Script {
             Physics::query(contactCheck);
             if (contactCheck.contactList.size() > 0) {
                 Entity *npc = contactCheck.contactList[0]->entity;
-                NpcController *npcController = npc->getComponent<NpcController>();
+                NpcController *npcController = npc->GetComponent<NpcController>();
                 dialog = UserInterface::showDialog(npcController);
             }
         } else if (clicked && dialog) {

@@ -25,7 +25,7 @@ void NpcSystem::update()
 
         for (auto &npcController : NpcController::collection)
         {
-            if (!npcController->entity->isEnable() || npcController->entity->getScene() != currentScene)
+            if (!npcController->entity->IsEnable() || npcController->entity->GetScene() != currentScene)
                 continue;
             float remaining = 1;
             float random = 0;
@@ -48,7 +48,7 @@ void NpcSystem::update()
 
     for (auto &npcController : NpcController::collection)
     {
-        if (!npcController->entity->isEnable() || npcController->entity->getScene() != currentScene)
+        if (!npcController->entity->IsEnable() || npcController->entity->GetScene() != currentScene)
             continue;
         move(npcController);
     }
@@ -71,9 +71,9 @@ void NpcSystem::move(NpcController *npcController)
         float alpha = timePassed / (movementTo.from - movementFrom.from);
         glm::vec2 newPos = movementFrom.position * (1 - alpha) +
                            movementTo.position * alpha;
-        auto transform = npcController->entity->getComponent<Transform>();
+        auto transform = npcController->entity->GetComponent<Transform>();
         transform->setPosition({newPos.x, newPos.y, transform->position.z});
-        auto animation = npcController->entity->getComponent<Animation>();
+        auto animation = npcController->entity->GetComponent<Animation>();
         if (!animation->isPlaying(movementFrom.animationName))
             animation->playAnimation(movementFrom.animationName);
     }
@@ -83,7 +83,7 @@ void NpcSystem::move(NpcController *npcController)
     if (i == behavior.movement.size() - 1)
     {
         auto &movementFrom = behavior.movement[i];
-        auto animation = npcController->entity->getComponent<Animation>();
+        auto animation = npcController->entity->GetComponent<Animation>();
         if (!animation->isPlaying(movementFrom.animationName))
             animation->playAnimation(movementFrom.animationName);
         i++;

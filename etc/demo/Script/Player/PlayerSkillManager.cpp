@@ -13,28 +13,28 @@ namespace PlayerSkill {
     }
 
     Entity* FireBall::castSpell(Entity* player) {
-        glm::vec2 transform = glm::vec2(player->getComponent<Transform>()->position);
-        auto fireball = EngineManager::getwlEngine()->getCurrentScene()->createGameObject("fireball", nullptr);
-        fireball->addComponent<Transform>(transform.x, transform.y, 0);
-        auto sprite = fireball->addComponent<Sprite>();
-        auto animation = fireball->addComponent<Animation>();
+        glm::vec2 transform = glm::vec2(player->GetComponent<Transform>()->position);
+        auto fireball = EngineManager::getwlEngine()->getCurrentScene()->CreateGameObject("fireball", nullptr);
+        fireball->AddComponent<Transform>(transform.x, transform.y, 0);
+        auto sprite = fireball->AddComponent<Sprite>();
+        auto animation = fireball->AddComponent<Animation>();
         animation->addAnimationFromAseprite("../resource/player/skill/fireball.json", "../resource/player/skill/fireball.png");
         animation->playAnimation("move");
         float x = Input::getControllerAxis(ControllerAxis::AxisLeftX);
         float y = Input::getControllerAxis(ControllerAxis::AxisLeftY);
-        fireball->addComponent<AiScript::Move>(glm::vec2(x,y), 250);
+        fireball->AddComponent<AiScript::Move>(glm::vec2(x,y), 250);
 
         PolygonShape shape({50,50});
-        auto body = fireball->addComponent<TRigidbody>(&shape, BodyType::Dynamic);
+        auto body = fireball->AddComponent<TRigidbody>(&shape, BodyType::Dynamic);
         body->sensor = true;
         body->mask = CONTACT_FILTER_ENEMY;
         body->contactBegin = [](TRigidbody *body, TRigidbody *other) {
             body->entity->removeComponent<AiScript::Move>();
-            auto animation = body->entity->getComponent<Animation>();
+            auto animation = body->entity->GetComponent<Animation>();
             animation->playAnimation("explode", false);
-            body->entity->addComponent<AiScript::Scheduler>([animation]() { return animation->hasEnded(); }, [animation]() { EngineManager::getwlEngine()->getCurrentScene()->destroyGameObject(animation->entity); });
+            body->entity->AddComponent<AiScript::Scheduler>([animation]() { return animation->hasEnded(); }, [animation]() { EngineManager::getwlEngine()->getCurrentScene()->destroyGameObject(animation->entity); });
 
-            other->entity->getComponent<BasicEnemy>()->attackedBy(body->entity);
+            other->entity->GetComponent<BasicEnemy>()->attackedBy(body->entity);
         };
         return fireball;
     }
@@ -48,11 +48,11 @@ namespace PlayerSkill {
         spellFailed = false;
         spellSucceed = false;
         currentSpellIndex = 0;
-        buttonEffect = EngineManager::getwlEngine()->getCurrentScene()->createGameObject("buttonEffect", nullptr);
-        glm::vec2 playerTransform = glm::vec2(player->getComponent<Transform>()->position);
-        buttonEffect->addComponent<Transform>()->setPosition({playerTransform.x, playerTransform.y + 50, 100});
-        buttonEffect->addComponent<Sprite>();
-        auto animation = buttonEffect->addComponent<Animation>();
+        buttonEffect = EngineManager::getwlEngine()->getCurrentScene()->CreateGameObject("buttonEffect", nullptr);
+        glm::vec2 playerTransform = glm::vec2(player->GetComponent<Transform>()->position);
+        buttonEffect->AddComponent<Transform>()->setPosition({playerTransform.x, playerTransform.y + 50, 100});
+        buttonEffect->AddComponent<Sprite>();
+        auto animation = buttonEffect->AddComponent<Animation>();
         animation->addAnimationFromAseprite("../resource/player/button.json", "../resource/player/button.png");
         animation->playAnimation("empty");
     }
@@ -67,25 +67,25 @@ namespace PlayerSkill {
                 if (currentSpellSkill->spell[currentSpellIndex] != 'l')
                     spellFailed = true;
                 else
-                    buttonEffect->getComponent<Animation>()->playAnimation("Y");
+                    buttonEffect->GetComponent<Animation>()->playAnimation("Y");
             };
             if (buttonDown) {
                 if (currentSpellSkill->spell[currentSpellIndex] != 'd')
                     spellFailed = true;
                 else
-                    buttonEffect->getComponent<Animation>()->playAnimation("B");
+                    buttonEffect->GetComponent<Animation>()->playAnimation("B");
             };
             if (buttonRight) {
                 if (currentSpellSkill->spell[currentSpellIndex] != 'r')
                     spellFailed = true;
                 else
-                    buttonEffect->getComponent<Animation>()->playAnimation("A");
+                    buttonEffect->GetComponent<Animation>()->playAnimation("A");
             };
             if (buttonUp) {
                 if (currentSpellSkill->spell[currentSpellIndex] != 'u')
                     spellFailed = true;
                 else
-                    buttonEffect->getComponent<Animation>()->playAnimation("X");
+                    buttonEffect->GetComponent<Animation>()->playAnimation("X");
             };
             currentSpellIndex++;
             if (currentSpellIndex == currentSpellSkill->spell.size() && !spellFailed)

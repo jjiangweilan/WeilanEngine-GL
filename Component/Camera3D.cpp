@@ -26,7 +26,7 @@ Camera3D::~Camera3D(){};
 
 glm::mat4 Camera3D::getViewMatrix() const
 {
-    auto transform = entity->getComponent<Transform>();
+    auto transform = entity->GetComponent<Transform>();
     return glm::lookAt(transform->position, transform->position + front,
                        glm::cross(right, front));
 }
@@ -90,7 +90,7 @@ void Camera3D::updateEyeDirection()
 }
 void Camera3D::updatePosition()
 {
-    auto transform = entity->getComponent<Transform>();
+    auto transform = entity->GetComponent<Transform>();
     auto keyboard = SDL_GetKeyboardState(nullptr);
     float speedDelta = speed * Time::deltaTime;
 

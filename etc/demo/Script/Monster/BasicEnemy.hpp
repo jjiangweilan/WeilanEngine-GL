@@ -32,11 +32,11 @@ private:
 	void attack() {
 		if (attackCD == 0) {
 			auto scene = EngineManager::getwlEngine()->getCurrentScene();
-			auto goTransform = entity->getComponent<Transform>();
+			auto goTransform = entity->GetComponent<Transform>();
 
-			auto arrow = scene->createGameObject(std::string("arrow"), nullptr);
-			arrow->addComponent<Sprite>("../resource/arrow.png", "Sprite");
-			arrow->addComponent<Transform>(goTransform->position);
+			auto arrow = scene->CreateGameObject(std::string("arrow"), nullptr);
+			arrow->AddComponent<Sprite>("../resource/arrow.png", "Sprite");
+			arrow->AddComponent<Transform>(goTransform->position);
 			attackCD = 3;
 		}
 	}

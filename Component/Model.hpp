@@ -19,10 +19,6 @@ public:
     Model(Entity *go, const std::string &id);
 
     void useShader(const std::string &name);
-
-    std::function<void(Model*)> ShaderParamUpdate;
-    std::function<void()> beforeRenderFunc;
-    std::function<void()> afterRenderFunc;
     
     const Graphics::Model * getModel() const;
     const Graphics::Shader* getShader() const;

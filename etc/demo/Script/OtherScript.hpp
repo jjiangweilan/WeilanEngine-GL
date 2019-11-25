@@ -8,7 +8,7 @@ struct AnnoShader : public Script {
 
 	const Graphics::Shader* shader;
 	AnnoShader(Entity* go) : Script(go) {
-		shader = go->getComponent<Model>()->getShader();
+		shader = go->GetComponent<Model>()->getShader();
 		shader->use();
 		shader->setVec3("light1.ambient", 0.3f, 0.3f, 0.3f);
 		shader->setVec3("light1.diffuse", 0.8f, 0.8f, 0.8f);
@@ -51,7 +51,7 @@ struct SpriteRotate : public Script {
 
 	Transform* transform;
 	SpriteRotate(Entity* go) : Script(go) {
-		transform = go->getComponent<Transform>();
+		transform = go->GetComponent<Transform>();
 	}
 
 	void update() override {
@@ -66,8 +66,8 @@ struct Rotate1 : public Script {
 	Transform* transform;
 	const Graphics::Shader* shader;
 	Rotate1(Entity* go) : Script(go) {
-		shader = go->getComponent<Model>()->getShader();
-		transform = go->getComponent<Transform>();
+		shader = go->GetComponent<Model>()->getShader();
+		transform = go->GetComponent<Transform>();
 		transform->setScale(0.05, 0.05, 0.05);
 		transform->setPosition({ 0,0,0 });
 		shader->setVec3("objectColor", { 1,1,1 });

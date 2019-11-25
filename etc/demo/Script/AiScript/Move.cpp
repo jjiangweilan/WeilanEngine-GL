@@ -10,7 +10,7 @@ Move::Move(Entity* e, const glm::vec2& dir, const float& speed) : Script(e), spe
 
 void Move::update() {
     existTime += Time::deltaTime;
-    auto transform = entity->getComponent<Transform>();
+    auto transform = entity->GetComponent<Transform>();
     transform->moveBy(direction.x * Time::deltaTime * speed, direction.y * Time::deltaTime * speed);
     if (existTime > 2) 
     EngineManager::getwlEngine()->getCurrentScene()->destroyGameObject(entity);

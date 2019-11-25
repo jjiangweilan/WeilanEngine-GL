@@ -13,32 +13,32 @@ namespace wlEngine {
         std::string name;
 		std::set<Entity*> children;
 		
-        Entity* getParent() {return parent;}
-        void setParent(Entity*);
+        Entity* GetParent() {return parent;}
+        void SetParent(Entity*);
 
         std::set<std::shared_ptr<Component>> components;
         
         template <typename ComponentType, typename... Args>
-		ComponentType* addComponent(Args&& ... params);
+		ComponentType* AddComponent(Args&& ... params);
 
         template <typename ComponentType>
-        void addComponent(std::shared_ptr<ComponentType>& );
+        void AddComponent(std::shared_ptr<ComponentType>& );
         
         template <typename ComponentType>
         void removeComponent();
 
         template <typename ComponentType>
-        ComponentType* getComponent();
+        ComponentType* GetComponent();
 
-        void removeComponent(Component* c);
+        void RemoveComponent(Component* c);
 
 		template<>
-		Transform* getComponent<Transform>();
+		Transform* GetComponent<Transform>();
 
-		Scene* getScene() { return scene; }
+		Scene* GetScene() { return scene; }
 
-		void setEnable(const bool& enable);
-		bool isEnable();
+		void SetEnable(const bool& enable);
+		bool IsEnable();
     private:
         Entity* parent = nullptr;
 		Scene* scene = nullptr;
@@ -50,7 +50,7 @@ namespace wlEngine {
     };
 
 	template<>
-	Transform* Entity::getComponent<Transform>() {
+	Transform* Entity::GetComponent<Transform>() {
 		if(transform) return transform;
 		for (auto& c : components) {
 			if (c->isType(Transform::componentId)) {
@@ -63,7 +63,7 @@ namespace wlEngine {
 	}
 
     template<typename ComponentType, typename... Args>
-	ComponentType* Entity::addComponent(Args&&... params) {
+	ComponentType* Entity::AddComponent(Args&&... params) {
 		auto p = ComponentType::createComponent(this, std::forward<Args>(params)...);
 		auto raw = p.get();
         components.insert(p);
@@ -71,7 +71,7 @@ namespace wlEngine {
     }
 
     template <typename ComponentType>
-    ComponentType* Entity::getComponent() {
+    ComponentType* Entity::GetComponent() {
         for (auto& c : components) {
             if (c->isType(ComponentType::componentId)) {
                 return static_cast<ComponentType*>(c.get());
@@ -83,7 +83,7 @@ namespace wlEngine {
     }
 
     template <typename ComponentType>
-    void Entity::addComponent(std::shared_ptr<ComponentType>& c) {
+    void Entity::AddComponent(std::shared_ptr<ComponentType>& c) {
         if (c->gameObjects == nullptr) c->gameObject = this;
         else c->gameObjects.insert(this);
 

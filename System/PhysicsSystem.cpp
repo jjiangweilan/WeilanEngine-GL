@@ -34,7 +34,7 @@ void PhysicsSystem::update()
     TRigidbody::dynamicSpaticalHash.clear();
     for (auto &body : TRigidbody::collection)
     {
-        if (!body->entity->isEnable() || body->entity->getScene() != scene)
+        if (!body->entity->IsEnable() || body->entity->GetScene() != scene)
             continue;
         if (body->type == BodyType::Dynamic)
         {
@@ -48,7 +48,7 @@ void PhysicsSystem::update()
     // collision detection
     for (auto &body : TRigidbody::collection)
     {
-        if (!body->entity->isEnable() || body->entity->getScene() != scene)
+        if (!body->entity->IsEnable() || body->entity->GetScene() != scene)
             continue;
         if (body->type == BodyType::Dynamic)
         {
@@ -94,8 +94,8 @@ bool PhysicsSystem::polygonVsPolygon(TRigidbody *polygon1, TRigidbody *polygon2,
 
     auto points1 = shape1->getPoints();
     auto points2 = shape2->getPoints();
-    Transform *t1 = polygon1->entity->getComponent<Transform>();
-    Transform *t2 = polygon2->entity->getComponent<Transform>();
+    Transform *t1 = polygon1->entity->GetComponent<Transform>();
+    Transform *t2 = polygon2->entity->GetComponent<Transform>();
     glm::vec2 pos1 = t1->position;
     glm::vec2 pos2 = t2->position;
 
@@ -150,8 +150,8 @@ bool PhysicsSystem::polygonVsCircle(TRigidbody *polygon, TRigidbody *circle,
 {
     PolygonShape *polygonShape = static_cast<PolygonShape *>(polygon->shape);
     CircleShape *circleShape = static_cast<CircleShape *>(circle->shape);
-    Transform *t1 = polygon->entity->getComponent<Transform>();
-    Transform *t2 = circle->entity->getComponent<Transform>();
+    Transform *t1 = polygon->entity->GetComponent<Transform>();
+    Transform *t2 = circle->entity->GetComponent<Transform>();
     auto circlePos = circleShape->center + glm::vec2(t2->position);
     float radius = circleShape->radius;
     auto points = polygonShape->points;
@@ -211,8 +211,8 @@ bool PhysicsSystem::polygonVsCircle(TRigidbody *polygon, TRigidbody *circle,
 bool PhysicsSystem::circleVsCircle(TRigidbody *circle1, TRigidbody *circle2,
                                    glm::vec2 &penetrationVec)
 {
-    auto t1 = circle1->entity->getComponent<Transform>();
-    auto t2 = circle2->entity->getComponent<Transform>();
+    auto t1 = circle1->entity->GetComponent<Transform>();
+    auto t2 = circle2->entity->GetComponent<Transform>();
     auto circleShape1 = static_cast<CircleShape *>(circle1->shape);
     auto circleShape2 = static_cast<CircleShape *>(circle2->shape);
     float radius1 = circleShape1->radius;
@@ -238,8 +238,8 @@ bool PhysicsSystem::lineVsLine(TRigidbody *line1, TRigidbody *line2,
 
     auto points1 = shape1->getPoints();
     auto points2 = shape2->getPoints();
-    Transform *t1 = line1->entity->getComponent<Transform>();
-    Transform *t2 = line2->entity->getComponent<Transform>();
+    Transform *t1 = line1->entity->GetComponent<Transform>();
+    Transform *t2 = line2->entity->GetComponent<Transform>();
     glm::vec2 pos1 = t1->position;
     glm::vec2 pos2 = t2->position;
 
@@ -303,8 +303,8 @@ bool PhysicsSystem::lineVsPolygon(TRigidbody *line, TRigidbody *polygon,
 
     auto points1 = shape1->getPoints();
     auto points2 = shape2->getPoints();
-    Transform *t1 = line->entity->getComponent<Transform>();
-    Transform *t2 = polygon->entity->getComponent<Transform>();
+    Transform *t1 = line->entity->GetComponent<Transform>();
+    Transform *t2 = polygon->entity->GetComponent<Transform>();
     glm::vec2 pos1 = t1->position;
     glm::vec2 pos2 = t2->position;
 
@@ -415,8 +415,8 @@ bool PhysicsSystem::lineVsCircle(TRigidbody *line, TRigidbody *circle,
     CircleShape *shape2 = static_cast<CircleShape *>(circle->shape);
 
     auto points1 = shape1->getPoints();
-    Transform *t1 = line->entity->getComponent<Transform>();
-    Transform *t2 = circle->entity->getComponent<Transform>();
+    Transform *t1 = line->entity->GetComponent<Transform>();
+    Transform *t2 = circle->entity->GetComponent<Transform>();
     glm::vec2 pos1 = t1->position;
     glm::vec2 pos2 = t2->position;
 
@@ -557,13 +557,13 @@ void PhysicsSystem::collisionCheck(TRigidbody *body, TRigidbody *other,
     if (otherIsDynamic)
     {
         cr.penetrationVec /= 2;
-        body->entity->getComponent<Transform>()->moveBy(cr.penetrationVec.x,
+        body->entity->GetComponent<Transform>()->moveBy(cr.penetrationVec.x,
                                                         cr.penetrationVec.y, 0);
-        other->entity->getComponent<Transform>()->moveBy(
+        other->entity->GetComponent<Transform>()->moveBy(
             -cr.penetrationVec.x, -cr.penetrationVec.y, 0);
     }
     else
-        body->entity->getComponent<Transform>()->moveBy(cr.penetrationVec.x,
+        body->entity->GetComponent<Transform>()->moveBy(cr.penetrationVec.x,
                                                         cr.penetrationVec.y, 0);
 }
 

@@ -97,7 +97,7 @@ public:                                                              \
 private:
 
 #define COMPONENT_EDITABLE_DEF(T)                                                                                       \
-    bool T::isComponentReg = registerComponent<T>([](Entity *go, void **args) { go->addComponent<T>(args); });
+    bool T::isComponentReg = registerComponent<T>([](Entity *go, void **args) { go->AddComponent<T>(args); });
 
 namespace wlEngine
 {

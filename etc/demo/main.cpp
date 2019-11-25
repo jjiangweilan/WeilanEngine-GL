@@ -17,12 +17,12 @@ class Rotate : public Script
 public:
     Rotate(Entity *go) : Script(go)
     {
-        auto transform = entity->getComponent<Transform>();
+        auto transform = entity->GetComponent<Transform>();
         transform->rotate({1, 0, 0}, 25);
     };
     void update() override
     {
-        auto transform = entity->getComponent<Transform>();
+        auto transform = entity->GetComponent<Transform>();
         transform->rotate({0, 1, 0}, 30 * Time::deltaTime);
         transform->rotateAround({0, 1, 0}, 25 * Time::deltaTime);
 		float ratio = (glm::sin(glm::radians(Time::timeAfterGameStart) * 100) + 2) / 2;
@@ -41,7 +41,7 @@ public:
     };
     void update() override
     {
-        auto transform = entity->getComponent<Transform>();
+        auto transform = entity->GetComponent<Transform>();
         transform->rotate({0, 1, 0}, 30 * Time::deltaTime);
     }
 };
@@ -124,10 +124,10 @@ int main()
     wlEngine::Scene scene;
 
     engine->setScene(&scene);
-    auto camera = scene.createGameObject("Camera", nullptr);
-    camera->addComponent<Transform>(0, 3, 12);
+    auto camera = scene.CreateGameObject("Camera", nullptr);
+    camera->AddComponent<Transform>(0, 3, 12);
 
-    camera->addComponent<Camera3D>();
+    camera->AddComponent<Camera3D>();
     
     scene.setCamera(camera);
 
@@ -148,27 +148,27 @@ int main()
     //  box->addComponent<Transform>(0, 0, -8);
     //  auto model2 = box->addComponent<Model>("nanosuit");
 
-    auto earth = scene.createGameObject("sphere", nullptr);
-    earth->addComponent<Transform>(4.5, 2, 0);
-    auto model3 = earth->addComponent<Model>("Sphere");
+    auto earth = scene.CreateGameObject("sphere", nullptr);
+    earth->AddComponent<Transform>(4.5, 2, 0);
+    auto model3 = earth->AddComponent<Model>("Sphere");
     model3->ShaderParamUpdate = [](Model* model) {
         auto& meshes = *model->getModel()->GetMeshes();
-        auto transform = model->entity->getComponent<Transform>();
+        auto transform = model->entity->GetComponent<Transform>();
         for (auto& mesh : meshes)
         {
             auto params = mesh.getMaterial()->GetParameters();
             params->SetParameter("model", transform->getModel());
         }
     };
-    earth->addComponent<Rotate>();
+    earth->AddComponent<Rotate>();
 
-    auto water = scene.createGameObject("water", nullptr);
-    water->addComponent<Transform>(0,0,0);
-    auto modelWater = water->addComponent<Model>("water");
+    auto water = scene.CreateGameObject("water", nullptr);
+    water->AddComponent<Transform>(0,0,0);
+    auto modelWater = water->AddComponent<Model>("water");
     modelWater->SetDrawMode(DrawMode::Line);
     modelWater->ShaderParamUpdate = [](Model* model) {
         auto& mesh = *model->getModel()->GetMesh("water");
-		auto transform = model->entity->getComponent<Transform>();
+		auto transform = model->entity->GetComponent<Transform>();
         auto parameters = mesh.getMaterial()->GetParameters();
         parameters->SetParameter("model", transform->getModel());
         parameters->SetParameter("t", (float)Time::timeAfterGameStart);

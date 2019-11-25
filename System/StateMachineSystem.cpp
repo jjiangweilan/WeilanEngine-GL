@@ -15,7 +15,7 @@ void StateMachineSystem::update()
     auto currentScene = EngineManager::getwlEngine()->getCurrentScene();
     for (auto &sm : StateMachine::collection)
     {
-        if (!sm->entity->isEnable() || sm->entity->getScene() != currentScene)
+        if (!sm->entity->IsEnable() || sm->entity->GetScene() != currentScene)
         {
             continue;
         }

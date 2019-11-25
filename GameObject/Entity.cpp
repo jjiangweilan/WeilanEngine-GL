@@ -5,7 +5,7 @@
 namespace wlEngine {
     Entity::Entity(const std::string& name) : name(name), transform(nullptr), enable(true) { }
 	
-    void Entity::setParent(Entity* newParent) {
+    void Entity::SetParent(Entity* newParent) {
         //remove from previous hierachy
         if (auto preParent = this->parent) preParent->children.erase(this);
         else {
@@ -30,7 +30,7 @@ namespace wlEngine {
         }
     }
 
-    void Entity::removeComponent(Component* component) {
+    void Entity::RemoveComponent(Component* component) {
 		assert(component != transform && "remove transform component is not allowed");
         for(auto c : components) {
             if(c.get() == component) {
@@ -40,12 +40,12 @@ namespace wlEngine {
         }
     }
 
-	void Entity::setEnable(const bool& enable) {
+	void Entity::SetEnable(const bool& enable) {
 		this->enable = enable;
-		for (auto& child : children) child->setEnable(enable);
+		for (auto& child : children) child->SetEnable(enable);
 	}
 
-	bool Entity::isEnable() {
+	bool Entity::IsEnable() {
 		return enable;
 	}
 }

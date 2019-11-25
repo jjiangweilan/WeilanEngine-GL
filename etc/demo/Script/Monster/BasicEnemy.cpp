@@ -6,16 +6,16 @@ SCRIPT_DEFINATION(Script, BasicEnemy, 32);
 
 extern Entity *player;
 BasicEnemy::BasicEnemy(Entity *entity) : Script(entity) {
-    entity->addComponent<StateMachine>("idle");
-    Animation *animation = entity->addComponent<Animation>();
-    entity->addComponent<Audio>();
+    entity->AddComponent<StateMachine>("idle");
+    Animation *animation = entity->AddComponent<Animation>();
+    entity->AddComponent<Audio>();
 
-    entity->addComponent<LuaScript>("../LuaScript/test.lua");
+    entity->AddComponent<LuaScript>("../LuaScript/test.lua");
     createState();
 }
 
 void BasicEnemy::createState() {
-    auto stateMachine = entity->getComponent<StateMachine>();
+    auto stateMachine = entity->GetComponent<StateMachine>();
     stateMachine->addTransition("idle", "move", [&]() -> StatePriority { return this->transitionFromIdleToMove(); });
     stateMachine->addTransition("idle", "attack-move", [this]() -> StatePriority { return this->playerDetected(); });
     stateMachine->addTransition("move", "attack-move", [this]() -> StatePriority { return this->playerDetected(); });
@@ -23,19 +23,19 @@ void BasicEnemy::createState() {
     stateMachine->addTransition("attack-move", "idle", [this]() -> StatePriority { return !this->playerDetected(); });
     stateMachine->addTransition("attack-move", "attack", [this]() -> StatePriority { return this->playerIsAttackable(); });
     stateMachine->addTransition("attack", "attack", [this]() -> StatePriority { 
-		return this->entity->getComponent<Animation>()->hasEnded()
+		return this->entity->GetComponent<Animation>()->hasEnded()
 		&& this->playerIsAttackable();
 		});
     stateMachine->addTransition("attack", "move", [this]() -> StatePriority { 
-		return this->entity->getComponent<Animation>()->hasEnded() && !this->playerIsAttackable(); 
+		return this->entity->GetComponent<Animation>()->hasEnded() && !this->playerIsAttackable(); 
 		});
-    stateMachine->addTransition("damaged", "move", [this]() -> StatePriority {return this->entity->getComponent<Animation>()->hasEnded() && !this->playerDetected();});
-    stateMachine->addTransition("damaged", "attack-move", [this]() -> StatePriority {return this->entity->getComponent<Animation>()->hasEnded() && this->playerDetected();});
+    stateMachine->addTransition("damaged", "move", [this]() -> StatePriority {return this->entity->GetComponent<Animation>()->hasEnded() && !this->playerDetected();});
+    stateMachine->addTransition("damaged", "attack-move", [this]() -> StatePriority {return this->entity->GetComponent<Animation>()->hasEnded() && this->playerDetected();});
 
     /* Idle action group*/
     auto &idleAG = *stateMachine->getActionGroup("idle");
     idleAG[StateActionEnterFuncIndex] = [this]() {
-        Animation *animation = this->entity->getComponent<Animation>();
+        Animation *animation = this->entity->GetComponent<Animation>();
         animation->playAnimation("idle");
     };
 
@@ -45,7 +45,7 @@ void BasicEnemy::createState() {
         /* Select a target position */
         wanderRadius = 200;
         float wanderRadiusLower = 80;
-        glm::vec2 currentPos = glm::vec2(this->entity->getComponent<Transform>()->position);
+        glm::vec2 currentPos = glm::vec2(this->entity->GetComponent<Transform>()->position);
 
         float radian = ((double)std::rand() / RAND_MAX) * 2 * 3.1415926;
 
@@ -54,18 +54,18 @@ void BasicEnemy::createState() {
         moveVec = glm::vec2(std::cos(radian), std::sin(radian));
 
         /* Play animation */
-        this->entity->getComponent<Animation>()->playAnimation("move");
+        this->entity->GetComponent<Animation>()->playAnimation("move");
     };
 
     moveAG[StateActionUpdateFuncIndex] = [this]() { this->updateMovement(); };
 
     /* Attack move action group*/
     auto &attackMoveAG = *stateMachine->getActionGroup("attack-move");
-    attackMoveAG[StateActionEnterFuncIndex] = [this]() { this->entity->getComponent<Animation>()->playAnimation("attack-move"); };
+    attackMoveAG[StateActionEnterFuncIndex] = [this]() { this->entity->GetComponent<Animation>()->playAnimation("attack-move"); };
 
     attackMoveAG[StateActionUpdateFuncIndex] = [this]() {
-        glm::vec2 playerPos = player->getComponent<Transform>()->position;
-        auto transform = this->entity->getComponent<Transform>();
+        glm::vec2 playerPos = player->GetComponent<Transform>()->position;
+        auto transform = this->entity->GetComponent<Transform>();
         glm::vec2 pos = transform->position;
 
         glm::vec2 moveVec = glm::normalize(playerPos - pos);
@@ -78,19 +78,19 @@ void BasicEnemy::createState() {
     /* Attack action group*/
     auto &attackAG = *stateMachine->getActionGroup("attack");
     attackAG[StateActionEnterFuncIndex] = [this]() { 
-		this->entity->getComponent<Animation>()->playAnimation("attack", false); 
+		this->entity->GetComponent<Animation>()->playAnimation("attack", false); 
 	};
 
     /* Damaged action group*/
     auto &damagedAG = *stateMachine->getActionGroup("damaged");
     damagedAG[StateActionEnterFuncIndex] = [this]() {
-        this->entity->getComponent<Animation>()->playAnimation("damaged", false);
-        this->entity->getComponent<Audio>()->play("../resource/ballon.wav");
+        this->entity->GetComponent<Animation>()->playAnimation("damaged", false);
+        this->entity->GetComponent<Audio>()->play("../resource/ballon.wav");
     };
 }
 
 void BasicEnemy::updateMovement() {
-    Transform *transform = entity->getComponent<Transform>();
+    Transform *transform = entity->GetComponent<Transform>();
     float moveDelta = Time::deltaTime * moveSpeed;
     float moveX = moveVec.x * moveDelta;
     float moveY = moveVec.y * moveDelta;
@@ -111,8 +111,8 @@ StatePriority BasicEnemy::transitionFromIdleToMove() {
 }
 
 StatePriority BasicEnemy::playerDetected() {
-    glm::vec2 playerPos = player->getComponent<Transform>()->position;
-    glm::vec2 pos = entity->getComponent<Transform>()->position;
+    glm::vec2 playerPos = player->GetComponent<Transform>()->position;
+    glm::vec2 pos = entity->GetComponent<Transform>()->position;
     float distance = glm::length(pos - playerPos);
 
     if (distance < 240) {
@@ -131,7 +131,7 @@ StatePriority BasicEnemy::moveEnded() {
     return 0;
 }
 StatePriority BasicEnemy::playerIsAttackable() {
-    auto body = entity->getComponent<TRigidbody>();
+    auto body = entity->GetComponent<TRigidbody>();
     for (auto other : body->contactList) {
         if (other->entity == player) {
             return 6;
@@ -142,15 +142,15 @@ StatePriority BasicEnemy::playerIsAttackable() {
 
 
 void BasicEnemy::postInit() {
-  auto body = entity->getComponent<TRigidbody>();
+  auto body = entity->GetComponent<TRigidbody>();
   body->category = CONTACT_FILTER_ENEMY;
   body->mask = CONTACT_FILTER_PLAYER;
   body->setType(BodyType::Dynamic);
   for (auto c : entity->children) {
-      c->getComponent<TRigidbody>()->setType(BodyType::Dynamic);
+      c->GetComponent<TRigidbody>()->setType(BodyType::Dynamic);
   }
 }
 
 void BasicEnemy::attackedBy(Entity* attackFrom) {
-    entity->getComponent<StateMachine>()->changeState("damaged");
+    entity->GetComponent<StateMachine>()->changeState("damaged");
 }

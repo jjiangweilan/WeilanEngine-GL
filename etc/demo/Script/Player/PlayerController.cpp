@@ -4,10 +4,10 @@ SCRIPT_DEFINATION(Script, PlayerController, 1);
 Entity* player = nullptr;
 
 PlayerController::PlayerController(Entity *entity) : Script(entity), playerSkillManager(entity) {
-    animation = entity->addComponent<Animation>();
+    animation = entity->AddComponent<Animation>();
     animation->addAnimationFromAseprite("../resource/player/player.json", "../resource/player/player.png");
     animation->playAnimation("idle");
-    transform = entity->getComponent<Transform>();
+    transform = entity->GetComponent<Transform>();
     createRigidBody();
     createState();
     player = entity;
@@ -19,7 +19,7 @@ void PlayerController::postInit() {
 
 
 void PlayerController::createState() {
-    playerStates = entity->addComponent<StateMachine>("idle");
+    playerStates = entity->AddComponent<StateMachine>("idle");
 
     //transition
     playerStates->addTransition("idle", "attack", []() -> StatePriority { return Input::getKeyStatus(SDL_SCANCODE_SPACE) || Input::isControllerButtonClicked(ControllerButton::ButtonLeft); });
@@ -82,7 +82,7 @@ void PlayerController::createState() {
             Physics::query(queryBody);
 
             for (auto& contact : queryBody.contactList) {
-                if (auto basicEnemy = contact->entity->getComponent<BasicEnemy>()) {
+                if (auto basicEnemy = contact->entity->GetComponent<BasicEnemy>()) {
                     basicEnemy->attackedBy(entity);
                 }
             }
@@ -101,7 +101,7 @@ void PlayerController::createState() {
     //combo
     StateActionGroup &comboActions = *playerStates->getActionGroup("combo");
     comboActions[StateActionEnterFuncIndex] = [&]() {
-        auto aniamtion = entity->getComponent<Animation>();
+        auto aniamtion = entity->GetComponent<Animation>();
         animation->playAnimation("combo");
         playerSkillManager.startSpellSkill();
     };
@@ -118,15 +118,15 @@ void PlayerController::createRigidBody() {
     shape.leftPoint = {-12, -40};
     shape.rightPoint = {12, -40};
     // auto shape = CircleShape({0,-30}, 10);
-    rigidbody = entity->addComponent<TRigidbody>(&shape, BodyType::Dynamic);
+    rigidbody = entity->AddComponent<TRigidbody>(&shape, BodyType::Dynamic);
     rigidbody->category = CONTACT_FILTER_PLAYER;
 
     rigidbody->contactBegin = [](TRigidbody* entity, TRigidbody *other) {
         if (other->category == CONTACT_FILTER_ENVIORNMENT_OBJECT_OUTLINE) {
-            auto parent = other->entity->getParent();
+            auto parent = other->entity->GetParent();
             for (auto c : parent->children) {
                 if (c->name == "front_building") {
-                    c->getComponent<Sprite>()->transparency = 0.5;
+                    c->GetComponent<Sprite>()->transparency = 0.5;
                     break;
                 }
             }
@@ -135,10 +135,10 @@ void PlayerController::createRigidBody() {
 
     rigidbody->contactEnd = [](TRigidbody* entity, TRigidbody *other) {
         if (other->category == CONTACT_FILTER_ENVIORNMENT_OBJECT_OUTLINE) {
-            auto parent = other->entity->getParent();
+            auto parent = other->entity->GetParent();
             for (auto c : parent->children) {
                 if (c->name == "front_building") {
-                    c->getComponent<Sprite>()->transparency = 1.0;
+                    c->GetComponent<Sprite>()->transparency = 1.0;
                     break;
                 }
             }
@@ -183,9 +183,9 @@ void PlayerController::updateSpeed() {
 }
 
 void PlayerController::updateCamera(const glm::vec2& playerMovesBy) {
-    glm::vec2 playerPos = glm::vec2(entity->getComponent<Transform>()->position);
+    glm::vec2 playerPos = glm::vec2(entity->GetComponent<Transform>()->position);
 
-    auto transformC = camera->getComponent<Transform>();
+    auto transformC = camera->GetComponent<Transform>();
     glm::vec2 cameraPos = glm::vec2(transformC->position);
     if (std::abs(cameraPos.x + 640 - playerPos.x ) > 200) {
         transformC->moveBy(playerMovesBy.x, 0);

@@ -12,7 +12,7 @@ public:
 		LineShape shape({ {-90,-66}, {-50,-34}, {90,-105}, { 53,-139 } });
 		//shape.pushbackVertex({-300,-300});
 		//CircleShape shape({0,0},60);
-		body = entity->addComponent<TRigidbody>(&shape, BodyType::Static);
+		body = entity->AddComponent<TRigidbody>(&shape, BodyType::Static);
 	};
 
 	void update() override {

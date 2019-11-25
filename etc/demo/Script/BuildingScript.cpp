@@ -10,27 +10,27 @@ Building::Building(Entity* entity) : Script(entity){
 
 void Building::entranceContactBegin(TRigidbody* other) {
     if (other->entity == player) {
-		front->getComponent<Sprite>()->enable = false;
+		front->GetComponent<Sprite>()->enable = false;
 		if (inside) {
-			inside->setEnable(true);
+			inside->SetEnable(true);
 		}
     }
-	else if (other->entity->getComponent<NpcController>()) {
-		other->entity->setParent(this->inside);
-		other->entity->setEnable(inside->isEnable());
+	else if (other->entity->GetComponent<NpcController>()) {
+		other->entity->SetParent(this->inside);
+		other->entity->SetEnable(inside->IsEnable());
 	}
 }
 
 void Building::entranceContactEnd(TRigidbody* other) {
     if (other->entity == player) {
-        front->getComponent<Sprite>()->enable = true;
+        front->GetComponent<Sprite>()->enable = true;
 		if (inside) {
-			inside->setEnable(false);
+			inside->SetEnable(false);
 		}
     }
-	else if (other->entity->getComponent<NpcController>()) {
-		other->entity->setParent(nullptr);
-		other->entity->setEnable(true);
+	else if (other->entity->GetComponent<NpcController>()) {
+		other->entity->SetParent(nullptr);
+		other->entity->SetEnable(true);
 	}
 }
 
@@ -43,7 +43,7 @@ void Building::postInit() {
 		else if (child->name == "outline") outline = child;
 	}
 
-	auto entranceTrb = entrance->getComponent<TRigidbody>();
+	auto entranceTrb = entrance->GetComponent<TRigidbody>();
 	entranceTrb->mask = CONTACT_FILTER_ENEMY | CONTACT_FILTER_PLAYER;
 	entranceTrb->sensor = true;
 	entranceTrb->contactBegin = [this](TRigidbody* entity, TRigidbody* other) {
@@ -52,7 +52,7 @@ void Building::postInit() {
 	entranceTrb->contactEnd = [this](TRigidbody* entity, TRigidbody* other) {
 		this->entranceContactEnd(other);
 	};
-	inside->setEnable(false);
+	inside->SetEnable(false);
 }
 
 

@@ -18,7 +18,7 @@ void AnimationSystem::update()
     auto currentScene = EngineManager::getwlEngine()->getCurrentScene();
     for (auto &c : Animation::collection)
     {
-        if (!c->entity->isEnable() || c->entity->getScene() != currentScene)
+        if (!c->entity->IsEnable() || c->entity->GetScene() != currentScene)
             continue;
         updateClip(c);
     }

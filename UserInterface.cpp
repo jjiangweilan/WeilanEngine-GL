@@ -16,20 +16,20 @@ Entity *UserInterface::showDialog(NpcController *npcController)
     auto engineManager = EngineManager::getwlEngine();
     auto renderSystem = RenderSystem::get();
     auto scene = engineManager->getCurrentScene();
-    auto dialog = scene->createGameObject("Dialog", scene->getCamera());
+    auto dialog = scene->CreateGameObject("Dialog", scene->getCamera());
 
-    auto tranform = dialog->addComponent<Transform>();
+    auto tranform = dialog->AddComponent<Transform>();
     auto sceneSize = renderSystem->getSceneSize();
     tranform->setLocalPosition({sceneSize.x / 2.0, 100, 10000});
-    auto background = dialog->addComponent<Sprite>("../resource/tasta/dialog-background.png");
+    auto background = dialog->AddComponent<Sprite>("../resource/tasta/dialog-background.png");
 
-    auto text = scene->createGameObject("Dialog-text", dialog);
-    text->addComponent<Transform>()->setLocalPosition({-354, 70, 1});
+    auto text = scene->CreateGameObject("Dialog-text", dialog);
+    text->AddComponent<Transform>()->setLocalPosition({-354, 70, 1});
 
     auto &behavior = npcController->behaviorList[npcController->todaysBehaviorIndex];
     auto &str = behavior.conversation[0].options.begin()->second;
 
-    text->addComponent<Text>()->loadText(L"Hi, that boss from the grocery store told me this looks like a milestone!!", 708, 40, 28, 28);
+    text->AddComponent<Text>()->loadText(L"Hi, that boss from the grocery store told me this looks like a milestone!!", 708, 40, 28, 28);
     return dialog;
 }
 

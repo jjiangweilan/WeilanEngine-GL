@@ -40,7 +40,7 @@ void Transform::moveBy(const glm::vec3 &vec)
     for (auto iter = entity->children.begin(); iter != entity->children.end();
          iter++)
     {
-        auto t = (*iter)->getComponent<Transform>();
+        auto t = (*iter)->GetComponent<Transform>();
         t->moveBy(vec);
     }
 }
@@ -56,7 +56,7 @@ void Transform::moveBy(const float &x, const float &y, const float &z)
     for (auto iter = entity->children.begin(); iter != entity->children.end();
          iter++)
     {
-        auto t = (*iter)->getComponent<Transform>();
+        auto t = (*iter)->GetComponent<Transform>();
         t->moveBy(x, y, z);
     }
 }
@@ -101,7 +101,7 @@ void Transform::setPosition(const glm::vec3 &pos)
     for (auto iter = entity->children.begin(); iter != entity->children.end();
          iter++)
     {
-        auto t = (*iter)->getComponent<Transform>();
+        auto t = (*iter)->GetComponent<Transform>();
         if (t)
             t->moveBy(moveVector.x, moveVector.y, moveVector.z);
     }
@@ -117,7 +117,7 @@ void Transform::setToPreviousPosition()
     for (auto iter = entity->children.begin(); iter != entity->children.end();
          iter++)
     {
-        auto t = (*iter)->getComponent<Transform>();
+        auto t = (*iter)->GetComponent<Transform>();
         if (t)
             t->moveBy(moveVector.x, moveVector.y, moveVector.z);
     }
@@ -126,7 +126,7 @@ void Transform::setToPreviousPosition()
 void Transform::setLocalPosition(const glm::vec3 &pos)
 {
     prePosition = position;
-    glm::vec3 newPosition = (entity->parent ? entity->parent->getComponent<Transform>()->position : glm::vec3(0.0)) + pos;
+    glm::vec3 newPosition = (entity->parent ? entity->parent->GetComponent<Transform>()->position : glm::vec3(0.0)) + pos;
     glm::vec3 moveVector = newPosition - position;
 
     position = newPosition;
@@ -135,7 +135,7 @@ void Transform::setLocalPosition(const glm::vec3 &pos)
 
     for (auto iter = entity->children.begin(); iter != entity->children.end(); iter++)
     {
-        auto t = (*iter)->getComponent<Transform>();
+        auto t = (*iter)->GetComponent<Transform>();
         if (t)
             t->moveBy(moveVector.x, moveVector.y, moveVector.z);
     }
@@ -144,7 +144,7 @@ void Transform::setLocalPosition(const glm::vec3 &pos)
 glm::vec3 Transform::getLocalPosition()
 {
     if (entity->parent)
-        return position - entity->parent->getComponent<Transform>()->position;
+        return position - entity->parent->GetComponent<Transform>()->position;
     else
         return position;
 }

@@ -66,7 +66,7 @@ void GameEditor::render(void **data)
     if (transformJsonPtr)
     {
         Json &transformJson = *transformJsonPtr;
-        auto pos = camera->getComponent<Transform>()->position;
+        auto pos = camera->GetComponent<Transform>()->position;
         transformJson["params"][0] = pos.x;
         transformJson["params"][1] = pos.y;
         transformJson["params"][2] = pos.z;
@@ -91,7 +91,7 @@ void GameEditor::pickObject()
             float distance;
             bool interact = Utility::TestRayOBBIntersection(origin, end - origin,
                                                             aabb.min, aabb.max,
-                                                            model->entity->getComponent<Transform>()->getModel(),
+                                                            model->entity->GetComponent<Transform>()->getModel(),
                                                             distance);
             if (interact && distance < min) {
                 min = distance;
@@ -106,14 +106,14 @@ void GameEditor::pickObject()
         mousePressingOnScene(relX, relY);
         relX = relX - x;
         relY = relY - y;
-        auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera()->getComponent<Camera3D>();
+        auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera()->GetComponent<Camera3D>();
         auto front = camera->front;
         auto right = camera->right;
 
         front = {front.x, 0.0, front.z};
         right = {right.x, 0.0, right.z};
 
-        auto transform =selectedGameObject->getComponent<Transform>();
+        auto transform =selectedGameObject->GetComponent<Transform>();
 		
         transform->moveBy(right *= (float)relX * Time::deltaTime * 2.0f);
         if (Input::getKeyStatus(SDL_SCANCODE_LCTRL)) 
@@ -380,7 +380,7 @@ void GameEditor::showGameObjectInfo()
 }
 void GameEditor::showModelInfo(Entity *entity)
 {
-    auto model = entity->getComponent<Model>();
+    auto model = entity->GetComponent<Model>();
     auto gModel = model->getModel();
     for (auto& mesh : *gModel->GetMeshes())
     {
@@ -402,7 +402,7 @@ void GameEditor::showModelInfo(Entity *entity)
 void GameEditor::showTRigidbodyInfo(Entity *entity)
 {
     //params  0. type string 1. shape string 2. vertices or radius int[0]...int[n]
-    auto trb = entity->getComponent<TRigidbody>();
+    auto trb = entity->GetComponent<TRigidbody>();
 
     int sensor = trb->sensor;
     bool changed = ImGui::InputInt("sensor", &sensor);
@@ -461,7 +461,7 @@ void GameEditor::showTRigidbodyInfo(Entity *entity)
         {
             editVertex = true;
             editLine = false;
-            selectedTRigidbody = entity->getComponent<TRigidbody>();
+            selectedTRigidbody = entity->GetComponent<TRigidbody>();
         }
     }
     // vertex editing
@@ -521,7 +521,7 @@ void GameEditor::showTRigidbodyInfo(Entity *entity)
         {
             editLine = true;
             editVertex = false;
-            selectedTRigidbody = entity->getComponent<TRigidbody>();
+            selectedTRigidbody = entity->GetComponent<TRigidbody>();
         }
     }
 
@@ -578,7 +578,7 @@ void GameEditor::showTRigidbodyInfo(Entity *entity)
         int ver[2];
         if (mousePressingOnScene(ver[0], ver[1], true, 1) && ImGui::IsMouseClicked(1))
         {
-            auto goTrans = selectedTRigidbody->entity->getComponent<Transform>();
+            auto goTrans = selectedTRigidbody->entity->GetComponent<Transform>();
             ver[0] += (-goTrans->position.x);
             ver[1] += (-goTrans->position.y);
             auto &goJson = scene->sceneData.getData(trb->entity);
@@ -718,7 +718,7 @@ void GameEditor::showMenu()
                     auto &cameraComponentJson = *Utility::findComponentWithName(j, "Camera2D");
                     //cameraComponentJson["name"] = "Camera3D";
                     cameraEntity->removeComponent<Camera2D>();
-                    cameraEntity->addComponent<Camera3D>();
+                    cameraEntity->AddComponent<Camera3D>();
                 }
             }
             else if (dimension = 3)
@@ -736,7 +736,7 @@ void GameEditor::showMenu()
 
 void GameEditor::showAnimationInfo(Entity *go)
 {
-    auto animation = go->getComponent<Animation>();
+    auto animation = go->GetComponent<Animation>();
     std::string current_item = animation->getCurrentClipName();
     if (ImGui::BeginCombo("animation", current_item.data()))
     {
@@ -760,7 +760,7 @@ void GameEditor::showAnimationInfo(Entity *go)
 
 void GameEditor::showTransformInfo(Entity *go)
 {
-    auto transform = go->getComponent<Transform>();
+    auto transform = go->GetComponent<Transform>();
     auto pos = transform->position;
 
     bool inputX = ImGui::InputFloat("x", &pos.x);
@@ -810,7 +810,7 @@ void GameEditor::showResourceWindow()
 }
 void GameEditor::showSpriteInfo(Entity *go)
 {
-    auto sprite = go->getComponent<Sprite>();
+    auto sprite = go->GetComponent<Sprite>();
     auto mainTexture = sprite->getMesh()->getTextures()->at(0);
     ImGui::Image((void *)mainTexture->getId(), {(float)mainTexture->getWidth(), (float)mainTexture->getHeight()}, {0, 1}, {1, 0});
 }
@@ -920,7 +920,7 @@ void GameEditor::dragDropGameObject()
 {
     if (goPack.dropped)
     {
-        goPack.child->setParent(goPack.parent);
+        goPack.child->SetParent(goPack.parent);
         goPack.dropped = false;
         scene->sceneData.changeHierachy(goPack.parent, goPack.child);
     }
@@ -928,7 +928,7 @@ void GameEditor::dragDropGameObject()
 
 void GameEditor::removeComponent(Entity *go, Component *c, const std::string &name)
 {
-    go->removeComponent(c);
+    go->RemoveComponent(c);
     scene->sceneData.removeComponent(go, name);
 }
 
@@ -956,7 +956,7 @@ void GameEditor::dragSprite()
             }
             if (go && !target)
             {
-                target = go->getComponent<Transform>();
+                target = go->GetComponent<Transform>();
                 setSelectedGameObject(go);
                 lastX = mouseX;
                 lastY = mouseY;
@@ -992,7 +992,7 @@ bool GameEditor::mousePressingOnScene(int &x, int &y, bool world, int mouse)
     auto sceneSize = RenderSystem::get()->getSceneSize();
 
     auto mousePos = ImGui::GetMousePos();
-    auto cameraPos = scene->getCamera()->getComponent<Transform>()->position;
+    auto cameraPos = scene->getCamera()->GetComponent<Transform>()->position;
     bool onWindow = false;
     if (ImGui::IsMouseDown(mouse))
     { // 0 left, 1 right, 2 mid
@@ -1022,7 +1022,7 @@ bool GameEditor::mousePressingOnScene(int &x, int &y, bool world, int mouse)
 
 void GameEditor::createTRigidbody()
 {
-    if (selectedGameObject->getComponent<TRigidbody>())
+    if (selectedGameObject->GetComponent<TRigidbody>())
     {
         helperWindowFunc = nullptr;
         return;
@@ -1044,7 +1044,7 @@ void GameEditor::createTRigidbody()
             shape = new CircleShape({0, 0}, 0);
         else
             shape = new LineShape({});
-        selectedGameObject->addComponent<TRigidbody>(shape, bodyType);
+        selectedGameObject->AddComponent<TRigidbody>(shape, bodyType);
 
         //add json information to saved game data
         Json trbJson = createComponentJson("TRigidbody", "static", "polygon", Json::array(), Json::array({{-1, 0}, {1.0}}), Json::array({0.0}), false);
@@ -1080,7 +1080,7 @@ void GameEditor::createVolumetricLight()
 {
     static int total = 0;
     static std::vector<std::string> files;
-    if (selectedGameObject->getComponent<TRigidbody>())
+    if (selectedGameObject->GetComponent<TRigidbody>())
     {
         helperWindowFunc = nullptr;
         return;
@@ -1108,7 +1108,7 @@ void GameEditor::createVolumetricLight()
 
     if (ImGui::Button("Create"))
     {
-        auto vl = selectedGameObject->addComponent<VolumetricLight>();
+        auto vl = selectedGameObject->AddComponent<VolumetricLight>();
         for (int i = 0; i < total; i++)
         {
             vl->loadTexture(files[i]);
@@ -1130,7 +1130,7 @@ void GameEditor::createVolumetricLight()
 
 void GameEditor::showVolumetricLightInfo(Entity *entity)
 {
-    auto vl = entity->getComponent<VolumetricLight>();
+    auto vl = entity->GetComponent<VolumetricLight>();
     auto textures = vl->getMesh()->getTextures();
     for (auto t : *textures)
     {

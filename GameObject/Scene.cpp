@@ -15,7 +15,7 @@
 
 namespace wlEngine {
 void Scene::update() {
-    camera->getComponent<Camera>()->update();
+    camera->GetComponent<Camera>()->update();
 }
 
 Scene::Scene() : sceneGraph(), gameObjectAllocator() {}
@@ -70,7 +70,7 @@ Entity *Scene::loadGameObjectFromFile(const Json &go_json, const std::string &id
         parent = loadGameObjectFromFile(jsonFile[parent_id], parent_id, jsonFile, loadedGameObjects);
 
     // create gameObject with the parent
-    auto go = createGameObject(name, parent);
+    auto go = CreateGameObject(name, parent);
     addComponent(go, components);
 
     sceneData.createGameObject(go, parent, &go_json);
@@ -123,13 +123,13 @@ Entity *Scene::createGameObjectByJson(const Json &go_json, Entity *parent) {
     auto &components = go_json["components"];
     auto &children = go_json["children"];
 
-    auto go = createGameObject(name, parent);
+    auto go = CreateGameObject(name, parent);
     addComponent(go, components);
 
     sceneData.createGameObject(go, parent, &go_json);
 
     for (Json::const_iterator iter = children.begin(); iter != children.end(); ++iter) {
-        createGameObject(sceneData.data[iter->get<std::string>()], go);
+        CreateGameObject(sceneData.data[iter->get<std::string>()], go);
     }
     return go;
 }
@@ -147,13 +147,13 @@ void Scene::clearScene() {
     TRigidbody::dynamicSpaticalHash.clear();
 }
 
-Entity *Scene::createGameObject(const std::string &name, Entity *parent) {
+Entity *Scene::CreateGameObject(const std::string &name, Entity *parent) {
     auto ptr = gameObjectAllocator.allocate(name);
 
     ptr->scene = this;
 
     if (parent)
-        ptr->setParent(parent);
+        ptr->SetParent(parent);
     else
         addGameObject(ptr);
 
@@ -170,7 +170,7 @@ void Scene::endFrame() {
         for (auto child : ptr->children) {
             destroyGameObjectHelper(child);
         }
-        if (auto parent = ptr->getParent())
+        if (auto parent = ptr->GetParent())
             parent->children.erase(ptr);
         else
             sceneGraph.erase(ptr);
@@ -194,8 +194,8 @@ Entity *Scene::findGameObjectNear(const int &mouseX, const int &mouseY) { return
 
 Entity *Scene::findGameObjectNearHelper(std::set<Entity *>::iterator iter, std::set<Entity *> *set, const int &x, const int &y) {
     if (iter != set->end()) {
-        auto transform = (*iter)->getComponent<Transform>();
-        auto sprite = (*iter)->getComponent<Sprite>();
+        auto transform = (*iter)->GetComponent<Transform>();
+        auto sprite = (*iter)->GetComponent<Sprite>();
         if (transform && sprite) {
             auto pos = transform->position;
             auto sizeHalf = glm::vec2(sprite->getMesh()->getClipRect()->width, sprite->getMesh()->getClipRect()->height) / 2.0f;

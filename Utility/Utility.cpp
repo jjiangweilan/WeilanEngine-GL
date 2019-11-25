@@ -28,7 +28,7 @@ std::wstring Utility::convertStringToWstring(const std::string &text) {
 
 void Utility::sortEntitiesByZOrder(std::vector<Entity *> &allEntities) { 
 	std::sort(allEntities.begin(), allEntities.end(), [](Entity* e1, Entity* e2) {
-		return e1->getComponent<Transform>()->position.z < e2->getComponent<Transform>()->position.z;
+		return e1->GetComponent<Transform>()->position.z < e2->GetComponent<Transform>()->position.z;
 	}); 
 }
 
@@ -150,7 +150,7 @@ bool Utility::TestRayOBBIntersection(
 void Utility::getRayFromScreenToWorld(const float& x, const float& y, glm::vec3& origin, glm::vec3& end) {
 	auto sceneSize = RenderSystem::get()->getSceneSize();
 	auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera();
-	auto camera3d = camera->getComponent<Camera3D>();
+	auto camera3d = camera->GetComponent<Camera3D>();
 
 	float xf = (2.0 * x) / sceneSize.x - 1.0f;
 	float yf = (2.0 * y) / sceneSize.y - 1.0f;

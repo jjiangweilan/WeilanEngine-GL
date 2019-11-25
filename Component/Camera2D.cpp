@@ -19,7 +19,7 @@ Camera2D::Camera2D(Entity *go, void **data) : Camera(go)
 
 glm::mat4 Camera2D::getViewMatrix() const
 {
-	auto transform = entity->getComponent<Transform>();
+	auto transform = entity->GetComponent<Transform>();
     return glm::lookAt(transform->position, transform->position + glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
 }
 
@@ -36,7 +36,7 @@ void Camera2D::setProjectionMatrix(const float &left, const float &right,
 
 void Camera2D::update()
 	{
-		auto transform = entity->getComponent<Transform>();
+		auto transform = entity->GetComponent<Transform>();
 		const int DEAD_ZONE = 10000;
 		ControllerAxisType xx, yy;
 		xx = Input::getControllerAxis(ControllerAxis::AxisRightX);

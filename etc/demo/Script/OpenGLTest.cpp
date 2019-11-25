@@ -3,11 +3,11 @@
 
 SCRIPT_DEFINATION(Script, OpenGLTest,2);
 OpenGLTest::OpenGLTest(Entity* entity) : Script(entity) {
-    transform = entity->addComponent<Transform>(30,30,0);
-    sprite = entity->addComponent<Sprite>("../resource/girl1.png");
+    transform = entity->AddComponent<Transform>(30,30,0);
+    sprite = entity->AddComponent<Sprite>("../resource/girl1.png");
     sprite->draw = [this](auto view, auto projection){this->draw(view, projection);};
     PolygonShape shape(64,139);
-    body = entity->addComponent<TRigidbody>(&shape, BodyType::Dynamic);
+    body = entity->AddComponent<TRigidbody>(&shape, BodyType::Dynamic);
 }
 
 void OpenGLTest::update() {

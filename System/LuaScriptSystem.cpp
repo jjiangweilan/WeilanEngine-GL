@@ -15,7 +15,7 @@ void LuaScriptSystem::update()
     auto currentScene = EngineManager::getwlEngine()->getCurrentScene();
     for (auto &luaScript : LuaScript::collection)
     {
-        if (luaScript->entity->isEnable() || luaScript->entity->getScene() != currentScene)
+        if (luaScript->entity->IsEnable() || luaScript->entity->GetScene() != currentScene)
             lua_getglobal(luaScript->state, "update");
         if (lua_pcall(luaScript->state, 0, 0, 0))
         {

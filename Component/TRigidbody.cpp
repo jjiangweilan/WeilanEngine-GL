@@ -430,7 +430,7 @@ TRigidbody::~TRigidbody()
 std::vector<Cell> TRigidbody::getCells() const
 {
     std::vector<Cell> cells;
-    auto position = entity->getComponent<Transform>()->position;
+    auto position = entity->GetComponent<Transform>()->position;
     int maxX = position.x + this->shape->aabb.max.x;
     int minX = position.x + this->shape->aabb.min.x;
     int maxY = position.y + this->shape->aabb.max.y;
