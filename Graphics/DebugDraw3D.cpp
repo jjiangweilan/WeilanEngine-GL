@@ -22,7 +22,7 @@ void DebugDraw3D::drawBox(const glm::vec3& min, const glm::vec3& max, const glm:
      
     glBindVertexArray(m_mesh.getVAO());
 	m_mesh.setMaterial("DebugDrawBox");
-    m_mesh.getMaterial()->getShader()->use();
+    m_mesh.getMaterial()->getShader()->Use();
     Shader::setUniform(0, model);
     Shader::setUniform(1, min);
     Shader::setUniform(2, max);
@@ -34,7 +34,7 @@ void DebugDraw3D::drawLine(const glm::vec3 &from, const glm::vec3 &to, const glm
 {
     glBindVertexArray(m_mesh.getVAO());
 	m_mesh.setMaterial("DebugDrawLine");
-    m_mesh.getMaterial()->getShader()->use();
+    m_mesh.getMaterial()->getShader()->Use();
     Shader::setUniform(0, from);
     Shader::setUniform(1, to);
     Shader::setUniform(2, color);

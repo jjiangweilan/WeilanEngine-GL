@@ -144,7 +144,7 @@ bool Shader::hasTess() const
     return m_hasTessellation;
 }
 
-void Shader::use() const
+void Shader::Use() const
 {
     glUseProgram(m_id);
 }

@@ -15,7 +15,7 @@ void Material::SetShader(const std::string &name)
 
 void Material::useShader() const
 {
-    m_shader->use();
+    m_shader->Use();
 }
 
 const Shader *Material::getShader() const

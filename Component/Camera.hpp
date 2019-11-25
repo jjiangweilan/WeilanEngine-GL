@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.hpp"
+#include "RenderNode.hpp"
 #include <glm/matrix.hpp>
 namespace wlEngine
 {
@@ -18,6 +19,7 @@ public:
     virtual void update() = 0;
 
 protected:
+    Graphics::RenderNode m_renderNode;
     glm::mat4 m_projMatrix;
 };
 } // namespace wlEngine

@@ -277,7 +277,7 @@ void RenderSystem::render(VolumetricLight *vl)
     auto vlShader = vl->getShader();
     auto mesh = vl->getMesh();
     auto &vlTextures = *mesh->getTextures();
-    vlShader->use();
+    vlShader->Use();
     auto transform = vl->entity->GetComponent<Transform>();
     vlShader->setMat4("model", transform->getModel());
     vlShader->setMat4("view", m_viewMatrix);
@@ -291,7 +291,7 @@ void RenderSystem::render(VolumetricLight *vl)
 }
 void RenderSystem::render(Text *t)
 {
-    t->getShader()->use();
+    t->getShader()->Use();
     //
     // main texture
     glActiveTexture(GL_TEXTURE0);
@@ -325,7 +325,7 @@ void RenderSystem::render(Sprite *t)
         return;
     }
 
-    t->getShader()->use();
+    t->getShader()->Use();
     if (t->beforeRenderFunc)
         t->beforeRenderFunc();
 
@@ -380,7 +380,7 @@ void RenderSystem::render(Model *model)
     for (auto mesh : *modelM->GetMeshes())
     {
         auto shader = mesh.m_material->getShader();
-		shader->use();
+		shader->Use();
         mesh.m_material->GetParameters()->Use();
         //
         // draw mesh
@@ -464,7 +464,7 @@ void RenderSystem::combineTheFramebuffersToFramebuffer(const GLuint &framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, framebufferTarget);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
     glViewport(0, 0, sceneWidth, sceneHeight);
-    sceneShader->use();
+    sceneShader->Use();
     // draw the main scene
     glBindVertexArray(sceneVAO);
     glActiveTexture(GL_TEXTURE0);
@@ -497,7 +497,7 @@ void RenderSystem::debugRender()
             else
                 vertices = static_cast<LineShape *>(rb->shape)->getPoints();
             std::vector<float> glVertices(vertices.size() * 2);
-            physicsDebugDrawShader->use();
+            physicsDebugDrawShader->Use();
             auto pos = rb->entity->GetComponent<Transform>()->position;
             for (int i = 0; i < vertices.size(); i++)
             {
@@ -541,7 +541,7 @@ void RenderSystem::debugRender()
             std::vector<glm::vec2> vertices = {{centerX + radius, centerY + radius}, {centerX + radius, centerY - radius}, {centerX - radius, centerY - radius}, {centerX - radius, centerY + radius}};
 
             std::vector<float> glVertices(vertices.size() * 2);
-            physicsDebugDrawShader->use();
+            physicsDebugDrawShader->Use();
             auto pos = rb->entity->GetComponent<Transform>()->position;
             for (int i = 0; i < vertices.size(); i++)
             {
@@ -581,7 +581,7 @@ void RenderSystem::debugRender()
             std::vector<glm::vec2> vertices = {shape->leftPoint, shape->rightPoint};
 
             std::vector<float> glVertices(vertices.size() * 2);
-            physicsDebugDrawShader->use();
+            physicsDebugDrawShader->Use();
             auto pos = rb->entity->GetComponent<Transform>()->position;
             for (int i = 0; i < vertices.size(); i++)
             {
