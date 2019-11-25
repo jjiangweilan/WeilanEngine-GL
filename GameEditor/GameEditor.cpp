@@ -42,6 +42,11 @@ void GameEditor::render(void **data)
     scene = EngineManager::getwlEngine()->getCurrentScene();
     ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
+    if (Input::getKeyStatus(SDL_SCANCODE_ESCAPE))
+    {
+        selectedGameObject = nullptr;
+    }
+
     showGameWindow(data);
     showMenu();
     showAllGameObjects();
@@ -170,8 +175,8 @@ void GameEditor::showGameWindow(void **data)
     if (selectedTRigidbody && editLine)
         windowName += " Editing Render Line";
     windowName += "###GameScene";
-    ImGui::SetNextWindowPos({450, 30});
-    ImGui::Begin(windowName.data(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::SetNextWindowPos({450, 30}, ImGuiCond_FirstUseEver);
+    ImGui::Begin(windowName.data(), nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_AlwaysAutoResize);
     m_isGameSceneFocused = ImGui::IsWindowFocused();
     gameplayWindowOffsetX = ImGui::GetWindowPos().x;
     gameplayWindowOffsetY = ImGui::GetWindowPos().y + 20;
