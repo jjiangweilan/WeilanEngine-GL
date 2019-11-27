@@ -21,14 +21,14 @@ enum class ParameterType
     Mat2,
     Mat3,
     Mat4,
-    Sampler
+    Sampler2D
 };
 
 struct TextureUnitBinding
 {
     GLint texUnit;
-    Texture *texture;
-    TextureUnitBinding(const GLint &texUnit, Texture *texture) : texUnit(texUnit), texture(texture) {}
+    const Texture *texture;
+    TextureUnitBinding(const GLint &texUnit, const Texture *texture) : texUnit(texUnit), texture(texture) {}
 };
 
 class ShaderParameter

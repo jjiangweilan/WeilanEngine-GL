@@ -1,22 +1,39 @@
 #include "RenderNode.hpp"
 #include "Shader.hpp"
+#include "Mesh.hpp"
+#include "Material.hpp"
+#include "DebugDraw3D.hpp"
+#include "GlobalShaderParameter.hpp"
+
+#include "../Component/Model.hpp"
+#include "../Component/Camera.hpp"
+#include "../Component/Transform.hpp"
+#include "../Component/RenderScript.hpp"
+
+#include "../System/RenderSystem.hpp"
+#include "../EngineManager.hpp"
 
 namespace wlEngine
 {
 namespace Graphics
 {
 
-FramebufferAttachment::FramebufferAttachment() : colors(), depth(0), stencil(0) {}
-FramebufferAttachment::~FramebufferAttachment()
+RenderNode::InputSource::InputSource(RenderNode* node, const Mesh& mesh) : node(node), mesh(mesh){}
+RenderNode::FramebufferAttachment::FramebufferAttachment() : colors(), depth(), stencil() {}
+RenderNode::FramebufferAttachment::~FramebufferAttachment()
+{}
+std::vector<GLenum> RenderNode::FramebufferAttachment::GetColorAttachmentArray() const
 {
-    glDeleteTextures(colors.size(), colors.data());
-    glDeleteTextures(1, &depth);
-    glDeleteTextures(1, &stencil);
+    std::vector<GLenum> rlt(colors.size());
+    for  (size_t i = 0; i < colors.size(); i++)
+    {
+        rlt[i] = GL_COLOR_ATTACHMENT0 + i;
+    }
+    return rlt;
 }
 
-RenderNode::RenderNode() : m_attachment()
+RenderNode::RenderNode(Camera* camera) : m_camera(camera), m_attachment(), m_framebuffer(0)
 {
-    glGenFramebuffers(1, &m_framebuffer);
 }
 
 RenderNode::~RenderNode()
@@ -24,96 +41,102 @@ RenderNode::~RenderNode()
     glDeleteFramebuffers(1, &m_framebuffer);
 }
 
-void RenderNode::BeginAttachment()
+void RenderNode::AddInputSource(RenderNode *node, const Mesh &mesh)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
-}
+    m_sources.emplace_back(node, mesh);
 
-void RenderNode::EndAttachment()
+    const std::string renderNodeColor_str = "renderNodeColor";
+    const std::string renderNodeDepth_str = "renderNodeDepth";
+    const std::string renderNodeStencil_str = "renderNodeStencil";
+
+    auto material = mesh.GetMaterial();
+    material->GetShader()->Use();
+    auto param = material->GetParameters();
+    for (int i = 0; i < node->m_attachment.colors.size(); i++)
+    {
+        param->SetParameter(renderNodeColor_str + std::to_string(i), TextureUnitBinding(2 + i, &(node->m_attachment.colors[i])));
+    }
+
+    if (node->m_attachment.depth.GetId() != 0)
+    {
+        param->SetParameter(renderNodeDepth_str, TextureUnitBinding(0, &node->m_attachment.depth));
+    }
+    if (node->m_attachment.stencil.GetId() != 0)
+    {
+        param->SetParameter(renderNodeDepth_str, TextureUnitBinding(1, &node->m_attachment.stencil));
+    }
+}
+void RenderNode::GenFramebuffer()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glGenFramebuffers(1, &m_framebuffer);
 }
 
 void RenderNode::AttachTexture2D(const AttachmentType &attachmentType,
-                                 const TextureInternalFormat &internalFormat,
+                                 const Texture::InternalFormat &internalFormat,
+                                 const Texture::DataFormat &format,
+                                 const Texture::DataType &type,
                                  const unsigned int &width,
-                                 const unsigned int &height,
-                                 const TextureDataFormat &format,
-                                 const TextureDataType &type)
+                                 const unsigned int &height
+                                 )
 {
-    GLuint texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, internalFormat, internalFormat, width, height, 0, format, type, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+
+    Texture texture(width, height, internalFormat, format, type);
 
     if (attachmentType == AttachmentType::Color)
     {
         glFramebufferTexture2D(GL_FRAMEBUFFER,
                                attachmentType + m_attachment.colors.size(),
                                GL_TEXTURE_2D,
-                               texture,
+                               texture.GetId(),
                                0);
-        m_attachment.colors.push_back(texture);
+        m_attachment.colors.emplace_back(std::move(texture));
     }
     else if (attachmentType == AttachmentType::Depth)
     {
-        if (m_attachment.depth != 0)
-        {
-            glDeleteTextures(1, &m_attachment.depth);
-        }
         glFramebufferTexture2D(GL_FRAMEBUFFER,
                                attachmentType,
                                GL_TEXTURE_2D,
-                               texture,
+                               texture.GetId(),
                                0);
-        m_attachment.depth = texture;
+        m_attachment.depth = std::move(texture);
     }
     else if (attachmentType == AttachmentType::Stencil)
     {
-        if (m_attachment.stencil != 0)
-        {
-            glDeleteTextures(1, &m_attachment.stencil);
-        }
         glFramebufferTexture2D(GL_FRAMEBUFFER,
                                attachmentType,
                                GL_TEXTURE_2D,
-                               texture,
+                               texture.GetId(),
                                0);
-        m_attachment.stencil = texture;
+        m_attachment.stencil = std::move(texture);
     }
-}
-
-const FramebufferAttachment *RenderNode::Render(Model *model)
-{
-
-    return &m_attachment;
-}
-const FramebufferAttachment *RenderNode::Render(RenderNode * node)
-{
-    glDrawBuffers(m_attachment.colors.size(), m_attachment.colors.data());
-
-    m_shader->Use();
-    m_shaderParam.Use();
-
-    std::string renderNode_str = "renderNodeBuffer";
-    for (int i = 0; i < m_attachment.colors.size(); i++)
+    auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        m_shaderParam.SetParameter(renderNode_str + std::to_string(i), m_attachment.colors[0]);
+        std::cerr << "frame buffer not completed: " << status << std::endl;
     }
-
-    const float vertices[] = { //TODO: agile
-        1.0
-    };
-
-    return &m_attachment;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void RenderNode::SetShader(Shader *shader)
+void RenderNode::Use() const
 {
-    m_shader = shader;
-    m_shaderParam.UpdateParameters(shader);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+}
+const Camera *RenderNode::GetCamera() const
+{
+    return m_camera;
+}
+const GLuint &RenderNode::GetFramebuffer() const
+{
+    return m_framebuffer;
+}
+const RenderNode::FramebufferAttachment *RenderNode::GetAttachment() const
+{
+    return &m_attachment;
+}
+const std::vector<RenderNode::InputSource> *RenderNode::GetSource() const
+{
+    return &m_sources;
 }
 } // namespace Graphics
 } // namespace wlEngine

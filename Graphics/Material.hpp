@@ -62,8 +62,8 @@ public:
  */
     Material Clone() const;
 
-    void useShader() const;
-    const Shader *getShader() const;
+    void UseMaterial() const;
+    const Shader *GetShader() const;
     ShaderParameter *GetParameters() const;
 
 protected:

@@ -14,10 +14,12 @@ class Material;
 struct Vertex
 {
     glm::vec3 position;
+    glm::vec2 texCoord;
     glm::vec3 normal;
-    glm::vec2 textureCoords;
     glm::vec3 tangent;
     glm::vec3 bitangent;
+    static const std::vector<Vertex> quad;
+    static const std::vector<unsigned int> quadElement;
 };
 
 enum PrimitiveMeshType
@@ -35,7 +37,7 @@ public:
  * @param meshType 
  */
     Mesh(const PrimitiveMeshType &meshType, Material *mat, const std::string &name = "");
-    Mesh(std::vector<GLuint> &indices, std::vector<Vertex> &vertices, Material *mat, const std::string &name = "");
+    Mesh(const std::vector<GLuint> &indices, const std::vector<Vertex> &vertices, Material *mat, const std::string &name = "");
     Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices, Material *mat, const std::string &name = "");
     Mesh(const Mesh &mesh) = default;
     Mesh(Mesh &&mesh) noexcept;
@@ -60,8 +62,10 @@ public:
     void setMaterial(const std::string &name) const;
 	void setVertices(std::vector<Vertex>&& vertices, std::vector<GLuint>&& indices);
 
-    const GLuint& getVAO() const;
-    const Material* getMaterial() const;
+    const GLuint& GetVAO() const;
+    const std::vector<GLuint>* GetIndices() const;
+    const std::vector<Vertex>* GetVertices() const;
+    const Material* GetMaterial() const {return m_material;}
     /**
  * @brief used in model to identify the material
  * 

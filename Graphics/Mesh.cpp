@@ -4,6 +4,18 @@ namespace wlEngine
 {
 namespace Graphics
 {
+const std::vector<Vertex> Vertex::quad = {
+    {glm::vec3(1.0, 1.0, 0.0), glm::vec2(1.0, 1.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0)},
+    {glm::vec3(1.0, -1.0, 0.0), glm::vec2(1.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0)},
+    {glm::vec3(-1.0, -1.0, 0.0), glm::vec2(0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0)},
+    {glm::vec3(-1.0, 1.0, 0.0), glm::vec2(0.0, 1.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0)},
+};
+
+const std::vector<unsigned int> Vertex::quadElement = {
+    0,1,3,
+    1,2,3
+};
+
 Mesh::Mesh(const PrimitiveMeshType &meshType, Material *mat, const std::string &name) : m_material(mat), name(name)
 {
     switch (meshType)
@@ -15,7 +27,7 @@ Mesh::Mesh(const PrimitiveMeshType &meshType, Material *mat, const std::string &
         break;
     }
 }
-Mesh::Mesh(std::vector<GLuint> &indices, std::vector<Vertex> &vertices, Material *mat, const std::string &name) : m_indices(indices), m_vertices(vertices), m_material(mat), name(name)
+Mesh::Mesh(const std::vector<GLuint> &indices, const std::vector<Vertex> &vertices, Material *mat, const std::string &name) : m_indices(indices), m_vertices(vertices), m_material(mat), name(name)
 {
     EBO = 0;
     VAO = 0;
@@ -47,10 +59,10 @@ void Mesh::setupMesh()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
 
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, normal));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, texCoord));
 
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, textureCoords));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, normal));
 
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)offsetof(Vertex, tangent));
@@ -111,11 +123,11 @@ void Mesh::loadFromAssimp(aiMesh *mesh)
             glm::vec2 vec2;
             vec2.x = mesh->mTextureCoords[0][i].x;
             vec2.y = mesh->mTextureCoords[0][i].y;
-            vertex.textureCoords = vec2;
+            vertex.texCoord = vec2;
         }
         else
         {
-            vertex.textureCoords = glm::vec2(0.0f, 0.0f);
+            vertex.texCoord = glm::vec2(0.0f, 0.0f);
         }
 
         if (mesh->mTangents)
@@ -157,22 +169,26 @@ void Mesh::setMaterial(const std::string &name) const
     m_material = Material::get(name);
 }
 
-void Mesh::setVertices(std::vector<Vertex>&& vertices, std::vector<GLuint>&& indices)
+void Mesh::setVertices(std::vector<Vertex> &&vertices, std::vector<GLuint> &&indices)
 {
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
     m_indices = std::move(indices);
-	m_vertices = std::move(vertices);
-	setupMesh();
+    m_vertices = std::move(vertices);
+    setupMesh();
 }
-const GLuint &Mesh::getVAO() const
+const GLuint &Mesh::GetVAO() const
 {
     return VAO;
 }
-const Material *Mesh::getMaterial() const
+const std::vector<GLuint> *Mesh::GetIndices() const
 {
-    return m_material;
+    return &m_indices;
+}
+const std::vector<Vertex> *Mesh::GetVertices() const
+{
+    return &m_vertices;
 }
 } // namespace Graphics
 } // namespace wlEngine

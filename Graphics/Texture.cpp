@@ -11,7 +11,54 @@ Texture::Texture(const std::string &file, const TextureType &textureType) : m_ty
 {
     loadFromFile(file, textureType);
 }
-Texture::Texture(FT_GlyphSlot glyph): m_textureId(0)
+Texture::Texture(const Texture &other)
+{
+    m_textureId = other.m_textureId;
+    m_sourcePath = other.m_sourcePath;
+    m_type = other.m_type;
+
+    m_width = other.m_width;
+    m_height = other.m_height;
+    m_nrChannel = other.m_nrChannel;
+}
+Texture::Texture(Texture &&other)
+{
+    m_textureId = other.m_textureId;
+    m_sourcePath = std::move(other.m_sourcePath);
+    m_type = other.m_type;
+
+    m_width = other.m_width;
+    m_height = other.m_height;
+    m_nrChannel = other.m_nrChannel;
+
+    other.m_textureId = 0;
+}
+
+Texture &Texture::operator=(const Texture &other)
+{
+    m_textureId = other.m_textureId;
+    m_sourcePath = other.m_sourcePath;
+    m_type = other.m_type;
+
+    m_width = other.m_width;
+    m_height = other.m_height;
+    m_nrChannel = other.m_nrChannel;
+    return *this;
+}
+Texture &Texture::operator=(Texture &&other)
+{
+    m_textureId = other.m_textureId;
+    m_sourcePath = std::move(other.m_sourcePath);
+    m_type = other.m_type;
+
+    m_width = other.m_width;
+    m_height = other.m_height;
+    m_nrChannel = other.m_nrChannel;
+
+    other.m_textureId = 0;
+    return *this;
+}
+Texture::Texture(FT_GlyphSlot glyph) : m_textureId(0)
 {
     m_type = Diffuse;
     loadFromFTBitmap(glyph);
@@ -41,6 +88,20 @@ Texture *Texture::loadFromFTBitmap(FT_GlyphSlot glyph)
     return this;
 }
 
+Texture::Texture(const unsigned int &width,
+                 const unsigned int &height,
+                 const InternalFormat &internalFormat,
+                 const DataFormat &format,
+                 const DataType &type)
+{
+    glGenTextures(1, &m_textureId);
+    glBindTexture(GL_TEXTURE_2D, m_textureId);
+    glTexImage2D(GL_TEXTURE_2D,0, internalFormat, width, height, 0, format, type, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
 Texture *Texture::loadFromFile(const std::string &path, const TextureType &textureType)
 {
     free();
@@ -83,7 +144,7 @@ void Texture::free()
 }
 
 Texture::~Texture() { free(); }
-const unsigned int &Texture::getId() const { return m_textureId; }
+const unsigned int &Texture::GetId() const { return m_textureId; }
 const std::string &Texture::getSourcePath() const { return m_sourcePath; }
 const int &Texture::getWidth() const { return m_width; }
 const int &Texture::getHeight() const { return m_height; }

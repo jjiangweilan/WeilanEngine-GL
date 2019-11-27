@@ -15,8 +15,8 @@ namespace wlEngine {
         Camera3D(Entity* entity, void** data);
         ~Camera3D();
 
-        virtual glm::mat4 getViewMatrix() const override;
-        virtual glm::mat4 getProjMatrix() const override;
+        virtual glm::mat4 GetViewMatrix() const override;
+        virtual glm::mat4 GetProjMatrix() const override;
         void update() override;
 
         glm::vec3 front;
@@ -32,7 +32,7 @@ namespace wlEngine {
         float yaw = -90;
 
         float speed;
-        void setProjectionMatrix(const float &fovy, const float &aspect,
+        void SetProjectionMatrix(const float &fovy, const float &aspect,
                                  const float &zNear, const float &zFar) override;
 
     private:

@@ -15,7 +15,6 @@
 
 namespace wlEngine {
 void Scene::update() {
-    camera->GetComponent<Camera>()->update();
 }
 
 Scene::Scene() : sceneGraph(), gameObjectAllocator() {}

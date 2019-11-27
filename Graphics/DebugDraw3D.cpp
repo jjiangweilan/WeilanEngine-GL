@@ -10,7 +10,7 @@ DebugDraw3D::DebugDraw3D()
     Material::add("DebugDrawBox", Shader::add("DebugDrawBox", path + "Debug.vert", "", "", path + "Box.geom", path + "Box.frag"));
 
     m_mesh.setVertices({
-        {glm::vec3(0,0,0), glm::vec3(0, 0, 0), glm::vec2(0.0,0.0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+        {glm::vec3(0,0,0), glm::vec2(0.0,0.0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
     }, {
         0
     });
@@ -20,9 +20,9 @@ DebugDraw3D::DebugDraw3D()
 void DebugDraw3D::drawBox(const glm::vec3& min, const glm::vec3& max, const glm::mat4& model)
 {
      
-    glBindVertexArray(m_mesh.getVAO());
+    glBindVertexArray(m_mesh.GetVAO());
 	m_mesh.setMaterial("DebugDrawBox");
-    m_mesh.getMaterial()->getShader()->Use();
+    m_mesh.GetMaterial()->GetShader()->Use();
     Shader::setUniform(0, model);
     Shader::setUniform(1, min);
     Shader::setUniform(2, max);
@@ -32,9 +32,9 @@ void DebugDraw3D::drawBox(const glm::vec3& min, const glm::vec3& max, const glm:
 
 void DebugDraw3D::drawLine(const glm::vec3 &from, const glm::vec3 &to, const glm::vec3 &color)
 {
-    glBindVertexArray(m_mesh.getVAO());
+    glBindVertexArray(m_mesh.GetVAO());
 	m_mesh.setMaterial("DebugDrawLine");
-    m_mesh.getMaterial()->getShader()->Use();
+    m_mesh.GetMaterial()->GetShader()->Use();
     Shader::setUniform(0, from);
     Shader::setUniform(1, to);
     Shader::setUniform(2, color);

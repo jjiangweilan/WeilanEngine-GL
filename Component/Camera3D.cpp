@@ -24,19 +24,19 @@ Camera3D::Camera3D(Entity *entity, void **data) : Camera3D(entity)
 }
 Camera3D::~Camera3D(){};
 
-glm::mat4 Camera3D::getViewMatrix() const
+glm::mat4 Camera3D::GetViewMatrix() const
 {
     auto transform = entity->GetComponent<Transform>();
     return glm::lookAt(transform->position, transform->position + front,
                        glm::cross(right, front));
 }
 
-glm::mat4 Camera3D::getProjMatrix() const
+glm::mat4 Camera3D::GetProjMatrix() const
 {
     return m_projMatrix;
 }
 
-void Camera3D::setProjectionMatrix(const float &fovy, const float &aspect,
+void Camera3D::SetProjectionMatrix(const float &fovy, const float &aspect,
                                    const float &zNear, const float &zFar)
 {
 
@@ -61,7 +61,7 @@ void Camera3D::update()
         enableMouse = false;
         Input::enableRelativeMouse(false);
     }
-    setProjectionMatrix(45.0f, sceneSize.x / sceneSize.y, 0.1, 100);
+    SetProjectionMatrix(45.0f, sceneSize.x / sceneSize.y, 0.1, 100);
 }
 
 void Camera3D::updateEyeDirection()

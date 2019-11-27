@@ -11,6 +11,7 @@
 
 #include "Component/Script.hpp"
 #include "Component/LuaScript.hpp"
+#include "Component/RenderScript.hpp"
 
 #include "Graphics/Shader.hpp"
 #include "Settings.hpp"
@@ -50,11 +51,16 @@ void EngineManager::postInitialization() {
     }
 
     for (auto &luaScript : LuaScript::collection) {
-        luaScript->postInit();
+        luaScript->PostInit();
+    }
+
+    for (auto &renderScript : RenderScript::collection)
+    {
+        renderScript->PostInit();
     }
 
     for (auto& system : System::collection) {
-        system->postInit();
+        system->PostInit();
     }
 }
 

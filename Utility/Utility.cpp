@@ -157,7 +157,7 @@ void Utility::getRayFromScreenToWorld(const float& x, const float& y, glm::vec3&
 	glm::vec4 rayClipOrigin = { xf, yf, -1.0, 1.0 };
 	glm::vec4 rayClipEnd = { xf, yf, 1.0, 1.0 };
 
-	glm::mat4 inverseBack = glm::inverse(camera3d->getViewMatrix()) * glm::inverse(camera3d->getProjMatrix());
+	glm::mat4 inverseBack = glm::inverse(camera3d->GetViewMatrix()) * glm::inverse(camera3d->GetProjMatrix());
 
 	glm::vec4 rayEyeOrigin = inverseBack * rayClipOrigin;
 	glm::vec4 rayEyeEnd = inverseBack * rayClipEnd;

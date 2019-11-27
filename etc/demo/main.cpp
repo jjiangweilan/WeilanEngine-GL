@@ -156,7 +156,7 @@ int main()
         auto transform = model->entity->GetComponent<Transform>();
         for (auto& mesh : meshes)
         {
-            auto params = mesh.getMaterial()->GetParameters();
+            auto params = mesh.GetMaterial()->GetParameters();
             params->SetParameter("model", transform->getModel());
         }
     };
@@ -169,7 +169,7 @@ int main()
     modelWater->ShaderParamUpdate = [](Model* model) {
         auto& mesh = *model->getModel()->GetMesh("water");
 		auto transform = model->entity->GetComponent<Transform>();
-        auto parameters = mesh.getMaterial()->GetParameters();
+        auto parameters = mesh.GetMaterial()->GetParameters();
         parameters->SetParameter("model", transform->getModel());
         parameters->SetParameter("t", (float)Time::timeAfterGameStart);
     };

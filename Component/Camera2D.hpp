@@ -16,9 +16,9 @@ public:
 
 	Camera2D(Entity *go);
 	Camera2D(Entity *go, void **);
-	glm::mat4 getViewMatrix() const override;
-	glm::mat4 getProjMatrix() const override;
-	virtual void setProjectionMatrix(const float &left, const float &right,
+	glm::mat4 GetViewMatrix() const override;
+	glm::mat4 GetProjMatrix() const override;
+	virtual void SetProjectionMatrix(const float &left, const float &right,
 									 const float &bottom, const float &top, const float &zNear, const float &zFar) override;
 	float speed = 100.0;
 

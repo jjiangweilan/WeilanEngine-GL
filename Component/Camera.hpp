@@ -1,24 +1,31 @@
 #pragma once
 #include "Component.hpp"
-#include "RenderNode.hpp"
+#include "Graphics/RenderNode.hpp"
 #include <glm/matrix.hpp>
 namespace wlEngine
 {
 class Camera : public Component
 {
 public:
-    COMPONENT_DECLARATION_ABSTRACT(Component, Camera);
+    COMPONENT_DECLARATION(Component, Camera, 2);
     Camera(Entity *entity);
-    virtual glm::mat4 getViewMatrix() const = 0;
-    virtual glm::mat4 getProjMatrix() const = 0;
-    virtual void setProjectionMatrix(const float &fovy, const float &aspect,
+    virtual glm::mat4 GetViewMatrix() const = 0;
+    virtual glm::mat4 GetProjMatrix() const = 0;
+    virtual void SetProjectionMatrix(const float &fovy, const float &aspect,
                                      const float &zNear, const float &zFar);
-    virtual void setProjectionMatrix(const float &left, const float &right,
+    virtual void SetProjectionMatrix(const float &left, const float &right,
                                      const float &bottom, const float &top,
                                      const float &zNear, const float &zFar);
     virtual void update() = 0;
 
+    void SetLayerMask(const int32_t& mask);
+    const int32_t& GetLayerMask() const;
+
+    Graphics::RenderNode* GetRenderNode();
+
+    const int32_t& GetLayerMask();
 protected:
+    int32_t m_layerMask;
     Graphics::RenderNode m_renderNode;
     glm::mat4 m_projMatrix;
 };

@@ -44,6 +44,7 @@ namespace wlEngine {
 		Scene* scene = nullptr;
 		Transform* transform;
 		bool enable;
+        int32_t m_layer;
         friend struct Transform;
         friend class SceneData;
 		friend class Scene;

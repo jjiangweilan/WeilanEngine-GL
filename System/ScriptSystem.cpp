@@ -21,7 +21,7 @@ void ScriptSystem::update()
         s->update();
     }
 }
-void ScriptSystem::postInit()
+void ScriptSystem::PostInit()
 {
     for (auto &s : Script::collection)
     {

@@ -32,7 +32,7 @@ void OpenGLTest::draw(const glm::mat4& view, const glm::mat4 proj) {
 void OpenGLTest::drawSprite(const glm::mat4& view, const glm::mat4 proj) {
     glActiveTexture(GL_TEXTURE0);
     sprite->getShader()->Use();
-    glBindTexture(GL_TEXTURE_2D, sprite->getMainTexture()->getId());
+    glBindTexture(GL_TEXTURE_2D, sprite->getMainTexture()->GetId());
     glUniform1i(glGetUniformLocation(sprite->getShader()->getId(), "texture0"), 0);
 
     glUniformMatrix4fv(glGetUniformLocation(sprite->getShader()->getId(), "model"), 1, GL_FALSE, &transform->getModel()[0][0]);
@@ -58,7 +58,7 @@ void OpenGLTest::drawOutline(const glm::mat4& view, const glm::mat4 proj) {
     outlineShader->Use();
     outlineShader->setInt("texture0", 0);
 
-    glBindTexture(GL_TEXTURE_2D, sprite->getMainTexture()->getId());
+    glBindTexture(GL_TEXTURE_2D, sprite->getMainTexture()->GetId());
     glUniform1i(glGetUniformLocation(outlineShader->getId(), "texture0"), 0);
 
     glUniformMatrix4fv(glGetUniformLocation(outlineShader->getId(), "model"), 1, GL_FALSE, &transform->getModel()[0][0]);
