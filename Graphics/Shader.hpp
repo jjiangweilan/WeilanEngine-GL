@@ -12,8 +12,6 @@
 #include <unordered_map>
 #include <functional>
 
-#define UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS 0
-#define UNIFORM_BLOCK_INDEX_MAIN_CAMERA 1
 namespace wlEngine
 {
 class GameEditor;

@@ -11,7 +11,7 @@ class LuaScript : public Component
 
     lua_State *state;
 
-    void postInit();
+    void PostInit();
 
 private:
     std::string file;

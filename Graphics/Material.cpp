@@ -13,9 +13,10 @@ void Material::SetShader(const std::string &name)
     m_parameters.UpdateParameters(m_shader);
 }
 
-void Material::UseShader() const
+void Material::UseMaterial() const
 {
     m_shader->Use();
+    m_parameters.Use();
 }
 
 const Shader *Material::GetShader() const

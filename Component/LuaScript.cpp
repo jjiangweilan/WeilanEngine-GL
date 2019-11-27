@@ -117,7 +117,7 @@ LuaScript::LuaScript(Entity *entity, const std::string &file) : Component(entity
     LUA_SET_FIELD("AxisMax", 0x7fff);
     lua_pop(state, 1);
 }
-void LuaScript::postInit()
+void LuaScript::PostInit()
 {
     if (luaL_dofile(state, file.data()))
     {

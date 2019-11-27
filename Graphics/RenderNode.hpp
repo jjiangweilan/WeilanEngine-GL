@@ -11,6 +11,7 @@
 namespace wlEngine
 {
 class RenderSystem;
+class Camera;
 namespace Graphics
 {
 class Shader;
@@ -40,7 +41,7 @@ public:
         ~FramebufferAttachment();
     };
 
-    RenderNode();
+    RenderNode(Camera* camera);
     ~RenderNode();
 
     void AddInputSource(RenderNode* node, const Mesh& mesh);
@@ -52,16 +53,17 @@ public:
                          const unsigned int &width,
                          const unsigned int &height);
     void Use() const;
+    const Camera* GetCamera() const;
+    const GLuint& GetFramebuffer() const;
+    const FramebufferAttachment* GetAttachment() const;
+    const std::vector<InputSource>* GetSource() const;
 
 private:
+    Camera* m_camera; //the attached camera
     GLuint m_framebuffer;
     FramebufferAttachment m_attachment;
 
-    const FramebufferAttachment *Render() const;
-    const FramebufferAttachment *RenderFromScene() const;
-    void RenderModel() const;
-
-    std::vector<InputSource> sources;
+    std::vector<InputSource> m_sources;
 
     friend class RenderSystem;
 };

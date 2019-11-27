@@ -3,10 +3,15 @@
 #include "Mesh.hpp"
 #include "Material.hpp"
 #include "DebugDraw3D.hpp"
+#include "GlobalShaderParameter.hpp"
 
 #include "../Component/Model.hpp"
-#include "../EngineManager.hpp"
+#include "../Component/Camera.hpp"
+#include "../Component/Transform.hpp"
+#include "../Component/RenderScript.hpp"
+
 #include "../System/RenderSystem.hpp"
+#include "../EngineManager.hpp"
 
 namespace wlEngine
 {
@@ -27,7 +32,7 @@ std::vector<GLenum> RenderNode::FramebufferAttachment::GetColorAttachmentArray()
     return rlt;
 }
 
-RenderNode::RenderNode() : m_attachment(), m_framebuffer(0)
+RenderNode::RenderNode(Camera* camera) : m_camera(camera), m_attachment(), m_framebuffer(0)
 {
 }
 
@@ -38,7 +43,28 @@ RenderNode::~RenderNode()
 
 void RenderNode::AddInputSource(RenderNode *node, const Mesh &mesh)
 {
-    sources.emplace_back(node, mesh);
+    m_sources.emplace_back(node, mesh);
+
+    const std::string renderNodeColor_str = "renderNodeColor";
+    const std::string renderNodeDepth_str = "renderNodeDepth";
+    const std::string renderNodeStencil_str = "renderNodeStencil";
+
+    auto material = mesh.GetMaterial();
+    material->GetShader()->Use();
+    auto param = material->GetParameters();
+    for (int i = 0; i < node->m_attachment.colors.size(); i++)
+    {
+        param->SetParameter(renderNodeColor_str + std::to_string(i), TextureUnitBinding(2 + i, &(node->m_attachment.colors[i])));
+    }
+
+    if (node->m_attachment.depth.GetId() != 0)
+    {
+        param->SetParameter(renderNodeDepth_str, TextureUnitBinding(0, &node->m_attachment.depth));
+    }
+    if (node->m_attachment.stencil.GetId() != 0)
+    {
+        param->SetParameter(renderNodeDepth_str, TextureUnitBinding(1, &node->m_attachment.stencil));
+    }
 }
 void RenderNode::GenFramebuffer()
 {
@@ -96,101 +122,21 @@ void RenderNode::Use() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
 }
-const RenderNode::FramebufferAttachment *RenderNode::Render() const
+const Camera *RenderNode::GetCamera() const
 {
-    if (sources.size() == 0)
-        return RenderFromScene();
-
-    //iteratively draw previous renderNode
-    const std::string renderNodeColor_str = "renderNodeColor";
-    const std::string renderNodeDepth_str = "renderNodeDepth";
-    const std::string renderNodeStencil_str = "renderNodeBStencil";
-    for (auto &inputSource : sources)
-    {
-        auto fbAttachment = inputSource.node->Render();
-        auto material = inputSource.mesh.GetMaterial();
-        material->UseShader();
-        auto param = material->GetParameters();
-        for (int i = 0; i < fbAttachment->colors.size(); i++)
-        {
-			param->SetParameter(renderNodeColor_str + std::to_string(i), TextureUnitBinding(2 + i, &(fbAttachment->colors[i])));
-        }
-        if (fbAttachment->depth.GetId() != 0)
-        {
-            param->SetParameter(renderNodeDepth_str, TextureUnitBinding(0, &fbAttachment->depth));
-        }
-        if (fbAttachment->depth.GetId() != 0)
-        {
-            param->SetParameter(renderNodeDepth_str, TextureUnitBinding(1, &fbAttachment->stencil));
-        }
-
-        //draw the output texture
-        param->Use();
-        glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear framebuffer
-        auto sceneSize = wlEngine::RenderSystem::get()->getSceneSize();
-        glViewport(0, 0, sceneSize.x, sceneSize.y);
-        glDrawBuffers(m_attachment.colors.size(), m_attachment.GetColorAttachmentArray().data());
-        glBindVertexArray(inputSource.mesh.GetVAO());
-        glDrawElements(GL_TRIANGLES, inputSource.mesh.GetIndices()->size(), GL_UNSIGNED_INT, nullptr);
-    }
-
+    return m_camera;
+}
+const GLuint &RenderNode::GetFramebuffer() const
+{
+    return m_framebuffer;
+}
+const RenderNode::FramebufferAttachment *RenderNode::GetAttachment() const
+{
     return &m_attachment;
 }
-const RenderNode::FramebufferAttachment *RenderNode::RenderFromScene() const
+const std::vector<RenderNode::InputSource> *RenderNode::GetSource() const
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
-    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDrawBuffers(m_attachment.colors.size(), m_attachment.GetColorAttachmentArray().data());
-    auto sceneSize = wlEngine::RenderSystem::get()->getSceneSize();
-    glViewport(0, 0, sceneSize.x, sceneSize.y);
-    RenderModel();
-    return &m_attachment;
+    return &m_sources;
 }
-void RenderNode::RenderModel() const
-{
-    auto currentScene = wlEngine::EngineManager::getwlEngine()->getCurrentScene();
-    for (auto model : wlEngine::Model::collection)
-    {
-        if (!model->entity->IsEnable() || model->entity->GetScene() != currentScene)
-            continue;
-
-        auto gameObject = model->entity;
-        auto modelM = model->getModel();
-        if (!modelM)
-            return;
-        for (auto mesh : *modelM->GetMeshes())
-        {
-            auto material = mesh.GetMaterial();
-            auto shader = material->GetShader();
-            shader->Use();
-            material->GetParameters()->Use();
-            //
-            // draw mesh
-            glBindVertexArray(mesh.GetVAO());
-            if (shader->hasTess())
-            {
-                glPolygonMode(GL_FRONT_AND_BACK, model->GetDrawMode());
-                glPatchParameteri(GL_PATCH_VERTICES, shader->getPatches());
-                glDrawElements(GL_PATCHES, mesh.GetIndices()->size(), GL_UNSIGNED_INT, 0);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-            else
-            {
-                glDrawElements(GL_TRIANGLES, mesh.GetIndices()->size(), GL_UNSIGNED_INT, 0);
-            }
-        }
-        glBindVertexArray(0);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-#ifdef DEBUG
-        auto aabb = modelM->getAABB();
-        //small offset to prevent collision
-        const float offset = 0.001;
-        Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, model->entity->GetComponent<Transform>()->getModel());
-#endif
-    }
-}
-
 } // namespace Graphics
 } // namespace wlEngine

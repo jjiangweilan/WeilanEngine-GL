@@ -3,7 +3,7 @@
 namespace wlEngine
 {
 COMPONENT_DEFINATION(Component, Camera, 2);
-Camera::Camera(Entity *entity) : Component(entity)
+Camera::Camera(Entity *entity) : Component(entity), m_renderNode(this)
 {
 };
 

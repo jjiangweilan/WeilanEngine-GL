@@ -1,4 +1,5 @@
 #include "Shader.hpp"
+#include "GlobalShaderParameter.hpp"
 
 namespace wlEngine
 {
@@ -21,13 +22,8 @@ Shader::Shader(const std::string &vertexPath,
     tessEval = tessEvalPath.size() == 0 ? 0 : createShaderFromFile(tessEvalPath, GL_TESS_EVALUATION_SHADER);
     geometry = geometryPath.size() == 0 ? 0 : createShaderFromFile(geometryPath, GL_GEOMETRY_SHADER);
     m_id = createProgram(vertex, tessCtrl, tessEval, geometry, fragment);
-    //uniform block
-    auto uniformBlockIndex = glGetUniformBlockIndex(m_id, "GlobalProjMaterices");
-    if (uniformBlockIndex != GL_INVALID_INDEX)
-        glUniformBlockBinding(m_id, uniformBlockIndex, UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS);
-    uniformBlockIndex = glGetUniformBlockIndex(m_id, "MainCamera");
-    if (uniformBlockIndex != GL_INVALID_INDEX)
-        glUniformBlockBinding(m_id, uniformBlockIndex, UNIFORM_BLOCK_INDEX_MAIN_CAMERA);
+
+    GlobalShaderParameter::Get()->ConfigureShaderParameterBlock(m_id);
 }
 
 Shader::Shader(Shader &&shader)

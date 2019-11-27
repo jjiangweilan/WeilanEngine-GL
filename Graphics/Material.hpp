@@ -62,7 +62,7 @@ public:
  */
     Material Clone() const;
 
-    void UseShader() const;
+    void UseMaterial() const;
     const Shader *GetShader() const;
     ShaderParameter *GetParameters() const;
 
