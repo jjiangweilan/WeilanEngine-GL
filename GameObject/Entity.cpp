@@ -9,7 +9,7 @@ namespace wlEngine {
         //remove from previous hierachy
         if (auto preParent = this->parent) preParent->children.erase(this);
         else {
-            EngineManager::getwlEngine()->getCurrentScene()->sceneGraph.erase(this);
+            EngineManager::GetwlEngine()->getCurrentScene()->sceneGraph.erase(this);
         }
         
         //add to new hierachy
@@ -18,7 +18,7 @@ namespace wlEngine {
             newParent->children.insert(this);
         }
         else {
-            EngineManager::getwlEngine()->getCurrentScene()->sceneGraph.insert(this);
+            EngineManager::GetwlEngine()->getCurrentScene()->sceneGraph.insert(this);
             this->parent = nullptr;
         }
 

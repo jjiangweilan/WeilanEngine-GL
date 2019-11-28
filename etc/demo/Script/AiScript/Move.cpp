@@ -13,6 +13,6 @@ void Move::update() {
     auto transform = entity->GetComponent<Transform>();
     transform->moveBy(direction.x * Time::deltaTime * speed, direction.y * Time::deltaTime * speed);
     if (existTime > 2) 
-    EngineManager::getwlEngine()->getCurrentScene()->destroyGameObject(entity);
+    EngineManager::GetwlEngine()->getCurrentScene()->destroyGameObject(entity);
 }
 };

@@ -64,7 +64,7 @@ void EngineManager::postInitialization() {
     }
 }
 
-EngineManager *EngineManager::getwlEngine() {
+EngineManager *EngineManager::GetwlEngine() {
     if (engine)
         return engine;
 
@@ -138,7 +138,7 @@ void EngineManager::initializeSystems() {
 
 void EngineManager::initializeManagers() { ResourceManager::init(); }
 void EngineManager::addGameplaySystem(System *s) { gameplaySystem.push_back(s); }
-void EngineManager::start() {
+void EngineManager::Start() {
     postInitialization();
     loop();
 }

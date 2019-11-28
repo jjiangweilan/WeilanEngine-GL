@@ -64,7 +64,7 @@ private:
 public:
     static Model* get(const std::string& id);
     template<typename ...Args>
-    static Model* add(const std::string& id, Args&& ... args);
+    static Model* Add(const std::string& id, Args&& ... args);
     static void remove(const std::string& id);
 private:
     static std::unordered_map<std::string, Model> collection;
@@ -73,12 +73,12 @@ private:
 };
 
 template<typename ...Args>
-Model* Model::add(const std::string& id, Args&& ... args)
+Model* Model::Add(const std::string& id, Args&& ... args)
 {
 	auto has = collection.find(id);
 	if (has != collection.end()) return &has->second;
-
-	auto pair = collection.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...));
+//std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(args...)
+	auto pair = collection.emplace(id, args...);
 	return &pair.first->second;
 }
 

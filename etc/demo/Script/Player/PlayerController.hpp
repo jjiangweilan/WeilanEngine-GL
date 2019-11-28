@@ -37,7 +37,7 @@ struct PlayerController : public Script {
                 dialog = UserInterface::showDialog(npcController);
             }
         } else if (clicked && dialog) {
-            EngineManager::getwlEngine()->getCurrentScene()->destroyGameObject(dialog);
+            EngineManager::GetwlEngine()->getCurrentScene()->destroyGameObject(dialog);
             dialog = nullptr;
         }
     }

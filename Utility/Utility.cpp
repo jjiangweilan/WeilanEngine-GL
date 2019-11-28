@@ -149,7 +149,7 @@ bool Utility::TestRayOBBIntersection(
 
 void Utility::getRayFromScreenToWorld(const float& x, const float& y, glm::vec3& origin, glm::vec3& end) {
 	auto sceneSize = RenderSystem::Get()->GetSceneSize();
-	auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera();
+	auto camera = EngineManager::GetwlEngine()->getCurrentScene()->getCamera();
 	auto camera3d = camera->GetComponent<Camera3D>();
 
 	float xf = (2.0 * x) / sceneSize.x - 1.0f;

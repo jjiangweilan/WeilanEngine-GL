@@ -13,7 +13,7 @@ namespace wlEngine
 {
 Entity *UserInterface::showDialog(NpcController *npcController)
 {
-    auto engineManager = EngineManager::getwlEngine();
+    auto engineManager = EngineManager::GetwlEngine();
     auto renderSystem = RenderSystem::Get();
     auto scene = engineManager->getCurrentScene();
     auto dialog = scene->CreateGameObject("Dialog", scene->getCamera());

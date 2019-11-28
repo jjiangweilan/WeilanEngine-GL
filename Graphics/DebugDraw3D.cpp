@@ -6,8 +6,8 @@ namespace Graphics
 DebugDraw3D::DebugDraw3D()
 {
     std::string path = ROOT_DIR + "/Graphics/Material/Shader/DebugDraw/";
-    Material::add("DebugDrawLine", Shader::add("DebugDrawLine", path + "Debug.vert", "", "", path + "Line.geom", path + "Line.frag"));
-    Material::add("DebugDrawBox", Shader::add("DebugDrawBox", path + "Debug.vert", "", "", path + "Box.geom", path + "Box.frag"));
+    Material::Add("DebugDrawLine", Shader::Add("DebugDrawLine", path + "Debug.vert", "", "", path + "Line.geom", path + "Line.frag"));
+    Material::Add("DebugDrawBox", Shader::Add("DebugDrawBox", path + "Debug.vert", "", "", path + "Box.geom", path + "Box.frag"));
 
     m_mesh.setVertices({
         {glm::vec3(0,0,0), glm::vec2(0.0,0.0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},

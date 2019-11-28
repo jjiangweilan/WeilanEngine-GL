@@ -29,7 +29,7 @@ Material Material::Clone() const
     return *this;
 }
 
-Material *Material::get(const std::string &id)
+Material *Material::Get(const std::string &id)
 {
     auto iter = collection.find(id);
     if (iter == collection.end()) return nullptr;

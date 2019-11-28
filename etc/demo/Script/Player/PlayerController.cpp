@@ -14,7 +14,7 @@ PlayerController::PlayerController(Entity *entity) : Script(entity), playerSkill
 }
 
 void PlayerController::postInit() {
-    camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera();
+    camera = EngineManager::GetwlEngine()->getCurrentScene()->getCamera();
 }
 
 

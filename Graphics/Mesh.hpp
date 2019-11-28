@@ -23,6 +23,9 @@ struct Vertex
     static const std::vector<Vertex> quad;
     static const std::vector<unsigned int> quadElement;
 
+    static const std::vector<Vertex> boxQuad;
+    static const std::vector<unsigned int> boxElementQuad;
+
     static const std::vector<Vertex> box;
     static const std::vector<unsigned int> boxElement;
 };

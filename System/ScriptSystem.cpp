@@ -13,7 +13,7 @@ ScriptSystem::ScriptSystem()
 
 void ScriptSystem::update()
 {
-    auto currentScene = EngineManager::getwlEngine()->getCurrentScene();
+    auto currentScene = EngineManager::GetwlEngine()->getCurrentScene();
     for (auto &s : Script::collection)
     {
         if (!s->entity->IsEnable() || s->entity->GetScene() != currentScene)

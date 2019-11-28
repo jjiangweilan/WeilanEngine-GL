@@ -76,7 +76,7 @@ void Transform::SetScale(const float &ratio)
     scale = {ratio, ratio, ratio};
     scaleMat4 = glm::scale(glm::mat4(1.0), scale);
 }
-void Transform::rotate(const glm::vec3 &axis, const float &degree)
+void Transform::Rotate(const glm::vec3 &axis, const float &degree)
 {
     rotationData.axis = axis;
     rotationData.degree = degree;

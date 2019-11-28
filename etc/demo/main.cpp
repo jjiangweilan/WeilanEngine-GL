@@ -18,12 +18,12 @@ public:
     Rotate(Entity *go) : Script(go)
     {
         auto transform = entity->GetComponent<Transform>();
-        transform->rotate({1, 0, 0}, 25);
+        transform->Rotate({1, 0, 0}, 25);
     };
     void update() override
     {
         auto transform = entity->GetComponent<Transform>();
-        transform->rotate({0, 1, 0}, 30 * Time::deltaTime);
+        transform->Rotate({0, 1, 0}, 30 * Time::deltaTime);
         transform->rotateAround({0, 1, 0}, 25 * Time::deltaTime);
 		float ratio = (glm::sin(glm::radians(Time::timeAfterGameStart) * 100) + 2) / 2;
         transform->SetScale(ratio);
@@ -42,27 +42,27 @@ public:
     void update() override
     {
         auto transform = entity->GetComponent<Transform>();
-        transform->rotate({0, 1, 0}, 30 * Time::deltaTime);
+        transform->Rotate({0, 1, 0}, 30 * Time::deltaTime);
     }
 };
 SCRIPT_DEFINATION(Script, Rotate2, 2);
 
 int main()
 {
-    engine = wlEngine::EngineManager::getwlEngine();
+    engine = wlEngine::EngineManager::GetwlEngine();
     {
-        Graphics::Shader::add("tess", "../Shader/Tess.vert", "../Shader/Tess.tesc", "../Shader/Tess.tese", "", "../Shader/Tess.frag", 0);
-        Graphics::Shader::add("green", "../Shader/green.vert", "../Shader/green.frag");
+        Graphics::Shader::Add("tess", "../Shader/Tess.vert", "../Shader/Tess.tesc", "../Shader/Tess.tese", "", "../Shader/Tess.frag", 0);
+        Graphics::Shader::Add("green", "../Shader/green.vert", "../Shader/green.frag");
 		auto shader = Graphics::Shader::get("green");
-        Graphics::Shader::add("sphere", "../Shader/Sphere/Sphere.vert", "../Shader/Sphere/Sphere.tesc", "../Shader/Sphere/Sphere.tese", "", "../Shader/Sphere/Sphere.frag", 4);
-        Graphics::Material::add("sphere", "sphere", std::vector<Graphics::Texture *>{Graphics::Texture::add("earth", "../resource/earth-cubemap.png")});
-        Graphics::Material::add("basicTree", "green");
-        Graphics::Material::add("water", "water");
+        Graphics::Shader::Add("sphere", "../Shader/Sphere/Sphere.vert", "../Shader/Sphere/Sphere.tesc", "../Shader/Sphere/Sphere.tese", "", "../Shader/Sphere/Sphere.frag", 4);
+        Graphics::Material::Add("sphere", "sphere", std::vector<Graphics::Texture *>{Graphics::Texture::add("earth", "../resource/earth-cubemap.png")});
+        Graphics::Material::Add("basicTree", "green");
+        Graphics::Material::Add("water", "water");
 
-        Graphics::Model::add("nanosuit", "../../nano/nanosuit.obj");
-        Graphics::Model::add("box", "../../box.fbx");
-        Graphics::Model::add("Wood_Steps_Stucco", "../resource/Modular Collection/Modular Village/Wood_Steps_Stucco.obj");
-        Graphics::Model::add("Bushes", "../resource/Modular Collection/Modular Terrain Hilly/Prop_Bush_2.obj");
+        Graphics::Model::Add("nanosuit", "../../nano/nanosuit.obj");
+        Graphics::Model::Add("box", "../../box.fbx");
+        Graphics::Model::Add("Wood_Steps_Stucco", "../resource/Modular Collection/Modular Village/Wood_Steps_Stucco.obj");
+        Graphics::Model::Add("Bushes", "../resource/Modular Collection/Modular Terrain Hilly/Prop_Bush_2.obj");
 
         //add Model manually
         std::vector<GLuint> indices{
@@ -105,8 +105,8 @@ int main()
                 {glm::vec3(-0.5, -0.5, -0.5), glm::vec3(0, 0, 0), glm::vec2(1, oneThird), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
                 {glm::vec3(-0.5, 0.5, -0.5), glm::vec3(0, 0, 0), glm::vec2(1, 2 * oneThird), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
             }};
-        Graphics::Mesh m(std::move(indices), std::move(vertices), Graphics::Material::get("sphere"));
-        Graphics::Model::add("Sphere", std::vector<Graphics::Mesh>{m});
+        Graphics::Mesh m(std::move(indices), std::move(vertices), Graphics::Material::Get("sphere"));
+        Graphics::Model::Add("Sphere", std::vector<Graphics::Mesh>{m});
 
         indices = {
             {0,1,2,3}
@@ -118,8 +118,8 @@ int main()
             {glm::vec3(-3.0, 0, -3.0), glm::vec3(0, 0, 0), glm::vec2(0,0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
             {glm::vec3(-3.0, 0, 3.0), glm::vec3(0, 0, 0), glm::vec2(0.0,3.0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
         };
-        Graphics::Mesh quadMesh(std::move(indices), std::move(vertices), Graphics::Material::get("water"), "water");
-        Graphics::Model::add("water", std::vector<Graphics::Mesh>{quadMesh});
+        Graphics::Mesh quadMesh(std::move(indices), std::move(vertices), Graphics::Material::Get("water"), "water");
+        Graphics::Model::Add("water", std::vector<Graphics::Mesh>{quadMesh});
     }
     wlEngine::Scene scene;
 
@@ -139,7 +139,7 @@ int main()
 
     std::vector<Graphics::Texture *> textures = {Graphics::Texture::add("building", "../resource/building.png")};
 
-    auto newMaterial = Graphics::Material::add("building",
+    auto newMaterial = Graphics::Material::Add("building",
                                                "Model",
                                                std::move(textures));
 
@@ -174,7 +174,7 @@ int main()
         parameters->SetParameter("t", (float)Time::timeAfterGameStart);
     };
     
-    engine->start();
+    engine->Start();
 }
 
 void initGameplaySystem()

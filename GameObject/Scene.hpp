@@ -19,7 +19,7 @@ namespace wlEngine {
             Entity* findGameObjectByName(const std::string& name);
             const std::set<Entity*>* getSceneGraph(){return &sceneGraph;};
 
-            Entity* CreateGameObject(const std::string& name, Entity* parent);
+            Entity* CreateGameObject(const std::string& name, Entity* parent = nullptr);
 			void addComponent(Entity*, const Json& json);
 
             /**

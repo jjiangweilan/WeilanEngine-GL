@@ -165,7 +165,7 @@ Shader::~Shader()
     glDeleteProgram(m_id);
 }
 
-Shader *Shader::add(const std::string &id,
+Shader *Shader::Add(const std::string &id,
                     const std::string &vertexPath,
                     const std::string &fragmentPath,
                     const std::function<void(Entity*)>& paramUpdateFunc)
@@ -186,7 +186,7 @@ Shader *Shader::get(const std::string &id)
     return &iter->second;
 }
 
-Shader *Shader::add(const std::string &id,
+Shader *Shader::Add(const std::string &id,
                     const std::string &vertexPath,
                     const std::string &tessCtrlPath,
                     const std::string &tessEvalPath,

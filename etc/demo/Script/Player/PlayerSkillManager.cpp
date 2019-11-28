@@ -14,7 +14,7 @@ namespace PlayerSkill {
 
     Entity* FireBall::castSpell(Entity* player) {
         glm::vec2 transform = glm::vec2(player->GetComponent<Transform>()->position);
-        auto fireball = EngineManager::getwlEngine()->getCurrentScene()->CreateGameObject("fireball", nullptr);
+        auto fireball = EngineManager::GetwlEngine()->getCurrentScene()->CreateGameObject("fireball", nullptr);
         fireball->AddComponent<Transform>(transform.x, transform.y, 0);
         auto sprite = fireball->AddComponent<Sprite>();
         auto animation = fireball->AddComponent<Animation>();
@@ -32,7 +32,7 @@ namespace PlayerSkill {
             body->entity->removeComponent<AiScript::Move>();
             auto animation = body->entity->GetComponent<Animation>();
             animation->playAnimation("explode", false);
-            body->entity->AddComponent<AiScript::Scheduler>([animation]() { return animation->hasEnded(); }, [animation]() { EngineManager::getwlEngine()->getCurrentScene()->destroyGameObject(animation->entity); });
+            body->entity->AddComponent<AiScript::Scheduler>([animation]() { return animation->hasEnded(); }, [animation]() { EngineManager::GetwlEngine()->getCurrentScene()->destroyGameObject(animation->entity); });
 
             other->entity->GetComponent<BasicEnemy>()->attackedBy(body->entity);
         };
@@ -48,7 +48,7 @@ namespace PlayerSkill {
         spellFailed = false;
         spellSucceed = false;
         currentSpellIndex = 0;
-        buttonEffect = EngineManager::getwlEngine()->getCurrentScene()->CreateGameObject("buttonEffect", nullptr);
+        buttonEffect = EngineManager::GetwlEngine()->getCurrentScene()->CreateGameObject("buttonEffect", nullptr);
         glm::vec2 playerTransform = glm::vec2(player->GetComponent<Transform>()->position);
         buttonEffect->AddComponent<Transform>()->setPosition({playerTransform.x, playerTransform.y + 50, 100});
         buttonEffect->AddComponent<Sprite>();
@@ -96,6 +96,6 @@ namespace PlayerSkill {
         if (spellSucceed) {
             currentSpellSkill->castSpell(player);
         }
-        EngineManager::getwlEngine()->getCurrentScene()->destroyGameObject(buttonEffect);
+        EngineManager::GetwlEngine()->getCurrentScene()->destroyGameObject(buttonEffect);
         buttonEffect = nullptr;
     }

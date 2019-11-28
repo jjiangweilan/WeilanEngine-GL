@@ -21,6 +21,7 @@ class Sprite;
 
 class Text;
 class Camera;
+class RenderNode;
 
 class VolumetricLight;
 namespace FramebuffersIndex
@@ -49,7 +50,7 @@ public:
   glm::vec2 getWindowSize() { return {windowWidth, windowHeight}; };
   glm::vec2 GetSceneSize() { return {sceneWidth, sceneHeight}; };
 
-  void SetOutputCamera(Camera* camera);
+  void SetOutputRenderNode(RenderNode* node);
 
 private:
 #if SETTINGS_ENGINEMODE
@@ -76,7 +77,6 @@ private:
   std::vector<GLuint> framebuffers;
   std::vector<GLuint> framebufferTextures;
   std::vector<GLuint> depthAndStencilTextures;
-  Graphics::Shader *sceneShader;
   GLuint sceneVAO;
   GLuint sceneVBO;
   GLuint sceneEBO;
@@ -92,15 +92,15 @@ private:
   void render(Text *);
   void render(VolumetricLight *);
 
-  void Render(Graphics::RenderNode*) ;
-  void RenderFromScene(Graphics::RenderNode*) ;
-  void RenderModel(Graphics::RenderNode*) ;
-  void RenderInputSources(Graphics::RenderNode*);
-  void RenderToFramebuffer(Graphics::RenderNode*, const Graphics::Mesh*);
+  void Render(RenderNode*) ;
+  void RenderFromScene(RenderNode*) ;
+  void RenderModel(RenderNode*) ;
+  void RenderInputSources(RenderNode*);
+  void RenderToFramebuffer(RenderNode*, const Graphics::Mesh*);
 
   SDL_GLContext glContext;
   SDL_Window *window;
-  Camera *m_mainCamera = nullptr;
+  RenderNode *m_outputNode = nullptr;
 
   glm::mat4 projection;
 
@@ -122,6 +122,5 @@ private:
 
   void genFramebuffer(GLuint &fb, GLuint &ft, GLuint &ds);
   void initSceneFrambufferData();
-  void combineTheFramebuffersToFramebuffer(const GLuint &framebufferTarget);
 };
 } // namespace wlEngine

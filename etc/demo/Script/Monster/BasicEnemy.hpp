@@ -31,7 +31,7 @@ private:
 
 	void attack() {
 		if (attackCD == 0) {
-			auto scene = EngineManager::getwlEngine()->getCurrentScene();
+			auto scene = EngineManager::GetwlEngine()->getCurrentScene();
 			auto goTransform = entity->GetComponent<Transform>();
 
 			auto arrow = scene->CreateGameObject(std::string("arrow"), nullptr);

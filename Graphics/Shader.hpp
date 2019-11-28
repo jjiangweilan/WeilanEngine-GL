@@ -147,11 +147,11 @@ private:
     /* Static ----*/
 public:
     static Shader *get(const std::string &id);
-    static Shader *add(const std::string &id,
+    static Shader *Add(const std::string &id,
                        const std::string &vertexPath,
                        const std::string &fragmentPath,
                        const std::function<void(Entity*)>& parameterUpdateFunc = nullptr);
-    static Shader *add(const std::string &name,
+    static Shader *Add(const std::string &name,
                        const std::string &vertexPath,
                        const std::string &tessCtrlPath,
                        const std::string &tessEvalPath,

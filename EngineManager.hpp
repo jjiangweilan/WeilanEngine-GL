@@ -9,7 +9,7 @@ namespace wlEngine {
     class System;
     class EngineManager {
         public:
-            static EngineManager* getwlEngine();
+            static EngineManager* GetwlEngine();
 
             void SetScene(Scene*);
 
@@ -22,7 +22,7 @@ namespace wlEngine {
 
             void addGameplaySystem(System*);
 
-            void start();
+            void Start();
             const unsigned long long& getFrameCount() const;
         private:
             void loop();

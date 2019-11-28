@@ -30,7 +30,7 @@ void PhysicsSystem::update()
     }*/
 
     // update cells
-    auto scene = EngineManager::getwlEngine()->getCurrentScene();
+    auto scene = EngineManager::GetwlEngine()->getCurrentScene();
     TRigidbody::dynamicSpaticalHash.clear();
     for (auto &body : TRigidbody::collection)
     {

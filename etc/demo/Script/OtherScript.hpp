@@ -55,7 +55,7 @@ struct SpriteRotate : public Script {
 	}
 
 	void update() override {
-		transform->rotate({ 0,1,0 }, 1);
+		transform->Rotate({ 0,1,0 }, 1);
 	}
 };
 SCRIPT_DEFINATION(Script, SpriteRotate, 1);

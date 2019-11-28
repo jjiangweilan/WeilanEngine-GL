@@ -56,7 +56,7 @@ void InputSystem::keyDown(const SDL_Event &event)
         if (Settings::engineMode == Settings::EngineMode::Gameplay)
         {
             Settings::engineMode = Settings::EngineMode::Editor;
-            auto currentScene = EngineManager::getwlEngine()->getCurrentScene();
+            auto currentScene = EngineManager::GetwlEngine()->getCurrentScene();
             currentScene->reloadScene();
         }
         else

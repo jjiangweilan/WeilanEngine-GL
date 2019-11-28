@@ -21,6 +21,7 @@
 #include "Component/Audio.hpp"
 #include "Component/VolumetricLight.hpp"
 #include "Component/RenderScript.hpp"
+#include "Component/RenderNode.hpp"
 
 #include "System/System.hpp"
 #include "System/RenderSystem.hpp"
@@ -35,7 +36,6 @@
 #include "Graphics/Material.hpp"
 #include "Graphics/Texture.hpp"
 #include "Graphics/ShaderParameter.hpp"
-#include "Graphics/RenderNode.hpp"
 #include "Graphics/GlobalShaderParameter.hpp"
 
 #include "Time.hpp"

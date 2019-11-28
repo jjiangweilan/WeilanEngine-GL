@@ -18,7 +18,7 @@ NpcSystem::NpcSystem() {}
 void NpcSystem::update()
 {
     // pick today's behavior
-    auto currentScene = EngineManager::getwlEngine()->getCurrentScene();
+    auto currentScene = EngineManager::GetwlEngine()->getCurrentScene();
     if (Time::dayTimeInSecond > Time::dayDuration)
     {
         Time::resetDayTime();

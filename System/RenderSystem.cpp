@@ -13,13 +13,13 @@
 #include "../Component/Camera2D.hpp"
 #include "../Component/Camera3D.hpp"
 #include "../Component/RenderScript.hpp"
+#include "../Component/RenderNode.hpp"
 
 #include "../Graphics/Mesh.hpp"
 #include "../Graphics/Material.hpp"
 #include "../Graphics/Mesh2D.hpp"
 #include "../Graphics/Model.hpp"
 #include "../Graphics/DebugDraw3D.hpp"
-#include "../Graphics/RenderNode.hpp"
 
 #include "../GameEditor/GameEditor.hpp"
 
@@ -39,12 +39,11 @@ RenderSystem::RenderSystem()
     ImGuiInit();
     initSceneFrambufferData();
 
-    sceneShader = Graphics::Shader::get("Scene");
     auto shaderPath = ROOT_DIR + "/Graphics/Material/Shader/";
-    Graphics::Shader::add("Text", ROOT_DIR + "/Graphics/Material/Shader/Text.vert", ROOT_DIR + "/Graphics/Material/Shader/Text.frag");
+    Graphics::Shader::Add("Text", ROOT_DIR + "/Graphics/Material/Shader/Text.vert", ROOT_DIR + "/Graphics/Material/Shader/Text.frag");
 
 #ifdef DEBUG
-    physicsDebugDrawShader = Graphics::Shader::add("PhysicsDebugDrawShader",
+    physicsDebugDrawShader = Graphics::Shader::Add("PhysicsDebugDrawShader",
                                                    ROOT_DIR + "/Graphics/Material/Shader/PhysicsDebugDraw.vert",
                                                    ROOT_DIR + "/Graphics/Material/Shader/PhysicsDebugDraw.frag");
     glGenVertexArrays(1, &physicsDebugVAO);
@@ -68,7 +67,7 @@ void RenderSystem::init() { renderSystem = new RenderSystem(); }
 
 void RenderSystem::render()
 {
-    auto renderNode = m_mainCamera->GetRenderNode();
+    auto renderNode = m_outputNode;
     auto attachment = renderNode->GetAttachment();
     Render(renderNode);
 
@@ -169,7 +168,7 @@ void RenderSystem::renderGameEditor(unsigned int& sceneTexId)
 /* Render *************/
 void RenderSystem::renderGame()
 {
-    auto currentScene = EngineManager::getwlEngine()->getCurrentScene();
+    auto currentScene = EngineManager::GetwlEngine()->getCurrentScene();
 
     for (auto c : Model::collection)
     {
@@ -358,30 +357,13 @@ void RenderSystem::initSceneFrambufferData()
     glBindVertexArray(0);
 }
 
-void RenderSystem::combineTheFramebuffersToFramebuffer(const GLuint &framebufferTarget)
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, framebufferTarget);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear scene frame buffer
-    glViewport(0, 0, sceneWidth, sceneHeight);
-    sceneShader->Use();
-    // draw the main scene
-    glBindVertexArray(sceneVAO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, framebufferTextures[FramebuffersIndex::Main]);
-    sceneShader->setInt("gameSceneSampler", 0);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, framebufferTextures[FramebuffersIndex::VolumetricLight]);
-    sceneShader->setInt("volumetricLightSampler", 1);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-}
-
 void RenderSystem::PostInit()
 {
-    m_engine = EngineManager::getwlEngine();
+    m_engine = EngineManager::GetwlEngine();
 }
 
 
-void RenderSystem::Render(Graphics::RenderNode* node) 
+void RenderSystem::Render(RenderNode* node) 
 {
     auto sources = node->GetSource();
     auto loopIn = node->GetLoopIn();
@@ -410,7 +392,7 @@ void RenderSystem::Render(Graphics::RenderNode* node)
         {
             //only has one frame buffer so we don't call RenderInputSources, because
             //the only source is the loopIn->source
-            auto renderScript = node->GetCamera()->entity->GetComponent<RenderScript>();
+            auto renderScript = node->entity->GetComponent<RenderScript>();
             if (renderScript)
                 renderScript->Update();
             RenderToFramebuffer(node, &loopIn->source.mesh);
@@ -425,10 +407,10 @@ void RenderSystem::Render(Graphics::RenderNode* node)
 
     RenderInputSources(node);
 }
-void RenderSystem::RenderInputSources(Graphics::RenderNode *node)
+void RenderSystem::RenderInputSources(RenderNode *node)
 {
     auto sources = node->GetSource();
-    auto renderScript = node->GetCamera()->entity->GetComponent<RenderScript>();
+    auto renderScript = node->entity->GetComponent<RenderScript>();
     if (renderScript)
         renderScript->Update();
     for (auto &inputSource : *sources)
@@ -437,7 +419,7 @@ void RenderSystem::RenderInputSources(Graphics::RenderNode *node)
         RenderToFramebuffer(node, &inputSource.mesh);
     }
 }
-void RenderSystem::RenderToFramebuffer(Graphics::RenderNode* node, const Graphics::Mesh *mesh)
+void RenderSystem::RenderToFramebuffer(RenderNode* node, const Graphics::Mesh *mesh)
 {
     auto attachment = node->GetAttachment();
     mesh->GetMaterial()->UseMaterial();
@@ -449,10 +431,10 @@ void RenderSystem::RenderToFramebuffer(Graphics::RenderNode* node, const Graphic
     glBindVertexArray(mesh->GetVAO());
     glDrawElements(GL_TRIANGLES, mesh->GetIndices()->size(), GL_UNSIGNED_INT, nullptr);
 }
-void RenderSystem::RenderFromScene(Graphics::RenderNode *node)
+void RenderSystem::RenderFromScene(RenderNode *node)
 {
     auto attachment = node->GetAttachment();
-    auto renderScript = node->GetCamera()->entity->GetComponent<RenderScript>();
+    auto renderScript = node->entity->GetComponent<RenderScript>();
     if (renderScript)
         renderScript->Update();
 
@@ -463,9 +445,9 @@ void RenderSystem::RenderFromScene(Graphics::RenderNode *node)
     glViewport(0, 0, sceneSize.x, sceneSize.y);
     RenderModel(node);
 }
-void RenderSystem::RenderModel(Graphics::RenderNode *node)
+void RenderSystem::RenderModel(RenderNode *node)
 {
-    auto currentScene = wlEngine::EngineManager::getwlEngine()->getCurrentScene();
+    auto currentScene = wlEngine::EngineManager::GetwlEngine()->getCurrentScene();
     for (auto model : wlEngine::Model::collection)
     {
         if (!model->entity->IsEnable() || model->entity->GetScene() != currentScene)
@@ -644,9 +626,9 @@ void RenderSystem::debugRender()
         }
     }
 }
-void RenderSystem::SetOutputCamera(Camera *camera)
+void RenderSystem::SetOutputRenderNode(RenderNode *node)
 {
-    m_mainCamera = camera;
+    m_outputNode = node;
 }
 #endif
 } // namespace wlEngine

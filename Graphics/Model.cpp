@@ -87,7 +87,7 @@ void Model::processNode(aiNode *node, const aiScene *scene)
 		if (pos == matName.npos) pos = matName.size();
 		matName = matName.substr(0, pos);
 
-		auto mat = Material::add(m_id + "-" + matName , "Model", textures);
+		auto mat = Material::Add(m_id + "-" + matName , "Model", textures);
 
         m_meshes.emplace_back(mesh, mat, std::to_string(mesh->mMaterialIndex));
     }

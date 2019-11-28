@@ -15,7 +15,7 @@ AnimationSystem::AnimationSystem()
 
 void AnimationSystem::update()
 {
-    auto currentScene = EngineManager::getwlEngine()->getCurrentScene();
+    auto currentScene = EngineManager::GetwlEngine()->getCurrentScene();
     for (auto &c : Animation::collection)
     {
         if (!c->entity->IsEnable() || c->entity->GetScene() != currentScene)

@@ -42,7 +42,7 @@ public:
     void setToPreviousPosition();
     glm::vec3 getLocalPosition();
 
-    void rotate(const glm::vec3 &axis, const float &radius);
+    void Rotate(const glm::vec3 &axis, const float &radius);
     void setRotation(const glm::mat4 &ro);
     void setScale(const float &x, const float &y, const float &z);
     void SetScale(const float &ratio);

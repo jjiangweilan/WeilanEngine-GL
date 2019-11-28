@@ -71,9 +71,9 @@ protected:
     Shader *m_shader;
     /* Static ----*/
 public:
-    static Material *get(const std::string &id);
+    static Material *Get(const std::string &id);
     template <typename... Args>
-    static Material *add(const std::string &id, Args &&... args);
+    static Material *Add(const std::string &id, Args &&... args);
     static void remove(const std::string &id);
 
 private:
@@ -81,7 +81,7 @@ private:
 };
 
 template <typename... Args>
-Material *Material::add(const std::string &id, Args &&... args)
+Material *Material::Add(const std::string &id, Args &&... args)
 {
     auto has = collection.find(id);
     if (has != collection.end())

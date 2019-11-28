@@ -1,6 +1,5 @@
 #pragma once
 #include "Component.hpp"
-#include "Graphics/RenderNode.hpp"
 #include <glm/matrix.hpp>
 namespace wlEngine
 {
@@ -21,12 +20,9 @@ public:
     void SetLayerMask(const int32_t& mask);
     const int32_t& GetLayerMask() const;
 
-    Graphics::RenderNode* GetRenderNode();
-
     const int32_t& GetLayerMask();
 protected:
     int32_t m_layerMask;
-    Graphics::RenderNode m_renderNode;
     glm::mat4 m_projMatrix;
 };
 } // namespace wlEngine

@@ -1,24 +1,12 @@
 #include "RenderNode.hpp"
-#include "Shader.hpp"
-#include "Mesh.hpp"
-#include "Material.hpp"
-#include "DebugDraw3D.hpp"
-#include "GlobalShaderParameter.hpp"
-
-#include "../Component/Model.hpp"
-#include "../Component/Camera.hpp"
-#include "../Component/Transform.hpp"
-#include "../Component/RenderScript.hpp"
-
+#include "../Graphics/Material.hpp"
 #include "../System/RenderSystem.hpp"
-#include "../EngineManager.hpp"
 
 namespace wlEngine
 {
-namespace Graphics
-{
+COMPONENT_DEFINATION_NEW(Component, RenderNode)
 
-RenderNode::InputSource::InputSource(RenderNode *node, const Mesh &mesh) : node(node), mesh(mesh) {}
+RenderNode::InputSource::InputSource(RenderNode *node, const Graphics::Mesh &mesh) : node(node), mesh(mesh) {}
 RenderNode::FramebufferAttachment::FramebufferAttachment() : colors(), depth(), stencil() {}
 RenderNode::FramebufferAttachment::~FramebufferAttachment()
 {
@@ -33,7 +21,7 @@ std::vector<GLenum> RenderNode::FramebufferAttachment::GetColorAttachmentArray()
     return rlt;
 }
 
-RenderNode::RenderNode(Camera *camera) : m_camera(camera), m_attachment(), m_framebuffer(0), loopIn(nullptr), loopOut(nullptr)
+RenderNode::RenderNode(Entity* entity) : Component(entity), m_attachment(), m_framebuffer(0), loopIn(nullptr), loopOut(nullptr)
 {
 }
 
@@ -42,12 +30,12 @@ RenderNode::~RenderNode()
     glDeleteFramebuffers(1, &m_framebuffer);
 }
 
-void RenderNode::AddInputSource(RenderNode *node, const Mesh &mesh)
+void RenderNode::AddInputSource(RenderNode *node, const Graphics::Mesh &mesh)
 {
     m_sources.emplace_back(node, mesh);
     ConfigureInputSourcesParameter(node, mesh);
 }
-void RenderNode::ConfigureInputSourcesParameter(RenderNode *node, const Mesh &mesh)
+void RenderNode::ConfigureInputSourcesParameter(RenderNode *node, const Graphics::Mesh &mesh)
 {
 
     const std::string renderNodeColor_str = "renderNodeColor";
@@ -59,16 +47,16 @@ void RenderNode::ConfigureInputSourcesParameter(RenderNode *node, const Mesh &me
     auto param = material->GetParameters();
     for (int i = 0; i < node->m_attachment.colors.size(); i++)
     {
-        param->SetParameter(renderNodeColor_str + std::to_string(i), TextureUnitBinding(2 + i, &(node->m_attachment.colors[i])));
+        param->SetParameter(renderNodeColor_str + std::to_string(i), Graphics::TextureUnitBinding(2 + i, &(node->m_attachment.colors[i])));
     }
 
     if (node->m_attachment.depth.GetId() != 0)
     {
-        param->SetParameter(renderNodeDepth_str, TextureUnitBinding(0, &node->m_attachment.depth));
+        param->SetParameter(renderNodeDepth_str, Graphics::TextureUnitBinding(0, &node->m_attachment.depth));
     }
     if (node->m_attachment.stencil.GetId() != 0)
     {
-        param->SetParameter(renderNodeDepth_str, TextureUnitBinding(1, &node->m_attachment.stencil));
+        param->SetParameter(renderNodeDepth_str, Graphics::TextureUnitBinding(1, &node->m_attachment.stencil));
     }
 }
 
@@ -80,19 +68,20 @@ void RenderNode::SetRenderLoop(RenderNode *start, const Graphics::Mesh &drawMesh
 }
 void RenderNode::GenFramebuffer()
 {
+    if (m_framebuffer != 0)glDeleteFramebuffers(1, &m_framebuffer);
     glGenFramebuffers(1, &m_framebuffer);
 }
 
 void RenderNode::AttachTexture2D(const AttachmentType &attachmentType,
-                                 const Texture::InternalFormat &internalFormat,
-                                 const Texture::DataFormat &format,
-                                 const Texture::DataType &type,
+                                 const Graphics::Texture::InternalFormat &internalFormat,
+                                 const Graphics::Texture::DataFormat &format,
+                                 const Graphics::Texture::DataType &type,
                                  const unsigned int &width,
                                  const unsigned int &height)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
 
-    Texture texture(width, height, internalFormat, format, type);
+    Graphics::Texture texture(width, height, internalFormat, format, type);
 
     if (attachmentType == AttachmentType::Color)
     {
@@ -133,10 +122,7 @@ void RenderNode::Use() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
 }
-const Camera *RenderNode::GetCamera() const
-{
-    return m_camera;
-}
+
 const GLuint &RenderNode::GetFramebuffer() const
 {
     return m_framebuffer;
@@ -152,18 +138,16 @@ const std::vector<RenderNode::InputSource> *RenderNode::GetSource() const
 
 void RenderNode::UsePredefinedAttachments(const PredefinedAttachments &choice)
 {
-    glDeleteFramebuffers(1, &m_framebuffer);
-    GenFramebuffer();
     switch (choice)
     {
     case PredefinedAttachments::HDR:
-        AttachTexture2D(Graphics::RenderNode::AttachmentType::Color,
+        AttachTexture2D(RenderNode::AttachmentType::Color,
                         Graphics::Texture::InternalFormat::RGBA16F,
                         Graphics::Texture::DataFormat::RGBA,
                         Graphics::Texture::DataType::HalfFloat,
                         wlEngine::RenderSystem::Get()->GetSceneSize().x,
                         wlEngine::RenderSystem::Get()->GetSceneSize().y);
-        AttachTexture2D(Graphics::RenderNode::AttachmentType::Depth,
+        AttachTexture2D(RenderNode::AttachmentType::Depth,
                         Graphics::Texture::InternalFormat::DepthComponent,
                         Graphics::Texture::DataFormat::Depth,
                         Graphics::Texture::DataType::UnsignedInt,
@@ -171,13 +155,13 @@ void RenderNode::UsePredefinedAttachments(const PredefinedAttachments &choice)
                         wlEngine::RenderSystem::Get()->GetSceneSize().y);
         break;
     case PredefinedAttachments::Standard:
-        AttachTexture2D(Graphics::RenderNode::AttachmentType::Color,
+        AttachTexture2D(RenderNode::AttachmentType::Color,
                         Graphics::Texture::InternalFormat::RGBA8,
                         Graphics::Texture::DataFormat::RGBA,
                         Graphics::Texture::DataType::HalfFloat,
                         wlEngine::RenderSystem::Get()->GetSceneSize().x,
                         wlEngine::RenderSystem::Get()->GetSceneSize().y);
-        AttachTexture2D(Graphics::RenderNode::AttachmentType::Depth,
+        AttachTexture2D(RenderNode::AttachmentType::Depth,
                         Graphics::Texture::InternalFormat::DepthComponent,
                         Graphics::Texture::DataFormat::Depth,
                         Graphics::Texture::DataType::UnsignedInt,
@@ -194,5 +178,4 @@ RenderNode::RenderLoopOut *RenderNode::GetLoopOut() const
 {
     return loopOut.get();
 }
-} // namespace Graphics
-} // namespace wlEngine
+}

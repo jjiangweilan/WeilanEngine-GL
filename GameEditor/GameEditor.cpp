@@ -39,7 +39,7 @@ GameEditor::~GameEditor()
 
 void GameEditor::render(void **data)
 {
-    scene = EngineManager::getwlEngine()->getCurrentScene();
+    scene = EngineManager::GetwlEngine()->getCurrentScene();
     ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
     if (Input::getKeyStatus(SDL_SCANCODE_ESCAPE))
@@ -112,7 +112,7 @@ void GameEditor::pickObject()
         mousePressingOnScene(relX, relY);
         relX = relX - x;
         relY = relY - y;
-        auto camera = EngineManager::getwlEngine()->getCurrentScene()->getCamera()->GetComponent<Camera3D>();
+        auto camera = EngineManager::GetwlEngine()->getCurrentScene()->getCamera()->GetComponent<Camera3D>();
         auto front = camera->front;
         auto right = camera->right;
 
@@ -397,9 +397,20 @@ void GameEditor::showModelInfo(Entity *entity)
 			switch (type)
 			{
 			case Graphics::ParameterType::Float:
+			{
 				float* val = static_cast<float*>(param.second->Get());
 				ImGui::InputFloat(param.first.data(), val, 0.05, 0.1, 3);
 				break;
+			}
+            case Graphics::ParameterType::Vec3:
+			{
+				glm::vec3* val = static_cast<glm::vec3*>(param.second->Get());
+                if (param.first.find("color") != param.first.npos)
+                    ImGui::ColorPicker3(param.first.data(), &(*val)[0]);
+                else
+                    ImGui::SliderFloat3(param.first.data(), &(*val)[0], 0, 1);
+                break;
+			}
 			}
         }
     }
@@ -719,7 +730,7 @@ void GameEditor::showMenu()
                 ImGui::MenuItem("Switch To 3D");
                 if (ImGui::IsItemClicked())
                 {
-                    auto cameraEntity = EngineManager::getwlEngine()->getCurrentScene()->getCamera();
+                    auto cameraEntity = EngineManager::GetwlEngine()->getCurrentScene()->getCamera();
                     Json &j = scene->sceneData.getData(cameraEntity);
                     auto &cameraComponentJson = *Utility::findComponentWithName(j, "Camera2D");
                     //cameraComponentJson["name"] = "Camera3D";
@@ -803,7 +814,7 @@ void GameEditor::showTransformInfo(Entity *go)
     edit1 = ImGui::InputFloat3("rotate axis", axis, 0);
     if (edit0 || edit1)
     {
-        transform->rotate(glm::vec3{axis[0], axis[1], axis[2]}, rotate);
+        transform->Rotate(glm::vec3{axis[0], axis[1], axis[2]}, rotate);
     }
 }
 void GameEditor::showResourceWindow()
@@ -1225,7 +1236,7 @@ void GameEditor::createMaterial()
         {
             textures[i] = Graphics::Texture::add(files[i], files[i], static_cast<Graphics::TextureType>(textureType[i]));
         }
-        auto mat = Graphics::Material::add(buf, selectedShader, std::move(textures));
+        auto mat = Graphics::Material::Add(buf, selectedShader, std::move(textures));
 
         //clean up
         files.clear();

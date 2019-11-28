@@ -12,7 +12,7 @@ LuaScriptSystem::LuaScriptSystem()
 
 void LuaScriptSystem::update()
 {
-    auto currentScene = EngineManager::getwlEngine()->getCurrentScene();
+    auto currentScene = EngineManager::GetwlEngine()->getCurrentScene();
     for (auto &luaScript : LuaScript::collection)
     {
         if (luaScript->entity->IsEnable() || luaScript->entity->GetScene() != currentScene)

@@ -42,6 +42,14 @@ public:
         RGBA16F = GL_RGBA16F,
         RGB16F = GL_RGB16F,
         DepthComponent = GL_DEPTH_COMPONENT,
+        DepthComponent16 = GL_DEPTH_COMPONENT16,
+        DepthComponent24 = GL_DEPTH_COMPONENT24,
+        DepthComponent32 = GL_DEPTH_COMPONENT32,
+        StencilIndex = GL_STENCIL_INDEX,
+        StencilIndex1 = GL_STENCIL_INDEX1,
+        StencilIndex4 = GL_STENCIL_INDEX4,
+        StencilIndex8 = GL_STENCIL_INDEX8,
+        StencilIndex16 = GL_STENCIL_INDEX16,
         DepthStencilInternal = GL_DEPTH_STENCIL
     };
     enum DataFormat

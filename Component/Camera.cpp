@@ -3,7 +3,7 @@
 namespace wlEngine
 {
 COMPONENT_DEFINATION(Component, Camera, 2);
-Camera::Camera(Entity *entity) : Component(entity), m_renderNode(this)
+Camera::Camera(Entity *entity) : Component(entity)
 {
 };
 
@@ -19,10 +19,6 @@ void Camera::SetProjectionMatrix(const float &left, const float &right,
     assert(0 && "You are probaly settings a 3D camera");
 }
 
-Graphics::RenderNode* Camera::GetRenderNode()
-{
-    return &m_renderNode;
-}
 
 void Camera::SetLayerMask(const int32_t& mask)
 {
