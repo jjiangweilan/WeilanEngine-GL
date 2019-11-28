@@ -14,6 +14,7 @@ namespace wlEngine
 namespace Graphics {
 		class Shader;
     class RenderNode;
+    class Mesh;
 }
 class Model;
 class Sprite;
@@ -33,7 +34,7 @@ enum Index
 class RenderSystem : public System
 {
 public:
-  static RenderSystem *get();
+  static RenderSystem *Get();
   static void init();
   ~RenderSystem();
 
@@ -46,7 +47,7 @@ public:
   SDL_GLContext *getSDL_GLContext() { return &glContext; };
   SDL_Window *getSDL_Window() { return window; };
   glm::vec2 getWindowSize() { return {windowWidth, windowHeight}; };
-  glm::vec2 getSceneSize() { return {sceneWidth, sceneHeight}; };
+  glm::vec2 GetSceneSize() { return {sceneWidth, sceneHeight}; };
 
   void SetOutputCamera(Camera* camera);
 
@@ -94,6 +95,8 @@ private:
   void Render(Graphics::RenderNode*) ;
   void RenderFromScene(Graphics::RenderNode*) ;
   void RenderModel(Graphics::RenderNode*) ;
+  void RenderInputSources(Graphics::RenderNode*);
+  void RenderToFramebuffer(Graphics::RenderNode*, const Graphics::Mesh*);
 
   SDL_GLContext glContext;
   SDL_Window *window;

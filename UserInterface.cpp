@@ -14,12 +14,12 @@ namespace wlEngine
 Entity *UserInterface::showDialog(NpcController *npcController)
 {
     auto engineManager = EngineManager::getwlEngine();
-    auto renderSystem = RenderSystem::get();
+    auto renderSystem = RenderSystem::Get();
     auto scene = engineManager->getCurrentScene();
     auto dialog = scene->CreateGameObject("Dialog", scene->getCamera());
 
     auto tranform = dialog->AddComponent<Transform>();
-    auto sceneSize = renderSystem->getSceneSize();
+    auto sceneSize = renderSystem->GetSceneSize();
     tranform->setLocalPosition({sceneSize.x / 2.0, 100, 10000});
     auto background = dialog->AddComponent<Sprite>("../resource/tasta/dialog-background.png");
 

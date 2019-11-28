@@ -46,7 +46,7 @@ void Camera3D::SetProjectionMatrix(const float &fovy, const float &aspect,
 
 void Camera3D::update()
 {
-    auto sceneSize = RenderSystem::get()->getSceneSize();
+    auto sceneSize = RenderSystem::Get()->GetSceneSize();
 
     updateEyeDirection();
     updatePosition();

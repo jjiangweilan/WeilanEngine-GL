@@ -12,7 +12,7 @@ namespace wlEngine {
             Scene();
             ~Scene();
             void update();
-            void setCamera(Entity* camera);
+            void SetMainCamera(Entity* camera);
 			void loadScene(const std::string& path);
             void reloadScene();
             Entity* getCamera() {return camera;};

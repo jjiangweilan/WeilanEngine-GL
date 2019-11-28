@@ -11,7 +11,7 @@ namespace wlEngine {
         public:
             static EngineManager* getwlEngine();
 
-            void setScene(Scene*);
+            void SetScene(Scene*);
 
             
             

@@ -21,7 +21,7 @@ Scene::Scene() : sceneGraph(), gameObjectAllocator() {}
 
 Scene::~Scene() { clearScene(); }
 
-void Scene::setCamera(Entity *newCamera) { this->camera = newCamera; }
+void Scene::SetMainCamera(Entity *newCamera) { this->camera = newCamera; }
 
 void Scene::reloadScene() {
     Json gameObjects_json = sceneData.data["gameObjects"];
@@ -112,7 +112,7 @@ void Scene::addComponent(Entity *go, const Json &components) {
 
 		if (iter["name"] == "Camera2D" || iter["name"] == "Camera3D") 
 		{
-			setCamera(go);
+			SetMainCamera(go);
 		}
     }
 }

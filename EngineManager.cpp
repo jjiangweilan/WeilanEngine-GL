@@ -73,7 +73,7 @@ EngineManager *EngineManager::getwlEngine() {
     return engine;
 }
 
-void EngineManager::setScene(Scene *scene) { currentScene = scene; }
+void EngineManager::SetScene(Scene *scene) { currentScene = scene; }
 
 void EngineManager::loop() {
 #if SETTINGS_ENGINEMODE
@@ -86,8 +86,7 @@ void EngineManager::loop() {
             AnimationSystem::get()->update();
             currentScene->update();
             InputSystem::get()->update();
-            if (currentScene->camera)
-                RenderSystem::get()->update();
+            RenderSystem::Get()->update();
             Time::update();
         }
 
@@ -122,7 +121,7 @@ void EngineManager::systemUpdate() {
     }
 
     AudioSystem::get()->update();
-    RenderSystem::get()->update();
+    RenderSystem::Get()->update();
 }
 
 void EngineManager::initializeSystems() {

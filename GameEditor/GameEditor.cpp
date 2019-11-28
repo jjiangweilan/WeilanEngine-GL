@@ -88,18 +88,19 @@ void GameEditor::pickObject()
         glm::vec3 origin;
         glm::vec3 end;
         Utility::getRayFromScreenToWorld(x, y, origin, end);
-        float min = FLT_MAX;
+        float minDis = FLT_MAX;
         for (auto model : Model::collection)
         {
             auto gModel = model->getModel();
+            auto modelMatrix = model->entity->GetComponent<Transform>()->getModel();
             auto aabb = gModel->getAABB();
             float distance;
             bool interact = Utility::TestRayOBBIntersection(origin, end - origin,
                                                             aabb.min, aabb.max,
-                                                            model->entity->GetComponent<Transform>()->getModel(),
+                                                            modelMatrix,
                                                             distance);
-            if (interact && distance < min) {
-                min = distance;
+            if (interact && distance < minDis) {
+                minDis = distance;
                 setSelectedGameObject(model->entity);
             }
         }
@@ -994,14 +995,14 @@ bool GameEditor::mousePressingOnScene(int &x, int &y, bool world, int mouse)
 {
     if (!scene)
         return false;
-    auto sceneSize = RenderSystem::get()->getSceneSize();
+    auto sceneSize = RenderSystem::Get()->GetSceneSize();
 
     auto mousePos = ImGui::GetMousePos();
     auto cameraPos = scene->getCamera()->GetComponent<Transform>()->position;
     bool onWindow = false;
     if (ImGui::IsMouseDown(mouse))
     { // 0 left, 1 right, 2 mid
-        int sceneHeight = RenderSystem::get()->getSceneSize().y;
+        int sceneHeight = RenderSystem::Get()->GetSceneSize().y;
 
         x = mousePos.x - gameplayWindowOffsetX;
         y = sceneHeight + gameplayWindowOffsetY - mousePos.y;
@@ -1014,7 +1015,7 @@ bool GameEditor::mousePressingOnScene(int &x, int &y, bool world, int mouse)
         }
         return onWindow;
     }
-    int sceneHeight = RenderSystem::get()->getSceneSize().y;
+    int sceneHeight = RenderSystem::Get()->GetSceneSize().y;
     x = mousePos.x - gameplayWindowOffsetX;
     y = sceneHeight + gameplayWindowOffsetY - mousePos.y; // 20 is the menu height
     if (world)

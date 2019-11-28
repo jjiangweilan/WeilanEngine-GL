@@ -26,7 +26,7 @@ public:
         transform->rotate({0, 1, 0}, 30 * Time::deltaTime);
         transform->rotateAround({0, 1, 0}, 25 * Time::deltaTime);
 		float ratio = (glm::sin(glm::radians(Time::timeAfterGameStart) * 100) + 2) / 2;
-        transform->setScale(ratio);
+        transform->SetScale(ratio);
     }
 };
 SCRIPT_DEFINATION(Script, Rotate, 2);
@@ -123,13 +123,13 @@ int main()
     }
     wlEngine::Scene scene;
 
-    engine->setScene(&scene);
+    engine->SetScene(&scene);
     auto camera = scene.CreateGameObject("Camera", nullptr);
     camera->AddComponent<Transform>(0, 3, 12);
 
     camera->AddComponent<Camera3D>();
     
-    scene.setCamera(camera);
+    scene.SetMainCamera(camera);
 
 //    auto test1 = scene.createGameObject("Test", nullptr);
 //    test1->addComponent<Transform>(0, 0, 0);

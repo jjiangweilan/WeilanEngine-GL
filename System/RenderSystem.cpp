@@ -62,7 +62,7 @@ RenderSystem::~RenderSystem()
     ImGui::DestroyContext();
 }
 
-RenderSystem *RenderSystem::get() { return renderSystem; }
+RenderSystem *RenderSystem::Get() { return renderSystem; }
 
 void RenderSystem::init() { renderSystem = new RenderSystem(); }
 
@@ -384,26 +384,70 @@ void RenderSystem::PostInit()
 void RenderSystem::Render(Graphics::RenderNode* node) 
 {
     auto sources = node->GetSource();
-    auto attachment = node->GetAttachment();
+    auto loopIn = node->GetLoopIn();
+    auto loopOut = node->GetLoopOut();
+
+    //This is a looped render path
+    if (loopOut)
+    {
+        size_t count = loopOut->count;
+        while(count--)
+        {
+            RenderInputSources(node);
+        }
+        loopOut->in->GetLoopIn()->firstTime = true;
+        return;
+    }
+
+    if (loopIn)
+    {
+        if (loopIn->firstTime){
+            loopIn->firstTime = false;
+            if (sources->size() == 0) return RenderFromScene(node);
+            RenderInputSources(node);
+        }
+        else
+        {
+            //only has one frame buffer so we don't call RenderInputSources, because
+            //the only source is the loopIn->source
+            auto renderScript = node->GetCamera()->entity->GetComponent<RenderScript>();
+            if (renderScript)
+                renderScript->Update();
+            RenderToFramebuffer(node, &loopIn->source.mesh);
+        }
+        return;
+    }
+    
+
+    //no loop
     if (sources->size() == 0)
         return RenderFromScene(node);
 
+    RenderInputSources(node);
+}
+void RenderSystem::RenderInputSources(Graphics::RenderNode *node)
+{
+    auto sources = node->GetSource();
+    auto renderScript = node->GetCamera()->entity->GetComponent<RenderScript>();
+    if (renderScript)
+        renderScript->Update();
     for (auto &inputSource : *sources)
     {
         Render(inputSource.node);
-        auto renderScript = node->GetCamera()->entity->GetComponent<RenderScript>();
-        if (renderScript)
-            renderScript->Update();
-        //draw the output texture
-        inputSource.mesh.GetMaterial()->UseMaterial();
-        glBindFramebuffer(GL_FRAMEBUFFER, node->GetFramebuffer());
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear framebuffer
-        auto sceneSize = wlEngine::RenderSystem::get()->getSceneSize();
-        glViewport(0, 0, sceneSize.x, sceneSize.y);
-        glDrawBuffers(attachment->colors.size(), attachment->GetColorAttachmentArray().data());
-        glBindVertexArray(inputSource.mesh.GetVAO());
-        glDrawElements(GL_TRIANGLES, inputSource.mesh.GetIndices()->size(), GL_UNSIGNED_INT, nullptr);
+        RenderToFramebuffer(node, &inputSource.mesh);
     }
+}
+void RenderSystem::RenderToFramebuffer(Graphics::RenderNode* node, const Graphics::Mesh *mesh)
+{
+    auto attachment = node->GetAttachment();
+    mesh->GetMaterial()->UseMaterial();
+    glBindFramebuffer(GL_FRAMEBUFFER, node->GetFramebuffer());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear framebuffer
+    auto sceneSize = wlEngine::RenderSystem::Get()->GetSceneSize();
+    glViewport(0, 0, sceneSize.x, sceneSize.y);
+    glDrawBuffers(attachment->colors.size(), attachment->GetColorAttachmentArray().data());
+    glBindVertexArray(mesh->GetVAO());
+    glDrawElements(GL_TRIANGLES, mesh->GetIndices()->size(), GL_UNSIGNED_INT, nullptr);
 }
 void RenderSystem::RenderFromScene(Graphics::RenderNode *node)
 {
@@ -415,7 +459,7 @@ void RenderSystem::RenderFromScene(Graphics::RenderNode *node)
     glBindFramebuffer(GL_FRAMEBUFFER, node->GetFramebuffer());
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDrawBuffers(attachment->colors.size(), attachment->GetColorAttachmentArray().data());
-    auto sceneSize = wlEngine::RenderSystem::get()->getSceneSize();
+    auto sceneSize = wlEngine::RenderSystem::Get()->GetSceneSize();
     glViewport(0, 0, sceneSize.x, sceneSize.y);
     RenderModel(node);
 }
@@ -471,138 +515,138 @@ void RenderSystem::RenderModel(Graphics::RenderNode *node)
 #ifdef DEBUG
 void RenderSystem::debugRender()
 {
-	for (auto& rb : TRigidbody::collection)
-	{
-		if (!rb->entity->IsEnable())
-			continue;
-		auto shape = rb->shape->getShapeType();
-		if (shape == ShapeType::Polygon || shape == ShapeType::Line)
-		{
-			std::vector<glm::vec2> vertices;
-			if (shape == ShapeType::Polygon)
-				vertices = static_cast<PolygonShape*>(rb->shape)->getPoints();
-			else
-				vertices = static_cast<LineShape*>(rb->shape)->getPoints();
-			std::vector<float> glVertices(vertices.size() * 2);
-			physicsDebugDrawShader->Use();
-			auto pos = rb->entity->GetComponent<Transform>()->position;
-			for (int i = 0; i < vertices.size(); i++)
-			{
-				glVertices[2 * i] = vertices[i].x + pos.x;
-				glVertices[2 * i + 1] = vertices[i].y + pos.y;
-			}
+    for (auto &rb : TRigidbody::collection)
+    {
+        if (!rb->entity->IsEnable())
+            continue;
+        auto shape = rb->shape->getShapeType();
+        if (shape == ShapeType::Polygon || shape == ShapeType::Line)
+        {
+            std::vector<glm::vec2> vertices;
+            if (shape == ShapeType::Polygon)
+                vertices = static_cast<PolygonShape *>(rb->shape)->getPoints();
+            else
+                vertices = static_cast<LineShape *>(rb->shape)->getPoints();
+            std::vector<float> glVertices(vertices.size() * 2);
+            physicsDebugDrawShader->Use();
+            auto pos = rb->entity->GetComponent<Transform>()->position;
+            for (int i = 0; i < vertices.size(); i++)
+            {
+                glVertices[2 * i] = vertices[i].x + pos.x;
+                glVertices[2 * i + 1] = vertices[i].y + pos.y;
+            }
 
-			glBindVertexArray(physicsDebugVAO);
-			glBindBuffer(GL_ARRAY_BUFFER, physicsDebugVBO);
-			glBufferData(GL_ARRAY_BUFFER, glVertices.size() * sizeof(float), glVertices.data(), GL_STATIC_DRAW);
-			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-			glEnableVertexAttribArray(0);
+            glBindVertexArray(physicsDebugVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, physicsDebugVBO);
+            glBufferData(GL_ARRAY_BUFFER, glVertices.size() * sizeof(float), glVertices.data(), GL_STATIC_DRAW);
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+            glEnableVertexAttribArray(0);
 
-			glm::mat4 proj = glm::mat4(1.0f);
-
-#if SETTINGS_GAME_DIMENSION
-			proj = glm::perspective(glm::radians(45.0f), (float)windowWidth / windowHeight, 0.1f, 100000.0f);
-
-#else
-			proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
-#endif
-			physicsDebugDrawShader->setMat4("view", m_viewMatrix);
-			physicsDebugDrawShader->setMat4("projection", m_projMatrix);
-			glm::vec3 color;
-			if (rb->type == BodyType::Dynamic)
-				color = { 1, 0, 0 };
-			else
-				color = { 0, 1, 0 };
-			physicsDebugDrawShader->setVec3("color", glm::vec3(color.r, color.g, color.b));
-			if (shape == ShapeType::Polygon)
-				glDrawArrays(GL_LINE_LOOP, 0, vertices.size());
-			else
-				glDrawArrays(GL_LINE_STRIP, 0, vertices.size());
-		}
-		else if (shape == ShapeType::Circle)
-		{
-			auto circle = static_cast<CircleShape*>(rb->shape);
-			float centerX = circle->center.x;
-			float centerY = circle->center.y;
-			float radius = circle->radius; // 1.41421356237 ~ square root of 2
-			std::vector<glm::vec2> vertices = { {centerX + radius, centerY + radius}, {centerX + radius, centerY - radius}, {centerX - radius, centerY - radius}, {centerX - radius, centerY + radius} };
-
-			std::vector<float> glVertices(vertices.size() * 2);
-			physicsDebugDrawShader->Use();
-			auto pos = rb->entity->GetComponent<Transform>()->position;
-			for (int i = 0; i < vertices.size(); i++)
-			{
-				glVertices[2 * i] = vertices[i].x + pos.x;
-				glVertices[2 * i + 1] = vertices[i].y + pos.y;
-			}
-
-			glBindVertexArray(physicsDebugVAO);
-			glBindBuffer(GL_ARRAY_BUFFER, physicsDebugVBO);
-			glBufferData(GL_ARRAY_BUFFER, glVertices.size() * sizeof(float), glVertices.data(), GL_STATIC_DRAW);
-			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-			glEnableVertexAttribArray(0);
-
-			glm::mat4 proj = glm::mat4(1.0f);
+            glm::mat4 proj = glm::mat4(1.0f);
 
 #if SETTINGS_GAME_DIMENSION
-			proj = glm::perspective(glm::radians(45.0f), (float)windowWidth / windowHeight, 0.1f, 100000.0f);
+            proj = glm::perspective(glm::radians(45.0f), (float)windowWidth / windowHeight, 0.1f, 100000.0f);
 
 #else
-			proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
+            proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
 #endif
-			physicsDebugDrawShader->setMat4("view", m_viewMatrix);
-			physicsDebugDrawShader->setMat4("projection", m_projMatrix);
-			glm::vec3 color;
-			if (rb->type == BodyType::Dynamic)
-				color = { 1, 0, 0 };
-			else
-				color = { 0, 1, 0 };
-			physicsDebugDrawShader->setVec3("color", glm::vec3(color.r, color.g, color.b));
+            physicsDebugDrawShader->setMat4("view", m_viewMatrix);
+            physicsDebugDrawShader->setMat4("projection", m_projMatrix);
+            glm::vec3 color;
+            if (rb->type == BodyType::Dynamic)
+                color = {1, 0, 0};
+            else
+                color = {0, 1, 0};
+            physicsDebugDrawShader->setVec3("color", glm::vec3(color.r, color.g, color.b));
+            if (shape == ShapeType::Polygon)
+                glDrawArrays(GL_LINE_LOOP, 0, vertices.size());
+            else
+                glDrawArrays(GL_LINE_STRIP, 0, vertices.size());
+        }
+        else if (shape == ShapeType::Circle)
+        {
+            auto circle = static_cast<CircleShape *>(rb->shape);
+            float centerX = circle->center.x;
+            float centerY = circle->center.y;
+            float radius = circle->radius; // 1.41421356237 ~ square root of 2
+            std::vector<glm::vec2> vertices = {{centerX + radius, centerY + radius}, {centerX + radius, centerY - radius}, {centerX - radius, centerY - radius}, {centerX - radius, centerY + radius}};
 
-			glDrawArrays(GL_LINE_LOOP, 0, vertices.size());
-		}
+            std::vector<float> glVertices(vertices.size() * 2);
+            physicsDebugDrawShader->Use();
+            auto pos = rb->entity->GetComponent<Transform>()->position;
+            for (int i = 0; i < vertices.size(); i++)
+            {
+                glVertices[2 * i] = vertices[i].x + pos.x;
+                glVertices[2 * i + 1] = vertices[i].y + pos.y;
+            }
 
-		// render render line
-		{
-			auto shape = rb->shape;
-			std::vector<glm::vec2> vertices = { shape->leftPoint, shape->rightPoint };
+            glBindVertexArray(physicsDebugVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, physicsDebugVBO);
+            glBufferData(GL_ARRAY_BUFFER, glVertices.size() * sizeof(float), glVertices.data(), GL_STATIC_DRAW);
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+            glEnableVertexAttribArray(0);
 
-			std::vector<float> glVertices(vertices.size() * 2);
-			physicsDebugDrawShader->Use();
-			auto pos = rb->entity->GetComponent<Transform>()->position;
-			for (int i = 0; i < vertices.size(); i++)
-			{
-				glVertices[2 * i] = vertices[i].x + pos.x;
-				glVertices[2 * i + 1] = vertices[i].y + pos.y;
-			}
-
-			glBindVertexArray(physicsDebugVAO);
-			glBindBuffer(GL_ARRAY_BUFFER, physicsDebugVBO);
-			glBufferData(GL_ARRAY_BUFFER, glVertices.size() * sizeof(float), glVertices.data(), GL_STATIC_DRAW);
-			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-			glEnableVertexAttribArray(0);
-
-			glm::mat4 proj = glm::mat4(1.0f);
+            glm::mat4 proj = glm::mat4(1.0f);
 
 #if SETTINGS_GAME_DIMENSION
-			proj = glm::perspective(glm::radians(45.0f), (float)windowWidth / windowHeight, 0.1f, 100000.0f);
+            proj = glm::perspective(glm::radians(45.0f), (float)windowWidth / windowHeight, 0.1f, 100000.0f);
 
 #else
-			proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
+            proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
 #endif
-			physicsDebugDrawShader->setMat4("view", m_viewMatrix);
-			physicsDebugDrawShader->setMat4("projection", m_projMatrix);
-			glm::vec3 color;
-			color = { 0.3, 0.8, 0.8 };
-			physicsDebugDrawShader->setVec3("color", glm::vec3(color.r, color.g, color.b));
+            physicsDebugDrawShader->setMat4("view", m_viewMatrix);
+            physicsDebugDrawShader->setMat4("projection", m_projMatrix);
+            glm::vec3 color;
+            if (rb->type == BodyType::Dynamic)
+                color = {1, 0, 0};
+            else
+                color = {0, 1, 0};
+            physicsDebugDrawShader->setVec3("color", glm::vec3(color.r, color.g, color.b));
 
-			glDrawArrays(GL_LINE_STRIP, 0, vertices.size());
-		}
-	}
+            glDrawArrays(GL_LINE_LOOP, 0, vertices.size());
+        }
+
+        // render render line
+        {
+            auto shape = rb->shape;
+            std::vector<glm::vec2> vertices = {shape->leftPoint, shape->rightPoint};
+
+            std::vector<float> glVertices(vertices.size() * 2);
+            physicsDebugDrawShader->Use();
+            auto pos = rb->entity->GetComponent<Transform>()->position;
+            for (int i = 0; i < vertices.size(); i++)
+            {
+                glVertices[2 * i] = vertices[i].x + pos.x;
+                glVertices[2 * i + 1] = vertices[i].y + pos.y;
+            }
+
+            glBindVertexArray(physicsDebugVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, physicsDebugVBO);
+            glBufferData(GL_ARRAY_BUFFER, glVertices.size() * sizeof(float), glVertices.data(), GL_STATIC_DRAW);
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
+            glEnableVertexAttribArray(0);
+
+            glm::mat4 proj = glm::mat4(1.0f);
+
+#if SETTINGS_GAME_DIMENSION
+            proj = glm::perspective(glm::radians(45.0f), (float)windowWidth / windowHeight, 0.1f, 100000.0f);
+
+#else
+            proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
+#endif
+            physicsDebugDrawShader->setMat4("view", m_viewMatrix);
+            physicsDebugDrawShader->setMat4("projection", m_projMatrix);
+            glm::vec3 color;
+            color = {0.3, 0.8, 0.8};
+            physicsDebugDrawShader->setVec3("color", glm::vec3(color.r, color.g, color.b));
+
+            glDrawArrays(GL_LINE_STRIP, 0, vertices.size());
+        }
+    }
 }
-  void RenderSystem::SetOutputCamera(Camera* camera)
-  {
-      m_mainCamera = camera;
-  }
+void RenderSystem::SetOutputCamera(Camera *camera)
+{
+    m_mainCamera = camera;
+}
 #endif
 } // namespace wlEngine

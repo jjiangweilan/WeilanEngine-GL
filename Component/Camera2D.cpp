@@ -57,7 +57,7 @@ void Camera2D::update()
 		float down = Input::getKeyStatus(SDL_SCANCODE_K) - y;
 		transform->moveBy(Time::deltaTime * 3000 * (-left + right), Time::deltaTime * 3000 * (up - down), 0);
         
-        auto size = RenderSystem::get()->getSceneSize();
+        auto size = RenderSystem::Get()->GetSceneSize();
         SetProjectionMatrix(0, size.x, 0, size.y, -100000,100000);
 	}
 } // namespace wlEngine

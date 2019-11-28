@@ -71,7 +71,7 @@ void Transform::setScale(const float &x, const float &y, const float &z)
     scale = {x, y, z};
     scaleMat4 = glm::scale(glm::mat4(1.0), {x, y, z});
 }
-void Transform::setScale(const float &ratio)
+void Transform::SetScale(const float &ratio)
 {
     scale = {ratio, ratio, ratio};
     scaleMat4 = glm::scale(glm::mat4(1.0), scale);
