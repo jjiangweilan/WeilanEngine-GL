@@ -110,7 +110,7 @@ public:
     ~Texture();
     Texture *loadFromFile(const std::string &path, const TextureType &textureType = TextureType::Diffuse);
     Texture *loadFromFTBitmap(FT_GlyphSlot bitmap_FT);
-    void free();
+    void Free();
 
     const unsigned int &GetId() const;
     const std::string &getSourcePath() const;

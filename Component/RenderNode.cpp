@@ -6,7 +6,7 @@ namespace wlEngine
 {
 COMPONENT_DEFINATION_NEW(Component, RenderNode)
 
-RenderNode::InputSource::InputSource(RenderNode *node, const Graphics::Mesh &mesh) : node(node), mesh(mesh) {}
+RenderNode::InputSource::InputSource(const std::vector<RenderNode *>&nodes, const Graphics::Mesh &mesh) : nodes(nodes), mesh(mesh) {}
 RenderNode::FramebufferAttachment::FramebufferAttachment() : colors(), depth(), stencil() {}
 RenderNode::FramebufferAttachment::~FramebufferAttachment()
 {
@@ -21,7 +21,7 @@ std::vector<GLenum> RenderNode::FramebufferAttachment::GetColorAttachmentArray()
     return rlt;
 }
 
-RenderNode::RenderNode(Entity* entity) : Component(entity), m_attachment(), m_framebuffer(0), loopIn(nullptr), loopOut(nullptr)
+RenderNode::RenderNode(Entity* entity) : Component(entity), m_attachment(), m_framebuffer(0), m_loopIn(nullptr), m_loopOut(nullptr), m_drawFlag(false)
 {
 }
 
@@ -30,45 +30,35 @@ RenderNode::~RenderNode()
     glDeleteFramebuffers(1, &m_framebuffer);
 }
 
-void RenderNode::AddInputSource(RenderNode *node, const Graphics::Mesh &mesh)
+void RenderNode::AddInputSource(const std::vector<RenderNode *>& nodes, const std::vector<std::pair<std::string, const Graphics::Texture*>>& textures, const Graphics::Mesh &mesh)
 {
-    m_sources.emplace_back(node, mesh);
-    ConfigureInputSourcesParameter(node, mesh);
+    ConfigureInputSourcesParameter(textures, mesh);
+    m_sources.emplace_back(nodes, mesh);
 }
-void RenderNode::ConfigureInputSourcesParameter(RenderNode *node, const Graphics::Mesh &mesh)
+void RenderNode::ConfigureInputSourcesParameter(const std::vector<std::pair<std::string, const Graphics::Texture*>>& textures, const Graphics::Mesh &mesh)
 {
-
-    const std::string renderNodeColor_str = "renderNodeColor";
-    const std::string renderNodeDepth_str = "renderNodeDepth";
-    const std::string renderNodeStencil_str = "renderNodeStencil";
-
     auto material = mesh.GetMaterial();
     material->GetShader()->Use();
     auto param = material->GetParameters();
-    for (int i = 0; i < node->m_attachment.colors.size(); i++)
+    size_t count = 0;
+    for (auto iter : textures)
     {
-        param->SetParameter(renderNodeColor_str + std::to_string(i), Graphics::TextureUnitBinding(2 + i, &(node->m_attachment.colors[i])));
-    }
-
-    if (node->m_attachment.depth.GetId() != 0)
-    {
-        param->SetParameter(renderNodeDepth_str, Graphics::TextureUnitBinding(0, &node->m_attachment.depth));
-    }
-    if (node->m_attachment.stencil.GetId() != 0)
-    {
-        param->SetParameter(renderNodeDepth_str, Graphics::TextureUnitBinding(1, &node->m_attachment.stencil));
+        assert(param->SetParameter(iter.first, Graphics::TextureUnitBinding(count++, iter.second)) && "No such global parameter name");
     }
 }
 
-void RenderNode::SetRenderLoop(RenderNode *start, const Graphics::Mesh &drawMesh, const size_t &loopCount)
+void RenderNode::SetRenderLoop(RenderNode *start, const std::vector<std::pair<std::string, const Graphics::Texture*>>& textures, const Graphics::Mesh &drawMesh, const size_t &loopCount)
 {
-    start->loopIn = std::make_unique<RenderLoopIn>(this, drawMesh);
-    loopOut = std::make_unique<RenderLoopOut>(start, loopCount);
-    start->ConfigureInputSourcesParameter(this, drawMesh);
+    start->m_loopIn = std::make_unique<RenderLoopIn>(this, drawMesh);
+    start->ConfigureInputSourcesParameter(textures, start->m_loopIn->mesh);
+    m_loopOut = std::make_unique<RenderLoopOut>(start, loopCount);
 }
 void RenderNode::GenFramebuffer()
 {
     if (m_framebuffer != 0)glDeleteFramebuffers(1, &m_framebuffer);
+    m_attachment.colors.clear();
+    if(m_attachment.depth)m_attachment.depth->Free();
+    if(m_attachment.stencil) m_attachment.stencil->Free();
     glGenFramebuffers(1, &m_framebuffer);
 }
 
@@ -79,25 +69,24 @@ void RenderNode::AttachTexture2D(const AttachmentType &attachmentType,
                                  const unsigned int &width,
                                  const unsigned int &height)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
-
-    Graphics::Texture texture(width, height, internalFormat, format, type);
-
+	glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
+    auto texture = std::make_unique<Graphics::Texture>(width, height, internalFormat, format, type);
     if (attachmentType == AttachmentType::Color)
     {
         glFramebufferTexture2D(GL_FRAMEBUFFER,
                                attachmentType + m_attachment.colors.size(),
                                GL_TEXTURE_2D,
-                               texture.GetId(),
+                               texture->GetId(),
                                0);
         m_attachment.colors.emplace_back(std::move(texture));
+        glDrawBuffers(m_attachment.colors.size(), m_attachment.GetColorAttachmentArray().data());
     }
     else if (attachmentType == AttachmentType::Depth)
     {
         glFramebufferTexture2D(GL_FRAMEBUFFER,
                                attachmentType,
                                GL_TEXTURE_2D,
-                               texture.GetId(),
+                               texture->GetId(),
                                0);
         m_attachment.depth = std::move(texture);
     }
@@ -106,14 +95,14 @@ void RenderNode::AttachTexture2D(const AttachmentType &attachmentType,
         glFramebufferTexture2D(GL_FRAMEBUFFER,
                                attachmentType,
                                GL_TEXTURE_2D,
-                               texture.GetId(),
+                               texture->GetId(),
                                0);
         m_attachment.stencil = std::move(texture);
     }
     auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        std::cerr << "frame buffer not completed: " << status << std::endl;
+        std::cerr << "frame buffer not completed! " << status << std::endl;
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -172,10 +161,30 @@ void RenderNode::UsePredefinedAttachments(const PredefinedAttachments &choice)
 }
 RenderNode::RenderLoopIn *RenderNode::GetLoopIn() const
 {
-    return loopIn.get();
+    return m_loopIn.get();
 }
 RenderNode::RenderLoopOut *RenderNode::GetLoopOut() const
 {
-    return loopOut.get();
+    return m_loopOut.get();
 }
+void RenderNode::SetDrawFlag(const bool &draw)
+{
+    m_drawFlag = draw;
 }
+const bool &RenderNode::GetDrawFlag() const
+{
+    return m_drawFlag;
+}
+const Graphics::Texture* RenderNode::GetColorAttachment(const size_t& loc) const
+{
+    return m_attachment.colors[0].get();
+}
+const Graphics::Texture *RenderNode::GetDepthAttachment() const
+{
+    return m_attachment.depth.get();
+}
+const Graphics::Texture *RenderNode::GetStencilAttachment() const
+{
+    return m_attachment.stencil.get();
+}
+} // namespace wlEngine

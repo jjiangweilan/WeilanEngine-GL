@@ -92,11 +92,13 @@ private:
   void render(Text *);
   void render(VolumetricLight *);
 
-  void Render(RenderNode*) ;
+  void Render(RenderNode*, const bool& loop = false) ;
+  void RenderInputSources(RenderNode*, const bool& loop = false);
   void RenderFromScene(RenderNode*) ;
   void RenderModel(RenderNode*) ;
-  void RenderInputSources(RenderNode*);
   void RenderToFramebuffer(RenderNode*, const Graphics::Mesh*);
+
+  void ResetDrawFlags(RenderNode*);
 
   SDL_GLContext glContext;
   SDL_Window *window;

@@ -65,7 +65,7 @@ Texture::Texture(FT_GlyphSlot glyph) : m_textureId(0)
 }
 Texture *Texture::loadFromFTBitmap(FT_GlyphSlot glyph)
 {
-    free();
+    Free();
     m_sourcePath = "load from FTBitmap";
     m_width = glyph->bitmap.width;
     m_height = glyph->bitmap.rows;
@@ -104,7 +104,7 @@ Texture::Texture(const unsigned int &width,
 }
 Texture *Texture::loadFromFile(const std::string &path, const TextureType &textureType)
 {
-    free();
+    Free();
     m_sourcePath = path;
     m_type = textureType;
 
@@ -137,13 +137,13 @@ void Texture::load(unsigned char *imageData)
 #endif
 }
 
-void Texture::free()
+void Texture::Free()
 {
     glDeleteTextures(1, &m_textureId);
     m_textureId = 0;
 }
 
-Texture::~Texture() { free(); }
+Texture::~Texture() { Free(); }
 const unsigned int &Texture::GetId() const { return m_textureId; }
 const std::string &Texture::getSourcePath() const { return m_sourcePath; }
 const int &Texture::getWidth() const { return m_width; }

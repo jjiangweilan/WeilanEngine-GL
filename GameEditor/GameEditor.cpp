@@ -406,7 +406,7 @@ void GameEditor::showModelInfo(Entity *entity)
 			{
 				glm::vec3* val = static_cast<glm::vec3*>(param.second->Get());
                 if (param.first.find("color") != param.first.npos)
-                    ImGui::ColorPicker3(param.first.data(), &(*val)[0]);
+                    ImGui::ColorPicker3(param.first.data(), &(*val)[0], ImGuiColorEditFlags_Float);
                 else
                     ImGui::SliderFloat3(param.first.data(), &(*val)[0], 0, 1);
                 break;
