@@ -43,7 +43,10 @@ void RenderNode::ConfigureInputSourcesParameter(const std::vector<std::pair<std:
     size_t count = 0;
     for (auto iter : textures)
     {
-        assert(param->SetParameter(iter.first, Graphics::TextureUnitBinding(count++, iter.second)) && "No such global parameter name");
+		if (!param->SetParameter(iter.first, Graphics::TextureUnitBinding(count++, iter.second)))
+		{
+			std::cerr << "No such global parameter name: " << iter.first << std::endl;
+		}
     }
 }
 
@@ -125,32 +128,30 @@ const std::vector<RenderNode::InputSource> *RenderNode::GetSource() const
     return &m_sources;
 }
 
-void RenderNode::UsePredefinedAttachments(const PredefinedAttachments &choice)
+void RenderNode::AttachTexture2D(const PredefinedAttachmentType &choice)
 {
     switch (choice)
     {
-    case PredefinedAttachments::HDR:
+	case PredefinedAttachmentType::Standard:
+		AttachTexture2D(RenderNode::AttachmentType::Color,
+			Graphics::Texture::InternalFormat::RGBA8,
+			Graphics::Texture::DataFormat::RGBA,
+			Graphics::Texture::DataType::UnsignedByte,
+			wlEngine::RenderSystem::Get()->GetSceneSize().x,
+			wlEngine::RenderSystem::Get()->GetSceneSize().y);
+		break;
+    case PredefinedAttachmentType::HDR:
+
         AttachTexture2D(RenderNode::AttachmentType::Color,
                         Graphics::Texture::InternalFormat::RGBA16F,
                         Graphics::Texture::DataFormat::RGBA,
                         Graphics::Texture::DataType::HalfFloat,
                         wlEngine::RenderSystem::Get()->GetSceneSize().x,
                         wlEngine::RenderSystem::Get()->GetSceneSize().y);
-        AttachTexture2D(RenderNode::AttachmentType::Depth,
-                        Graphics::Texture::InternalFormat::DepthComponent,
-                        Graphics::Texture::DataFormat::Depth,
-                        Graphics::Texture::DataType::UnsignedInt,
-                        wlEngine::RenderSystem::Get()->GetSceneSize().x,
-                        wlEngine::RenderSystem::Get()->GetSceneSize().y);
         break;
-    case PredefinedAttachments::Standard:
-        AttachTexture2D(RenderNode::AttachmentType::Color,
-                        Graphics::Texture::InternalFormat::RGBA8,
-                        Graphics::Texture::DataFormat::RGBA,
-                        Graphics::Texture::DataType::HalfFloat,
-                        wlEngine::RenderSystem::Get()->GetSceneSize().x,
-                        wlEngine::RenderSystem::Get()->GetSceneSize().y);
-        AttachTexture2D(RenderNode::AttachmentType::Depth,
+
+    case PredefinedAttachmentType::Depth:
+        AttachTexture2D(RenderNode::Depth,
                         Graphics::Texture::InternalFormat::DepthComponent,
                         Graphics::Texture::DataFormat::Depth,
                         Graphics::Texture::DataType::UnsignedInt,
@@ -175,9 +176,9 @@ const bool &RenderNode::GetDrawFlag() const
 {
     return m_drawFlag;
 }
-const Graphics::Texture* RenderNode::GetColorAttachment(const size_t& loc) const
+const Graphics::Texture *RenderNode::GetColorAttachment(const size_t &loc) const
 {
-    return m_attachment.colors[0].get();
+    return m_attachment.colors[loc].get();
 }
 const Graphics::Texture *RenderNode::GetDepthAttachment() const
 {

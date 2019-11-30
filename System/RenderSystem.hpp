@@ -96,7 +96,7 @@ private:
   void RenderInputSources(RenderNode*, const bool& loop = false);
   void RenderFromScene(RenderNode*) ;
   void RenderModel(RenderNode*) ;
-  void RenderToFramebuffer(RenderNode*, const Graphics::Mesh*);
+  void RenderToFramebuffer(const Graphics::Mesh*);
 
   void ResetDrawFlags(RenderNode*);
 

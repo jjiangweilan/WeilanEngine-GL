@@ -11,6 +11,10 @@ class Entity;
 class Sprite;
 class Animation;
 class TRigidbody;
+namespace Graphics
+{
+    class ShaderParameter;
+}
 struct GameObjectPack
 {
     Entity *child = nullptr;
@@ -78,6 +82,8 @@ private:
     void showSpriteInfo(Entity *);
     void showVolumetricLightInfo(Entity *);
     void showModelInfo(Entity *);
+    void showRenderNodeInfo(Entity *);
+    void ShowShaderParameterInfo(Graphics::ShaderParameter*);
 
     void showGameWindow(void **data);
 

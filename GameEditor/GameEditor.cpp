@@ -15,6 +15,7 @@
 #include "../Component/Camera2D.hpp"
 #include "../Component/Camera3D.hpp"
 #include "../Component/Model.hpp"
+#include "../Component/RenderNode.hpp"
 
 #include "../System/RenderSystem.hpp"
 #include "../System/InputSystem.hpp"
@@ -367,6 +368,10 @@ void GameEditor::showGameObjectInfo()
             {
                 showComponent(go, c.get(), "Model", std::bind(&GameEditor::showModelInfo, this, std::placeholders::_1));
             }
+            else if (c->getId() == RenderNode::componentId)
+            {
+                showComponent(go, c.get(), "RenderNode", std::bind(&GameEditor::showRenderNodeInfo, this, std::placeholders::_1));
+            }
             //else if (c->getId() == Sprite::componentId)showComponent(go, c.get(), "Sprite", std::bind(&GameEditor::showSpriteInfo, this, std::placeholders::_1));
             //else if (c->getId() == Animation::componentId)showComponent(go, c.get(), "Animation", std::bind(&GameEditor::showAnimationInfo, this, std::placeholders::_1));
             else
@@ -391,31 +396,56 @@ void GameEditor::showModelInfo(Entity *entity)
     for (auto& mesh : *gModel->GetMeshes())
     {
         auto params = mesh.GetMaterial()->GetParameters();
-        for (auto& param : params->m_parameters)
+        ShowShaderParameterInfo(params);
+    }
+}
+
+void GameEditor::ShowShaderParameterInfo(Graphics::ShaderParameter *params)
+{
+    for (auto &param : params->m_parameters)
+    {
+        auto type = param.second->GetType();
+        switch (type)
         {
-			auto type = param.second->GetType();
-			switch (type)
-			{
-			case Graphics::ParameterType::Float:
-			{
-				float* val = static_cast<float*>(param.second->Get());
-				ImGui::InputFloat(param.first.data(), val, 0.05, 0.1, 3);
-				break;
-			}
-            case Graphics::ParameterType::Vec3:
-			{
-				glm::vec3* val = static_cast<glm::vec3*>(param.second->Get());
-                if (param.first.find("color") != param.first.npos)
-                    ImGui::ColorPicker3(param.first.data(), &(*val)[0], ImGuiColorEditFlags_Float);
-                else
-                    ImGui::SliderFloat3(param.first.data(), &(*val)[0], 0, 1);
-                break;
-			}
-			}
+        case Graphics::ParameterType::Float:
+        {
+            float *val = static_cast<float *>(param.second->Get());
+            ImGui::InputFloat(param.first.data(), val, 0.05, 0.1, 3);
+            break;
+        }
+        case Graphics::ParameterType::Vec3:
+        {
+            glm::vec3 *val = static_cast<glm::vec3 *>(param.second->Get());
+            if (param.first.find("color") != param.first.npos)
+                ImGui::ColorPicker3(param.first.data(), &(*val)[0], ImGuiColorEditFlags_Float);
+            else
+                ImGui::SliderFloat3(param.first.data(), &(*val)[0], 0, 1);
+            break;
+        }
+        case Graphics::ParameterType::Int:
+            int *val = static_cast<int *>(param.second->Get());
+            ImGui::InputInt(param.first.data(), val);
+            break;
         }
     }
 }
 
+void GameEditor::showRenderNodeInfo(Entity *entity)
+{
+    auto renderNode = entity->GetComponent<RenderNode>();
+    auto loopIn = renderNode->GetLoopIn();
+    if (loopIn)
+    {
+        ImGui::TreeNode("LoopIn");
+        auto material = loopIn->mesh.GetMaterial();
+        ShowShaderParameterInfo(material->GetParameters());
+        ImGui::TreePop();
+    }
+    for (auto& source : *renderNode->GetSource())
+    {
+        ShowShaderParameterInfo(source.mesh.GetMaterial()->GetParameters());
+    }
+}
 void GameEditor::showTRigidbodyInfo(Entity *entity)
 {
     //params  0. type string 1. shape string 2. vertices or radius int[0]...int[n]

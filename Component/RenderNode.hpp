@@ -11,6 +11,12 @@ class Shader;
 class Model;
 class Texture;
 }
+enum class PredefinedAttachmentType
+{
+    HDR,
+    Standard,
+    Depth
+};
 class RenderNode : public Component
 {
     COMPONENT_DECLARATION_NEW(Component, RenderNode);
@@ -24,26 +30,26 @@ public:
     };
     struct InputSource
     {
-        std::vector<RenderNode*> nodes;
+        std::vector<RenderNode *> nodes;
         Graphics::Mesh mesh;
-        InputSource(const std::vector<RenderNode*>& nodes, const Graphics::Mesh& mesh);
+        InputSource(const std::vector<RenderNode *> &nodes, const Graphics::Mesh &mesh);
     };
     struct FramebufferAttachment
     {
         std::vector<std::unique_ptr<Graphics::Texture>> colors;
-		std::unique_ptr<Graphics::Texture> depth;
-		std::unique_ptr<Graphics::Texture> stencil;
+        std::unique_ptr<Graphics::Texture> depth;
+        std::unique_ptr<Graphics::Texture> stencil;
         std::vector<GLenum> GetColorAttachmentArray() const;
         FramebufferAttachment();
         ~FramebufferAttachment();
     };
     struct RenderLoopIn;
     struct RenderLoopOut
-    
+
     {
-        RenderNode* in;
+        RenderNode *in;
         size_t count;
-        RenderLoopOut(RenderNode* in, const size_t& count) : in(in), count(count){}
+        RenderLoopOut(RenderNode *in, const size_t &count) : in(in), count(count) {}
     };
 
     RenderNode(Entity *entity);
@@ -64,6 +70,8 @@ public:
                          const Graphics::Texture::DataType &type,
                          const unsigned int &width,
                          const unsigned int &height);
+    void AttachTexture2D(const PredefinedAttachmentType &);
+
     void Use() const;
     /**
      * @brief Set the Render Loop object
@@ -83,14 +91,6 @@ public:
     const Graphics::Texture *GetStencilAttachment() const;
     const std::vector<InputSource> *GetSource() const;
 
-    enum class PredefinedAttachments
-    {
-        HDR,
-        Bloom,
-        Deferred,
-        Standard
-    };
-    void UsePredefinedAttachments(const PredefinedAttachments &); //TODO: this needs to be renamed
     void SetDrawFlag(const bool &draw);
     const bool &GetDrawFlag() const;
 
@@ -98,7 +98,7 @@ private:
     struct RenderLoopIn
     {
         bool firstTime;
-        RenderNode* out;
+        RenderNode *out;
         Graphics::Mesh mesh;
         RenderLoopIn(RenderNode *out, const Graphics::Mesh &mesh) : out(out), mesh(mesh), firstTime(true) {}
     };

@@ -67,10 +67,12 @@ void RenderSystem::init() { renderSystem = new RenderSystem(); }
 
 void RenderSystem::render()
 {
+    glClearColor(0,0,0,0);
     auto renderNode = m_outputNode;
     auto attachment = renderNode->GetAttachment();
     Render(renderNode);
 
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear main frambuffer
     glViewport(0, 0, windowWidth, windowHeight);
@@ -113,7 +115,7 @@ void RenderSystem::Render(RenderNode* node, const bool& loop)
     if (loopOut)
     {
         size_t count = loopOut->count;
-        Render(loopOut->in); //get the original image
+
         while (count--) //then start loop
         {
             RenderInputSources(node, true);
@@ -138,7 +140,12 @@ void RenderSystem::Render(RenderNode* node, const bool& loop)
             auto renderScript = node->entity->GetComponent<RenderScript>();
             if (renderScript)
                 renderScript->Update();
-            RenderToFramebuffer(node, &loopIn->mesh);
+
+			auto sceneSize = wlEngine::RenderSystem::Get()->GetSceneSize();
+            glBindFramebuffer(GL_FRAMEBUFFER, node->GetFramebuffer()); 
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear framebuffer
+            glViewport(0, 0, sceneSize.x, sceneSize.y);
+            RenderToFramebuffer(&loopIn->mesh);
         }
     }
 
@@ -174,10 +181,10 @@ void RenderSystem::RenderInputSources(RenderNode *node, const bool& loop)
     glViewport(0, 0, sceneSize.x, sceneSize.y);
     for (auto &inputSource : *sources)
     {
-        RenderToFramebuffer(node, &inputSource.mesh);
+        RenderToFramebuffer(&inputSource.mesh);
     }
 }
-void RenderSystem::RenderToFramebuffer(RenderNode *node, const Graphics::Mesh *mesh)
+void RenderSystem::RenderToFramebuffer(const Graphics::Mesh *mesh)
 {
     mesh->GetMaterial()->UseMaterial();
     glBindVertexArray(mesh->GetVAO());
@@ -235,11 +242,24 @@ void RenderSystem::RenderModel(RenderNode *node)
         glBindVertexArray(0);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
+        Input::getKeyStatus(SDL_SCANCODE_F10);
 #ifdef DEBUG
-        auto aabb = modelM->getAABB();
-        //small offset to prevent collision
-        const float offset = 0.001;
-        Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, model->entity->GetComponent<Transform>()->getModel());
+        static bool show = false;
+        static bool lastFramePressed = false;
+        bool keyPressed = Input::getKeyStatus(SDL_SCANCODE_F11);
+        if (keyPressed && !lastFramePressed)
+        {
+            lastFramePressed = true;
+            show = !show;
+        }
+        if (!keyPressed) lastFramePressed = false;
+        if (show)
+        {
+            auto aabb = modelM->getAABB(); 
+            //small offset to prevent collision
+            const float offset = 0.001;
+            Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, model->entity->GetComponent<Transform>()->getModel());
+        }
 #endif
     }
 }
@@ -376,6 +396,7 @@ void RenderSystem::debugRender()
         }
     }
 }
+#endif
 int RenderSystem::windowResizeCallbackWrapper(void* data, SDL_Event* event)
 {
 	if (renderSystem)
@@ -655,5 +676,4 @@ void RenderSystem::SetOutputRenderNode(RenderNode *node)
 {
     m_outputNode = node;
 }
-#endif
 } // namespace wlEngine
