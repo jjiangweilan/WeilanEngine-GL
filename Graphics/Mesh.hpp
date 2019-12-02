@@ -5,6 +5,7 @@
 #include <vector>
 #include <assimp/mesh.h>
 #include <glad/glad.h>
+#include <memory>
 
 namespace wlEngine
 {
@@ -47,12 +48,12 @@ public:
     Mesh(const PrimitiveMeshType &meshType, Material *mat, const std::string &name = "");
     Mesh(const std::vector<GLuint> &indices, const std::vector<Vertex> &vertices, Material *mat, const std::string &name = "");
     Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices, Material *mat, const std::string &name = "");
-    Mesh(const Mesh &mesh) = default;
+    Mesh(const Mesh &mesh);
     Mesh(Mesh &&mesh) noexcept;
     Mesh(aiMesh *mesh, Material *m = nullptr, const std::string &name = "");
     Mesh() = default;
 
-    Mesh &operator=(const Mesh &mesh) = default;
+    Mesh &operator=(const Mesh &mesh);
     Mesh &operator=(Mesh &&mesh);
     /**
      * @brief load mesh's vertex data using assimp
@@ -73,7 +74,10 @@ public:
     const GLuint& GetVAO() const;
     const std::vector<GLuint>* GetIndices() const;
     const std::vector<Vertex>* GetVertices() const;
-    const Material* GetMaterial() const {return m_material;}
+    const Material* GetMaterial() const {
+		if (m_material) return m_material;
+		else return m_uniqueMaterial.get();
+	}
     /**
  * @brief used in model to identify the material
  * 
@@ -90,10 +94,10 @@ private:
     GLuint VBO;
     GLuint EBO;
 
-    void setupMesh();
-
     mutable Material *m_material;
+	mutable std::unique_ptr<Material> m_uniqueMaterial;
 
+    void setupMesh();
     friend class RenderSystem;
     friend class Model;
 };

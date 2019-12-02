@@ -1,4 +1,5 @@
 #include "Shader.hpp"
+#include "Material.hpp"
 #include "GlobalShaderParameter.hpp"
 
 namespace wlEngine
@@ -12,7 +13,7 @@ Shader::Shader(const std::string &vertexPath,
                const std::string &tessEvalPath,
                const std::string &geometryPath,
                const std::string &fragmentPath,
-               const GLuint &patches) : m_hasTessellation(false), m_patches(patches), paramUpdateFunc(nullptr)
+               const GLuint &patches) : m_hasTessellation(false), m_patches(patches)
 {
     GLuint vertex = 0, tessCtrl = 0, tessEval = 0, geometry = 0, fragment = 0;
     vertex = createShaderFromFile(vertexPath, GL_VERTEX_SHADER);
@@ -24,6 +25,12 @@ Shader::Shader(const std::string &vertexPath,
     m_id = createProgram(vertex, tessCtrl, tessEval, geometry, fragment);
 
     GlobalShaderParameter::Get()->ConfigureShaderParameterBlock(m_id);
+
+    m_vertPath = vertexPath;
+	m_tessCtrlPath = tessCtrlPath;
+	m_tessEvalPath = tessEvalPath;
+	m_geometryPath = geometryPath;
+	m_fragPath = fragmentPath;
 }
 
 Shader::Shader(Shader &&shader)
@@ -34,12 +41,38 @@ Shader::Shader(Shader &&shader)
     shader.m_id = 0;
     shader.m_patches = 0;
     shader.m_hasTessellation = 0;
+
+    m_vertPath = std::move(shader.m_vertPath);
+    m_tessCtrlPath = std::move(shader.m_tessCtrlPath);
+    m_tessEvalPath = std::move(shader.m_tessEvalPath);
+    m_geometryPath = std::move(shader.m_geometryPath);
+    m_fragPath = std::move(shader.m_fragPath);
 }
 Shader::Shader(const Shader &shader)
 {
     m_hasTessellation = shader.m_hasTessellation;
     m_patches = shader.m_patches;
     m_id = shader.m_id;
+
+    m_vertPath = shader.m_vertPath;
+    m_tessCtrlPath = shader.m_tessCtrlPath;
+    m_tessEvalPath = shader.m_tessEvalPath;
+    m_geometryPath = shader.m_geometryPath;
+    m_fragPath = shader.m_fragPath;
+}
+void Shader::Reload()
+{
+    glDeleteProgram(m_id);
+    GLuint vertex = 0, tessCtrl = 0, tessEval = 0, geometry = 0, fragment = 0;
+    vertex = createShaderFromFile(m_vertPath, GL_VERTEX_SHADER);
+    fragment = createShaderFromFile(m_fragPath, GL_FRAGMENT_SHADER);
+
+    tessCtrl = m_tessCtrlPath.size() == 0 ? 0 : createShaderFromFile(m_tessCtrlPath, GL_TESS_CONTROL_SHADER);
+    tessEval = m_tessEvalPath.size() == 0 ? 0 : createShaderFromFile(m_tessEvalPath, GL_TESS_EVALUATION_SHADER);
+    geometry = m_geometryPath.size() == 0 ? 0 : createShaderFromFile(m_geometryPath, GL_GEOMETRY_SHADER);
+    m_id = createProgram(vertex, tessCtrl, tessEval, geometry, fragment);
+
+    GlobalShaderParameter::Get()->ConfigureShaderParameterBlock(m_id);
 }
 
 GLuint Shader::createProgram(const GLuint &vertexShader,
@@ -167,17 +200,24 @@ Shader::~Shader()
 
 Shader *Shader::Add(const std::string &id,
                     const std::string &vertexPath,
-                    const std::string &fragmentPath,
-                    const std::function<void(Entity*)>& paramUpdateFunc)
+                    const std::string &fragmentPath)
 {
     auto has = collection.find(id);
     if (has != collection.end())
         return &has->second;
 
     auto pair = collection.emplace(std::make_pair(id, Shader(vertexPath, "", "", "", fragmentPath, 0)));
-	pair.first->second.paramUpdateFunc = paramUpdateFunc; // std::function can't be moved
     return &pair.first->second;
 }
+Shader *Shader::AddWithMaterial(const std::string &id,
+                                const std::string &vertexPath,
+                                const std::string &fragmentPath)
+{
+    auto rtn = Add(id, vertexPath, fragmentPath);
+    Material::Add(id, id);
+    return rtn;
+}
+
 Shader *Shader::get(const std::string &id)
 {
     auto iter = collection.find(id);
@@ -192,8 +232,7 @@ Shader *Shader::Add(const std::string &id,
                     const std::string &tessEvalPath,
                     const std::string &geometryPath,
                     const std::string &fragmentPath,
-                    const GLuint& patches,
-                    const std::function<void(Entity*)>& paramUpdateFunc)
+                    const GLuint &patches)
 {
     auto has = collection.find(id);
     if (has != collection.end())
@@ -205,10 +244,21 @@ Shader *Shader::Add(const std::string &id,
                                                              geometryPath,
                                                              fragmentPath,
                                                              patches)));
-	pair.first->second.paramUpdateFunc = paramUpdateFunc; // std::function can't be moved
     return &pair.first->second;
 }
 
+Shader *Shader::AddWithMaterial(const std::string &id,
+                                const std::string &vertexPath,
+                                const std::string &tessCtrlPath,
+                                const std::string &tessEvalPath,
+                                const std::string &geometryPath,
+                                const std::string &fragmentPath,
+                                const GLuint &patches)
+{
+    auto rtn = Add(id, vertexPath, tessCtrlPath, tessEvalPath, geometryPath, fragmentPath, patches);
+    Material::Add(id, id);
+    return rtn;
+}
 void Shader::remove(const std::string &id)
 {
     collection.erase(id);

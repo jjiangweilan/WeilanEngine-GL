@@ -80,7 +80,7 @@ void Transform::Rotate(const glm::vec3 &axis, const float &degree)
 {
     rotationData.axis = axis;
     rotationData.degree = degree;
-    rotation = glm::rotate(rotation, glm::radians(degree), axis);
+    rotation = glm::rotate(glm::mat4(1.0), glm::radians(degree), axis);
 }
 
 void Transform::setRotation(const glm::mat4 &ro) { rotation = ro; }

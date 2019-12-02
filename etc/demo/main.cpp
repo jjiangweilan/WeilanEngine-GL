@@ -55,7 +55,7 @@ int main()
         Graphics::Shader::Add("green", "../Shader/green.vert", "../Shader/green.frag");
 		auto shader = Graphics::Shader::get("green");
         Graphics::Shader::Add("sphere", "../Shader/Sphere/Sphere.vert", "../Shader/Sphere/Sphere.tesc", "../Shader/Sphere/Sphere.tese", "", "../Shader/Sphere/Sphere.frag", 4);
-        Graphics::Material::Add("sphere", "sphere", std::vector<Graphics::Texture *>{Graphics::Texture::add("earth", "../resource/earth-cubemap.png")});
+        Graphics::Material::Add("sphere", "sphere", std::vector<Graphics::Texture *>{Graphics::Texture::Add("earth", "../resource/earth-cubemap.png")});
         Graphics::Material::Add("basicTree", "green");
         Graphics::Material::Add("water", "water");
 
@@ -137,7 +137,7 @@ int main()
 //    auto model = test1->addComponent<Model>("Bushes");
 //    model->setAllMaterials("basicTree");
 
-    std::vector<Graphics::Texture *> textures = {Graphics::Texture::add("building", "../resource/building.png")};
+    std::vector<Graphics::Texture *> textures = {Graphics::Texture::Add("building", "../resource/building.png")};
 
     auto newMaterial = Graphics::Material::Add("building",
                                                "Model",
@@ -152,7 +152,7 @@ int main()
     earth->AddComponent<Transform>(4.5, 2, 0);
     auto model3 = earth->AddComponent<Model>("Sphere");
     model3->ShaderParamUpdate = [](Model* model) {
-        auto& meshes = *model->getModel()->GetMeshes();
+        auto& meshes = *model->GetModel()->GetMeshes();
         auto transform = model->entity->GetComponent<Transform>();
         for (auto& mesh : meshes)
         {
@@ -167,7 +167,7 @@ int main()
     auto modelWater = water->AddComponent<Model>("water");
     modelWater->SetDrawMode(DrawMode::Line);
     modelWater->ShaderParamUpdate = [](Model* model) {
-        auto& mesh = *model->getModel()->GetMesh("water");
+        auto& mesh = *model->GetModel()->GetMesh("water");
 		auto transform = model->entity->GetComponent<Transform>();
         auto parameters = mesh.GetMaterial()->GetParameters();
         parameters->SetParameter("model", transform->getModel());

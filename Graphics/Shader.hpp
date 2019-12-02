@@ -21,8 +21,6 @@ namespace Graphics
 class Shader
 {
 public:
-	std::function<void(Entity*)> paramUpdateFunc;
-
     ~Shader();
 	Shader(Shader&& shader);
 	Shader(const Shader& shader);
@@ -30,6 +28,7 @@ public:
     bool hasTess() const;
     const GLuint& getPatches() const;
 	const GLuint& getId() const;
+    void Reload();
     void setBool(const std::string &name, bool value) const;
     void setInt(const std::string &name, int value) const;
     void setFloat(const std::string &name, float value) const;
@@ -143,22 +142,36 @@ private:
     bool m_hasTessellation;
     GLuint m_patches;
 	unsigned int m_id;
+
+    std::string m_vertPath;
+    std::string m_tessCtrlPath;
+    std::string m_tessEvalPath;
+    std::string m_geometryPath;
+    std::string m_fragPath;
     
     /* Static ----*/
 public:
     static Shader *get(const std::string &id);
     static Shader *Add(const std::string &id,
                        const std::string &vertexPath,
-                       const std::string &fragmentPath,
-                       const std::function<void(Entity*)>& parameterUpdateFunc = nullptr);
+                       const std::string &fragmentPath);
+    static Shader *AddWithMaterial(const std::string &id,
+                       const std::string &vertexPath,
+                       const std::string &fragmentPath);
     static Shader *Add(const std::string &name,
                        const std::string &vertexPath,
                        const std::string &tessCtrlPath,
                        const std::string &tessEvalPath,
                        const std::string &geometryPath,
                        const std::string &fragmentPath,
-                       const GLuint& patches = 0, 
-                       const std::function<void(Entity*)>& parameterUpdateFunc = nullptr);
+                       const GLuint& patches = 0);
+    static Shader *AddWithMaterial(const std::string &name,
+                       const std::string &vertexPath,
+                       const std::string &tessCtrlPath,
+                       const std::string &tessEvalPath,
+                       const std::string &geometryPath,
+                       const std::string &fragmentPath,
+                       const GLuint& patches = 0);
 
     static void remove(const std::string &id);
 

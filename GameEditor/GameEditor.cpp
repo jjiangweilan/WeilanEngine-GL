@@ -16,6 +16,7 @@
 #include "../Component/Camera3D.hpp"
 #include "../Component/Model.hpp"
 #include "../Component/RenderNode.hpp"
+#include "../Component/RenderScript.hpp"
 
 #include "../System/RenderSystem.hpp"
 #include "../System/InputSystem.hpp"
@@ -27,6 +28,7 @@
 #include <fstream>
 #include <sstream>
 #include <dirent.h>
+#include <vector>
 namespace wlEngine
 {
 GameEditor::GameEditor() : selectedGameObject(nullptr), selectedTRigidbody(nullptr), editVertex(false), editLine(false), m_isGameSceneFocused(true), scene(nullptr)
@@ -92,13 +94,15 @@ void GameEditor::pickObject()
         float minDis = FLT_MAX;
         for (auto model : Model::collection)
         {
-            auto gModel = model->getModel();
-            auto modelMatrix = model->entity->GetComponent<Transform>()->getModel();
+            auto gModel = model->GetModel();
+			auto transform = model->entity->GetComponent<Transform>();
             auto aabb = gModel->getAABB();
+			glm::vec4 minw = transform->rotation * transform->scaleMat4 * glm::vec4(aabb.min ,1.0);
+            glm::vec4 maxw = transform->rotation * transform->scaleMat4 * glm::vec4(aabb.max, 1.0);
             float distance;
             bool interact = Utility::TestRayOBBIntersection(origin, end - origin,
-                                                            aabb.min, aabb.max,
-                                                            modelMatrix,
+                                                            minw, maxw,
+                                                            transform->rotateArou * transform->positionMat4,
                                                             distance);
             if (interact && distance < minDis) {
                 minDis = distance;
@@ -392,17 +396,43 @@ void GameEditor::showGameObjectInfo()
 void GameEditor::showModelInfo(Entity *entity)
 {
     auto model = entity->GetComponent<Model>();
-    auto gModel = model->getModel();
+    auto gModel = model->GetModel();
+
     for (auto& mesh : *gModel->GetMeshes())
     {
-        auto params = mesh.GetMaterial()->GetParameters();
-        ShowShaderParameterInfo(params);
+        ShowMaterialInfo(entity, mesh.GetMaterial());
     }
+}
+
+void GameEditor::ShowMaterialInfo(Entity* entity, const Graphics::Material * mat)
+{
+	if (ImGui::TreeNode(mat->name.data()))
+	{
+		if (ImGui::Button("Reload Shader"))
+		{
+			mat->ReloadShader();
+				auto rs = entity->GetComponent<RenderScript>();
+				if (rs) rs->PostInit();
+		}
+		ShowShaderParameterInfo(mat->GetParameters());
+		ImGui::TreePop();
+	}
 }
 
 void GameEditor::ShowShaderParameterInfo(Graphics::ShaderParameter *params)
 {
-    for (auto &param : params->m_parameters)
+	std::vector<std::pair<std::string, Graphics::ShaderParameter::ShaderParameterBase*>> paramsVec;
+	for (auto& iter : params->m_parameters)
+	{
+		paramsVec.emplace_back(iter.first, iter.second.get());
+	}
+	std::sort(paramsVec.begin(), paramsVec.end(),
+		[](const std::pair<std::string, Graphics::ShaderParameter::ShaderParameterBase* > & first,
+			const std::pair<std::string, Graphics::ShaderParameter::ShaderParameterBase* > & second) {
+				return first.first < second.first;
+		});
+
+    for (auto &param : paramsVec)
     {
         auto type = param.second->GetType();
         switch (type)
@@ -415,13 +445,23 @@ void GameEditor::ShowShaderParameterInfo(Graphics::ShaderParameter *params)
         }
         case Graphics::ParameterType::Vec3:
         {
+            static float vec3Scaler = 1.0f;
             glm::vec3 *val = static_cast<glm::vec3 *>(param.second->Get());
             if (param.first.find("color") != param.first.npos)
                 ImGui::ColorPicker3(param.first.data(), &(*val)[0], ImGuiColorEditFlags_Float);
             else
-                ImGui::SliderFloat3(param.first.data(), &(*val)[0], 0, 1);
+            {
+                ImGui::SliderFloat3(param.first.data(), &(*val)[0], -vec3Scaler, vec3Scaler);
+            }
             break;
         }
+		case Graphics::ParameterType::Vec2:
+		{
+            static float vec2Scaler = 1.0f;
+			glm::vec2* val = static_cast<glm::vec2*>(param.second->Get());
+			ImGui::SliderFloat2(param.first.data(), &(*val)[0], -vec2Scaler, vec2Scaler);
+			break;
+		}
         case Graphics::ParameterType::Int:
             int *val = static_cast<int *>(param.second->Get());
             ImGui::InputInt(param.first.data(), val);
@@ -438,12 +478,12 @@ void GameEditor::showRenderNodeInfo(Entity *entity)
     {
         ImGui::TreeNode("LoopIn");
         auto material = loopIn->mesh.GetMaterial();
-        ShowShaderParameterInfo(material->GetParameters());
+        ShowMaterialInfo(entity, material);
         ImGui::TreePop();
     }
-    for (auto& source : *renderNode->GetSource())
+    for (auto &source : *renderNode->GetSource())
     {
-        ShowShaderParameterInfo(source.mesh.GetMaterial()->GetParameters());
+        ShowMaterialInfo(entity, source.mesh.GetMaterial());
     }
 }
 void GameEditor::showTRigidbodyInfo(Entity *entity)
@@ -840,7 +880,7 @@ void GameEditor::showTransformInfo(Entity *go)
 
     float rotate = transform->rotationData.degree;
     float axis[3] = {transform->rotationData.axis.x, transform->rotationData.axis.y, transform->rotationData.axis.z};
-    edit0 = ImGui::InputFloat("rotate degree", &rotate, 1.0, 20.0, 0);
+    edit0 = ImGui::SliderFloat("rotate degree", &rotate, 0, 360);
     edit1 = ImGui::InputFloat3("rotate axis", axis, 0);
     if (edit0 || edit1)
     {
@@ -907,13 +947,13 @@ void GameEditor::showResourceInDirectory(const std::string &path)
                     std::string name = filePath.substr(filePath.find_last_of("/") + 1, filePath.length());
                     if (ImGui::TreeNodeEx(name.data()))
                     {
-                        auto texture = Graphics::Texture::add(filePath, filePath);
+                        auto texture = Graphics::Texture::Add(filePath, filePath);
                         ImGui::Image((void *)texture->GetId(), {(float)texture->getWidth(), (float)texture->getHeight()}, {0, 1}, {1, 0});
                         ImGui::TreePop();
                     }
                     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
                     {
-                        auto texture = Graphics::Texture::add(filePath, filePath);
+                        auto texture = Graphics::Texture::Add(filePath, filePath);
                         ImGui::SetDragDropPayload("Sprite", &texture, sizeof(Graphics::Texture *)); // Set payload to carry the index of our item (could be anything)
                         ImGui::Text("%s", filePath.data());
                         ImGui::EndDragDropSource();
@@ -1264,7 +1304,7 @@ void GameEditor::createMaterial()
         std::vector<Graphics::Texture *> textures(total);
         for (int i = 0; i < total; i++)
         {
-            textures[i] = Graphics::Texture::add(files[i], files[i], static_cast<Graphics::TextureType>(textureType[i]));
+            textures[i] = Graphics::Texture::Add(files[i], files[i], static_cast<Graphics::TextureType>(textureType[i]));
         }
         auto mat = Graphics::Material::Add(buf, selectedShader, std::move(textures));
 

@@ -211,14 +211,14 @@ void RenderSystem::RenderModel(RenderNode *node)
             continue;
 
         auto gameObject = model->entity;
-        auto modelM = model->getModel();
+        auto modelM = model->GetModel();
         if (!modelM)
             return;
         auto renderScript = model->entity->GetComponent<RenderScript>();
         if (renderScript)
             renderScript->Update();
 
-        for (auto mesh : *modelM->GetMeshes())
+        for (auto& mesh : *modelM->GetMeshes())
         {
             auto material = mesh.GetMaterial();
             auto shader = material->GetShader();
@@ -604,14 +604,14 @@ void RenderSystem::render(Sprite* t)
 void RenderSystem::render(Model* model)
 {
 	auto gameObject = model->entity;
-	auto modelM = model->getModel();
+	auto modelM = model->GetModel();
 	if (!modelM)
 		return;
-	for (auto mesh : *modelM->GetMeshes())
+	for (auto& mesh : *modelM->GetMeshes())
 	{
-		auto shader = mesh.m_material->GetShader();
+		auto shader = mesh.GetMaterial()->GetShader();
 		shader->Use();
-		mesh.m_material->GetParameters()->Use();
+		mesh.GetMaterial()->GetParameters()->Use();
 		//
 		// draw mesh
 		glBindVertexArray(mesh.VAO);

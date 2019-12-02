@@ -36,17 +36,27 @@ public:
 		m_parameters.SetTextures(textures);
     }
 
-    Material(Shader* shader) :  m_shader(shader)
+    Material(const std::string &shader, const std::vector<std::pair<std::string, Texture *>> &textures)
+    {
+        SetShader(shader);
+        for (int i = 0; i < textures.size(); i++)
+        {
+            m_parameters.SetParameter(textures[i].first,
+                                      TextureUnitBinding(i, textures[i].second));
+        }
+    }
+
+    Material(Shader *shader) : m_shader(shader)
     {
     }
 
-    Material(const std::string &shader) 
+    Material(const std::string &shader)
     {
         SetShader(shader);
     }
 
-    Material(const Material& other);
-    Material(Material&& other);
+    Material(const Material &other);
+    Material(Material &&other);
     /**
      * @brief change the used shader
      * 
@@ -54,6 +64,8 @@ public:
      */
     void SetShader(const std::string &shader);
 
+    Material& operator=(const Material&);
+    Material& operator=(Material&&);
 
     /**
  * @brief return a copy of this material
@@ -65,7 +77,9 @@ public:
     void UseMaterial() const;
     const Shader *GetShader() const;
     ShaderParameter *GetParameters() const;
-
+    void ReloadShader() const;
+    
+    std::string name;
 protected:
     mutable ShaderParameter m_parameters;
     Shader *m_shader;
@@ -87,6 +101,7 @@ Material *Material::Add(const std::string &id, Args &&... args)
     if (has != collection.end())
         return &has->second;
     auto pair = collection.emplace(id, Material(args...));
+    pair.first->second.name = id;
     return &pair.first->second;
 }
 } // namespace Graphics

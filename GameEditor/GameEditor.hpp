@@ -14,6 +14,7 @@ class TRigidbody;
 namespace Graphics
 {
     class ShaderParameter;
+    class Material;
 }
 struct GameObjectPack
 {
@@ -83,6 +84,7 @@ private:
     void showVolumetricLightInfo(Entity *);
     void showModelInfo(Entity *);
     void showRenderNodeInfo(Entity *);
+    void ShowMaterialInfo(Entity*, const Graphics::Material*);
     void ShowShaderParameterInfo(Graphics::ShaderParameter*);
 
     void showGameWindow(void **data);

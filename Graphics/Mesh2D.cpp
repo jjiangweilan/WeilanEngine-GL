@@ -33,7 +33,7 @@ Mesh2D::~Mesh2D()
 
 void Mesh2D::addTexture(const std::string &file)
 {
-	m_textures.emplace_back(Texture::add(file, file));
+	m_textures.emplace_back(Texture::Add(file, file));
 
 	//update vertices update according to the first texture (the main texture)
 	if (m_textures.size() == 1)

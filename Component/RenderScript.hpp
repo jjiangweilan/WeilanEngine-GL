@@ -3,6 +3,7 @@
  * @brief Render Script will be called before a drawable component drew to screen,
  * or before a RenderNode's draw call is called
  * Render Script acts like script but it's one per entity. It's used in RenderSystem 
+ * Use Render Script to update unique parameter to material. Or you should clone the material
  * 
  */
 namespace wlEngine

@@ -5,33 +5,52 @@ namespace wlEngine
 {
 COMPONENT_DEFINATION(Component, Model, 32);
 
-Model::Model(Entity* go) : Component(go), m_model(nullptr), m_drawMode(DrawMode::Fill)
+Model::Model(Entity * entity, const std::string &id, const bool& copy): Component(entity), m_drawMode(DrawMode::Fill)
 {
-    m_shader = Graphics::Shader::get("Model");
+	if(!copy)m_model = Graphics::Model::get(id);
+	else
+	{
+		m_model = nullptr;
+		m_uniqueModel = std::make_unique<Graphics::Model>(*Graphics::Model::get(id));
+	}
 }
 
-Model::Model(Entity *go, const std::string &id): Model(go)
+
+void Model::MakeUnique()
 {
-	m_model = Graphics::Model::get(id);
+	if (!m_uniqueModel && m_model)
+	{
+		m_uniqueModel = std::make_unique<Graphics::Model>(*m_model);
+		m_model = nullptr;
+	}
+	else 
+	{
+		std::cerr << "Model, MakeUnique failed" << std::endl;
+	}
 }
 
-const Graphics::Model* Model::getModel() const
+const Graphics::Model* Model::GetModel() const
 {
-    return m_model;
-}
-const Graphics::Shader *Model::getShader() const
-{
-    return m_shader;
+	if(m_model) return m_model;
+	else return m_uniqueModel.get();
 }
 
 void Model::setModel(Graphics::Model *model)
 {
     m_model = model;
 }
-void Model::setAllMaterials(const std::string& id) {
+void Model::SetAllMaterials(const std::string& id) {
 	for (auto& m : *m_model->GetMeshes())
 	{
 		m.setMaterial(id);
+	}
+}
+
+void Model::SetAllMaterials(Graphics::Material* mat)
+{
+	for (auto& m : *m_model->GetMeshes())
+	{
+		m.setMaterial(mat);
 	}
 }
 

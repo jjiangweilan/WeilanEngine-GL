@@ -6,7 +6,10 @@
 #include <functional>
 namespace wlEngine
 {
-
+namespace Graphics
+{
+    class Material;
+}
 enum DrawMode {
     Line = GL_LINE, Fill = GL_FILL
 };
@@ -15,23 +18,22 @@ class Model : public Component
 public:
     COMPONENT_DECLARATION(Component, Model, 32);
 
-    Model(Entity *go);
-    Model(Entity *go, const std::string &id);
+    Model(Entity *go, const std::string &id, const bool& unique = false);
 
     void useShader(const std::string &name);
     
-    const Graphics::Model * getModel() const;
-    const Graphics::Shader* getShader() const;
+    const Graphics::Model * GetModel() const;
 
     void setModel(Graphics::Model* model);
-	void setAllMaterials(const std::string& id);
+	void SetAllMaterials(const std::string& id);
+	void SetAllMaterials(Graphics::Material* mat);
+    void MakeUnique();
 
     const DrawMode& GetDrawMode();
-
     void SetDrawMode(const DrawMode& mode);
 private:
     DrawMode m_drawMode;
 	Graphics::Model* m_model;
-    Graphics::Shader *m_shader;
+	std::unique_ptr<Graphics::Model> m_uniqueModel;
 };
 } // namespace wlEngine

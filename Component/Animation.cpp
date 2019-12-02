@@ -41,7 +41,7 @@ void Animation::addAnimationFromAseprite(const FilePath &animationJson, const Fi
         for (int tagI = 0; tagI < frameTags.size(); tagI++)
         {
             std::string name = frameTags[tagI]["name"].get<std::string>();
-            animations[name].atlas = Graphics::Texture::add(texturePath, texturePath);
+            animations[name].atlas = Graphics::Texture::Add(texturePath, texturePath);
             Json &frames = animation["frames"];
 
             int i = frameTags[tagI]["from"].get<int>();

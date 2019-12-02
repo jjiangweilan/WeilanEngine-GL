@@ -69,6 +69,7 @@ Mesh::Mesh(Mesh &&mesh) noexcept
     this->VAO = mesh.VAO;
     this->VBO = mesh.VBO;
     this->m_material = mesh.m_material;
+    this->m_uniqueMaterial = std::move(m_uniqueMaterial);
     this->name = mesh.name;
 }
 Mesh &Mesh::operator=(Mesh &&mesh)
@@ -79,6 +80,7 @@ Mesh &Mesh::operator=(Mesh &&mesh)
     this->VAO = mesh.VAO;
     this->VBO = mesh.VBO;
     this->m_material = mesh.m_material;
+    this->m_uniqueMaterial = std::move(m_uniqueMaterial);
     this->name = mesh.name;
     return *this;
 }
@@ -152,6 +154,50 @@ void Mesh::setMaterial(Material *material) const
 {
     m_material = material;
 }
+
+Mesh &Mesh::operator=(const Mesh &other)
+{
+    name = other.name;
+    m_indices = other.m_indices;
+    m_vertices = other.m_vertices;
+
+    VAO = other.VAO;
+    VBO = other.VBO;
+    EBO = other.EBO;
+
+    m_material = nullptr;
+    if (other.m_material)
+    {
+        m_uniqueMaterial = std::make_unique<Material>(*other.m_material);
+    }
+    else
+    {
+        m_uniqueMaterial = std::make_unique<Material>(*other.m_uniqueMaterial);
+    }
+    return *this;
+}
+
+Mesh::Mesh(const Mesh &other)
+{
+    name = other.name;
+    m_indices = other.m_indices;
+    m_vertices = other.m_vertices;
+
+    VAO = other.VAO;
+    VBO = other.VBO;
+    EBO = other.EBO;
+
+    m_material = nullptr;
+    if (other.m_material)
+    {
+        m_uniqueMaterial = std::make_unique<Material>(*other.m_material);
+    }
+    else
+    {
+        m_uniqueMaterial = std::make_unique<Material>(*other.m_uniqueMaterial);
+    }
+}
+
 void Mesh::setMaterial(const std::string &name) const
 {
     m_material = Material::Get(name);
@@ -187,9 +233,8 @@ const std::vector<Vertex> Vertex::quad = {
 };
 
 const std::vector<unsigned int> Vertex::quadElement = {
-    0,1,3,
-    1,2,3
-};
+    0, 1, 3,
+    1, 2, 3};
 #define oneThird (1 / 3.0)
 const std::vector<Vertex> Vertex::boxQuad = {
     {
@@ -225,14 +270,14 @@ const std::vector<Vertex> Vertex::boxQuad = {
     }};
 
 const std::vector<Vertex> Vertex::box = {
-        {glm::vec3(0.5, 0.5, 0.5), glm::vec2(0.5, 2 * oneThird), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
-        {glm::vec3(-0.5, 0.5, 0.5), glm::vec2(0.25, 2 * oneThird), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
-        {glm::vec3(-0.5, 0.5, -0.5), glm::vec2(0.25, 1.0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
-        {glm::vec3(0.5, 0.5, -0.5), glm::vec2(0.5, 1.0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
-        {glm::vec3(0.5, -0.5, 0.5), glm::vec2(0.5, oneThird), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
-        {glm::vec3(-0.5, -0.5, 0.5), glm::vec2(0.25, oneThird), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
-        {glm::vec3(-0.5, -0.5, -0.5), glm::vec2(0.25, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
-        {glm::vec3(0.5, -0.5, -0.5), glm::vec2(0.5, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+    {glm::vec3(0.5, 0.5, 0.5), glm::vec2(0.5, 2 * oneThird), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+    {glm::vec3(-0.5, 0.5, 0.5), glm::vec2(0.25, 2 * oneThird), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+    {glm::vec3(-0.5, 0.5, -0.5), glm::vec2(0.25, 1.0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+    {glm::vec3(0.5, 0.5, -0.5), glm::vec2(0.5, 1.0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+    {glm::vec3(0.5, -0.5, 0.5), glm::vec2(0.5, oneThird), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+    {glm::vec3(-0.5, -0.5, 0.5), glm::vec2(0.25, oneThird), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+    {glm::vec3(-0.5, -0.5, -0.5), glm::vec2(0.25, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
+    {glm::vec3(0.5, -0.5, -0.5), glm::vec2(0.5, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0)},
 };
 
 const std::vector<unsigned int> Vertex::boxElementQuad = {
@@ -244,12 +289,11 @@ const std::vector<unsigned int> Vertex::boxElementQuad = {
     20, 21, 22, 23};
 
 const std::vector<unsigned int> Vertex::boxElement = {
-    0,1,2,0,2,3,
-    0,4,1,1,4,5,
-    4,5,6,4,6,7,
-    3,7,2,7,6,2,
-    2,1,0,0,1,5,
-    0,3,7,0,7,4
-};
+    0, 1, 2, 0, 2, 3,
+    0, 4, 1, 1, 4, 5,
+    4, 5, 6, 4, 6, 7,
+    3, 7, 2, 7, 6, 2,
+    2, 1, 0, 0, 1, 5,
+    0, 3, 7, 0, 7, 4};
 } // namespace Graphics
 } // namespace wlEngine

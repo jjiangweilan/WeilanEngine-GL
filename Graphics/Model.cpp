@@ -73,7 +73,7 @@ void Model::processNode(aiNode *node, const aiScene *scene)
             {
                 material->GetTexture((aiTextureType)aiType, i, &name);
                 auto path = m_directory + "/" + name.C_Str();
-                Texture *texture = Texture::add(path, path, (TextureType)aiType);
+                Texture *texture = Texture::Add(path, path, (TextureType)aiType);
                 textures.push_back(texture);
             }
         }
@@ -88,6 +88,7 @@ void Model::processNode(aiNode *node, const aiScene *scene)
 		matName = matName.substr(0, pos);
 
 		auto mat = Material::Add(m_id + "-" + matName , "Model", textures);
+        mat->name = m_id + "-" + matName;
 
         m_meshes.emplace_back(mesh, mat, std::to_string(mesh->mMaterialIndex));
     }
@@ -164,7 +165,7 @@ AABB Model::getAABB() const
                 back = pos.z;
         }
     }
-    return {{left, top, back}, {right, down, front}};
+    return {{left, down, back}, {right, top, front}};
 }
 std::unordered_map<std::string, Model> Model::collection = std::unordered_map<std::string, Model>();
 } // namespace Graphics

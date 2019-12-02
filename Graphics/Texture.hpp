@@ -134,7 +134,7 @@ private:
 public:
     static Texture *get(const std::string &id);
     template <typename... Args>
-    static Texture *add(const std::string &id, Args &&... args);
+    static Texture *Add(const std::string &id, Args &&... args);
     static void remove(const std::string &id);
 
 private:
@@ -142,7 +142,7 @@ private:
 };
 
 template <typename... Args>
-Texture *Texture::add(const std::string &id, Args &&... args)
+Texture *Texture::Add(const std::string &id, Args &&... args)
 {
     auto has = collection.find(id);
     if (has != collection.end())
