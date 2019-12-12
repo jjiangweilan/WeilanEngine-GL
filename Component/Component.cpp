@@ -24,6 +24,7 @@ Component::getComponentFactoryList()
         componentFactoryList =
             new std::map<std::size_t, std::function<void(Entity *, void **)>>();
     }
+
     return componentFactoryList;
 }
 

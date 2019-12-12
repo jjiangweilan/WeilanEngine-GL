@@ -86,7 +86,9 @@ void GameEditor::pickObject()
     if (Settings::gameDimension == Settings::GameDimension::Two) return; 
     static int x,y;
     static bool pressing = false;
-    if (Input::isMouseClicked(MouseButton::Left))
+	int relX, relY;
+	static int dummyX, dummyY;
+    if (mousePressingOnScene(dummyX, dummyY) && Input::isMouseClicked(MouseButton::Left))
     {
         glm::vec3 origin;
         glm::vec3 end;
@@ -113,7 +115,6 @@ void GameEditor::pickObject()
 
     if (pressing && selectedGameObject) 
     {
-        int relX, relY;
         mousePressingOnScene(relX, relY);
         relX = relX - x;
         relY = relY - y;
