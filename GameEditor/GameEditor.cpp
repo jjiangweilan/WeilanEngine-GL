@@ -15,7 +15,7 @@
 #include "../Component/Camera2D.hpp"
 #include "../Component/Camera3D.hpp"
 #include "../Component/Model.hpp"
-#include "../Component/RenderNode.hpp"
+#include "../Component/RenderContext.hpp"
 #include "../Component/RenderScript.hpp"
 
 #include "../System/RenderSystem.hpp"
@@ -373,9 +373,9 @@ void GameEditor::showGameObjectInfo()
             {
                 showComponent(go, c.get(), "Model", std::bind(&GameEditor::showModelInfo, this, std::placeholders::_1));
             }
-            else if (c->getId() == RenderNode::componentId)
+            else if (c->getId() == RenderContext::componentId)
             {
-                showComponent(go, c.get(), "RenderNode", std::bind(&GameEditor::showRenderNodeInfo, this, std::placeholders::_1));
+                showComponent(go, c.get(), "RenderContext", std::bind(&GameEditor::showRenderNodeInfo, this, std::placeholders::_1));
             }
             //else if (c->getId() == Sprite::componentId)showComponent(go, c.get(), "Sprite", std::bind(&GameEditor::showSpriteInfo, this, std::placeholders::_1));
             //else if (c->getId() == Animation::componentId)showComponent(go, c.get(), "Animation", std::bind(&GameEditor::showAnimationInfo, this, std::placeholders::_1));
@@ -473,7 +473,7 @@ void GameEditor::ShowShaderParameterInfo(Graphics::ShaderParameter *params)
 
 void GameEditor::showRenderNodeInfo(Entity *entity)
 {
-    auto renderNode = entity->GetComponent<RenderNode>();
+    auto renderNode = entity->GetComponent<RenderContext>();
     auto loopIn = renderNode->GetLoopIn();
     if (loopIn)
     {
@@ -893,7 +893,7 @@ void GameEditor::showResourceWindow()
     ImGui::SetNextWindowPos({5, 30}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({430, 160}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Resource", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
-    showResourceInDirectory("../resource");
+    showResourceInDirectory("resource");
     ImGui::End();
 }
 void GameEditor::showSpriteInfo(Entity *go)

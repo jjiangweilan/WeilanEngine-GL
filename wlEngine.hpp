@@ -21,7 +21,7 @@
 #include "Component/Audio.hpp"
 #include "Component/VolumetricLight.hpp"
 #include "Component/RenderScript.hpp"
-#include "Component/RenderNode.hpp"
+#include "Component/RenderContext.hpp"
 
 #include "System/System.hpp"
 #include "System/RenderSystem.hpp"

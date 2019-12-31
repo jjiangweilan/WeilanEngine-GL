@@ -1,17 +1,17 @@
-#include "RenderNode.hpp"
+#include "RenderContext.hpp"
 #include "../Graphics/Material.hpp"
 #include "../System/RenderSystem.hpp"
 
 namespace wlEngine
 {
-COMPONENT_DEFINATION_NEW(Component, RenderNode)
+COMPONENT_DEFINATION_NEW(Component, RenderContext)
 
-RenderNode::InputSource::InputSource(const std::vector<RenderNode *>&nodes, const Graphics::Mesh &mesh) : nodes(nodes), mesh(mesh) {}
-RenderNode::FramebufferAttachment::FramebufferAttachment() : colors(), depth(), stencil() {}
-RenderNode::FramebufferAttachment::~FramebufferAttachment()
+RenderContext::InputSource::InputSource(const std::vector<RenderContext *>&nodes, const Graphics::Mesh &mesh) : nodes(nodes), mesh(mesh) {}
+RenderContext::FramebufferAttachment::FramebufferAttachment() : colors(), depth(), stencil() {}
+RenderContext::FramebufferAttachment::~FramebufferAttachment()
 {
 }
-std::vector<GLenum> RenderNode::FramebufferAttachment::GetColorAttachmentArray() const
+std::vector<GLenum> RenderContext::FramebufferAttachment::GetColorAttachmentArray() const
 {
     std::vector<GLenum> rlt(colors.size());
     for (size_t i = 0; i < colors.size(); i++)
@@ -21,21 +21,21 @@ std::vector<GLenum> RenderNode::FramebufferAttachment::GetColorAttachmentArray()
     return rlt;
 }
 
-RenderNode::RenderNode(Entity* entity) : Component(entity), m_attachment(), m_framebuffer(0), m_loopIn(nullptr), m_loopOut(nullptr), m_drawFlag(false)
+RenderContext::RenderContext(Entity* entity) : Component(entity), m_attachment(), m_framebuffer(0), m_loopIn(nullptr), m_loopOut(nullptr), m_drawFlag(false)
 {
 }
 
-RenderNode::~RenderNode()
+RenderContext::~RenderContext()
 {
     glDeleteFramebuffers(1, &m_framebuffer);
 }
 
-void RenderNode::AddInputSource(const std::vector<RenderNode *>& nodes, const std::vector<std::pair<std::string, const Graphics::Texture*>>& textures, const Graphics::Mesh &mesh)
+void RenderContext::AddInputSource(const std::vector<RenderContext *>& nodes, const std::vector<std::pair<std::string, const Graphics::Texture*>>& textures, const Graphics::Mesh &mesh)
 {
     ConfigureInputSourcesParameter(textures, mesh);
     m_sources.emplace_back(nodes, mesh);
 }
-void RenderNode::ConfigureInputSourcesParameter(const std::vector<std::pair<std::string, const Graphics::Texture*>>& textures, const Graphics::Mesh &mesh)
+void RenderContext::ConfigureInputSourcesParameter(const std::vector<std::pair<std::string, const Graphics::Texture*>>& textures, const Graphics::Mesh &mesh)
 {
     auto material = mesh.GetMaterial();
     material->GetShader()->Use();
@@ -50,13 +50,13 @@ void RenderNode::ConfigureInputSourcesParameter(const std::vector<std::pair<std:
     }
 }
 
-void RenderNode::SetRenderLoop(RenderNode *start, const std::vector<std::pair<std::string, const Graphics::Texture*>>& textures, const Graphics::Mesh &drawMesh, const size_t &loopCount)
+void RenderContext::SetRenderLoop(RenderContext *start, const std::vector<std::pair<std::string, const Graphics::Texture*>>& textures, const Graphics::Mesh &drawMesh, const size_t &loopCount)
 {
     start->m_loopIn = std::make_unique<RenderLoopIn>(this, drawMesh);
     start->ConfigureInputSourcesParameter(textures, start->m_loopIn->mesh);
     m_loopOut = std::make_unique<RenderLoopOut>(start, loopCount);
 }
-void RenderNode::GenFramebuffer()
+void RenderContext::GenFramebuffer()
 {
     if (m_framebuffer != 0)glDeleteFramebuffers(1, &m_framebuffer);
     m_attachment.colors.clear();
@@ -65,7 +65,7 @@ void RenderNode::GenFramebuffer()
     glGenFramebuffers(1, &m_framebuffer);
 }
 
-void RenderNode::AttachTexture2D(const AttachmentType &attachmentType,
+void RenderContext::AttachTexture2D(const AttachmentType &attachmentType,
                                  const Graphics::Texture::InternalFormat &internalFormat,
                                  const Graphics::Texture::DataFormat &format,
                                  const Graphics::Texture::DataType &type,
@@ -110,30 +110,30 @@ void RenderNode::AttachTexture2D(const AttachmentType &attachmentType,
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void RenderNode::Use() const
+void RenderContext::Use() const
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffer);
 }
 
-const GLuint &RenderNode::GetFramebuffer() const
+const GLuint &RenderContext::GetFramebuffer() const
 {
     return m_framebuffer;
 }
-const RenderNode::FramebufferAttachment *RenderNode::GetAttachment() const
+const RenderContext::FramebufferAttachment *RenderContext::GetAttachment() const
 {
     return &m_attachment;
 }
-const std::vector<RenderNode::InputSource> *RenderNode::GetSource() const
+const std::vector<RenderContext::InputSource> *RenderContext::GetSource() const
 {
     return &m_sources;
 }
 
-void RenderNode::AttachTexture2D(const PredefinedAttachmentType &choice)
+void RenderContext::AttachTexture2D(const PredefinedAttachmentType &choice)
 {
     switch (choice)
     {
 	case PredefinedAttachmentType::Standard:
-		AttachTexture2D(RenderNode::AttachmentType::Color,
+		AttachTexture2D(RenderContext::AttachmentType::Color,
 			Graphics::Texture::InternalFormat::RGBA8,
 			Graphics::Texture::DataFormat::RGBA,
 			Graphics::Texture::DataType::UnsignedByte,
@@ -142,7 +142,7 @@ void RenderNode::AttachTexture2D(const PredefinedAttachmentType &choice)
 		break;
     case PredefinedAttachmentType::HDR:
 
-        AttachTexture2D(RenderNode::AttachmentType::Color,
+        AttachTexture2D(RenderContext::AttachmentType::Color,
                         Graphics::Texture::InternalFormat::RGBA16F,
                         Graphics::Texture::DataFormat::RGBA,
                         Graphics::Texture::DataType::HalfFloat,
@@ -151,7 +151,7 @@ void RenderNode::AttachTexture2D(const PredefinedAttachmentType &choice)
         break;
 
     case PredefinedAttachmentType::Depth:
-        AttachTexture2D(RenderNode::Depth,
+        AttachTexture2D(RenderContext::Depth,
                         Graphics::Texture::InternalFormat::DepthComponent,
                         Graphics::Texture::DataFormat::Depth,
                         Graphics::Texture::DataType::UnsignedInt,
@@ -160,31 +160,31 @@ void RenderNode::AttachTexture2D(const PredefinedAttachmentType &choice)
         break;
     }
 }
-RenderNode::RenderLoopIn *RenderNode::GetLoopIn() const
+RenderContext::RenderLoopIn *RenderContext::GetLoopIn() const
 {
     return m_loopIn.get();
 }
-RenderNode::RenderLoopOut *RenderNode::GetLoopOut() const
+RenderContext::RenderLoopOut *RenderContext::GetLoopOut() const
 {
     return m_loopOut.get();
 }
-void RenderNode::SetDrawFlag(const bool &draw)
+void RenderContext::SetDrawFlag(const bool &draw)
 {
     m_drawFlag = draw;
 }
-const bool &RenderNode::GetDrawFlag() const
+const bool &RenderContext::GetDrawFlag() const
 {
     return m_drawFlag;
 }
-const Graphics::Texture *RenderNode::GetColorAttachment(const size_t &loc) const
+const Graphics::Texture *RenderContext::GetColorAttachment(const size_t &loc) const
 {
     return m_attachment.colors[loc].get();
 }
-const Graphics::Texture *RenderNode::GetDepthAttachment() const
+const Graphics::Texture *RenderContext::GetDepthAttachment() const
 {
     return m_attachment.depth.get();
 }
-const Graphics::Texture *RenderNode::GetStencilAttachment() const
+const Graphics::Texture *RenderContext::GetStencilAttachment() const
 {
     return m_attachment.stencil.get();
 }

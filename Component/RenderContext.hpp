@@ -17,9 +17,9 @@ enum class PredefinedAttachmentType
     Standard,
     Depth
 };
-class RenderNode : public Component
+class RenderContext : public Component
 {
-    COMPONENT_DECLARATION_NEW(Component, RenderNode);
+    COMPONENT_DECLARATION_NEW(Component, RenderContext);
 
 public:
     enum AttachmentType
@@ -30,9 +30,9 @@ public:
     };
     struct InputSource
     {
-        std::vector<RenderNode *> nodes;
+        std::vector<RenderContext *> nodes;
         Graphics::Mesh mesh;
-        InputSource(const std::vector<RenderNode *> &nodes, const Graphics::Mesh &mesh);
+        InputSource(const std::vector<RenderContext *> &nodes, const Graphics::Mesh &mesh);
     };
     struct FramebufferAttachment
     {
@@ -47,15 +47,15 @@ public:
     struct RenderLoopOut
 
     {
-        RenderNode *in;
+        RenderContext *in;
         size_t count;
-        RenderLoopOut(RenderNode *in, const size_t &count) : in(in), count(count) {}
+        RenderLoopOut(RenderContext *in, const size_t &count) : in(in), count(count) {}
     };
 
-    RenderNode(Entity *entity);
-    ~RenderNode();
+    RenderContext(Entity *entity);
+    ~RenderContext();
 
-    void AddInputSource(const std::vector<RenderNode *> &nodes,
+    void AddInputSource(const std::vector<RenderContext *> &nodes,
                         const std::vector<
                             std::pair<std::string, const Graphics::Texture *>> &textures,
                         const Graphics::Mesh &mesh);
@@ -80,7 +80,7 @@ public:
      * @param drawMesh the mesh used to draw the texture from start
      * @param loop 
      */
-    void SetRenderLoop(RenderNode *start, const std::vector<std::pair<std::string, const Graphics::Texture *>> &textures, const Graphics::Mesh &drawMesh, const size_t &loop);
+    void SetRenderLoop(RenderContext *start, const std::vector<std::pair<std::string, const Graphics::Texture *>> &textures, const Graphics::Mesh &drawMesh, const size_t &loop);
     RenderLoopIn *GetLoopIn() const;
     RenderLoopOut *GetLoopOut() const;
 
@@ -98,9 +98,9 @@ private:
     struct RenderLoopIn
     {
         bool firstTime;
-        RenderNode *out;
+        RenderContext *out;
         Graphics::Mesh mesh;
-        RenderLoopIn(RenderNode *out, const Graphics::Mesh &mesh) : out(out), mesh(mesh), firstTime(true) {}
+        RenderLoopIn(RenderContext *out, const Graphics::Mesh &mesh) : out(out), mesh(mesh), firstTime(true) {}
     };
     GLuint m_framebuffer;
     FramebufferAttachment m_attachment;

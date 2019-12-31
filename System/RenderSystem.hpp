@@ -13,7 +13,7 @@ namespace wlEngine
 {
 namespace Graphics {
 		class Shader;
-    class RenderNode;
+    class RenderContext;
     class Mesh;
 }
 class Model;
@@ -21,7 +21,7 @@ class Sprite;
 
 class Text;
 class Camera;
-class RenderNode;
+class RenderContext;
 
 class VolumetricLight;
 namespace FramebuffersIndex
@@ -50,7 +50,7 @@ public:
   glm::vec2 getWindowSize() { return {windowWidth, windowHeight}; };
   glm::vec2 GetSceneSize() { return {sceneWidth, sceneHeight}; };
 
-  void SetOutputRenderNode(RenderNode* node);
+  void SetOutputRenderNode(RenderContext* node);
 
 private:
 #if SETTINGS_ENGINEMODE
@@ -92,17 +92,17 @@ private:
   void render(Text *);
   void render(VolumetricLight *);
 
-  void Render(RenderNode*, const bool& loop = false) ;
-  void RenderInputSources(RenderNode*, const bool& loop = false);
-  void RenderFromScene(RenderNode*) ;
-  void RenderModel(RenderNode*) ;
+  void Render(RenderContext*, const bool& loop = false) ;
+  void RenderInputSources(RenderContext*, const bool& loop = false);
+  void RenderFromScene(RenderContext*) ;
+  void RenderModel(RenderContext*) ;
   void RenderToFramebuffer(const Graphics::Mesh*);
 
-  void ResetDrawFlags(RenderNode*);
+  void ResetDrawFlags(RenderContext*);
 
   SDL_GLContext glContext;
   SDL_Window *window;
-  RenderNode *m_outputNode = nullptr;
+  RenderContext *m_outputNode = nullptr;
 
   glm::mat4 projection;
 

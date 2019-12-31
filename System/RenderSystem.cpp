@@ -13,7 +13,7 @@
 #include "../Component/Camera2D.hpp"
 #include "../Component/Camera3D.hpp"
 #include "../Component/RenderScript.hpp"
-#include "../Component/RenderNode.hpp"
+#include "../Component/RenderContext.hpp"
 
 #include "../Graphics/Mesh.hpp"
 #include "../Graphics/Material.hpp"
@@ -84,7 +84,7 @@ void RenderSystem::render()
 	ResetDrawFlags(renderNode);
 }
 
-void RenderSystem::ResetDrawFlags(RenderNode* node)
+void RenderSystem::ResetDrawFlags(RenderContext* node)
 {
 	node->SetDrawFlag(false);
 	for (auto& source : *node->GetSource())
@@ -104,13 +104,13 @@ void RenderSystem::update()
 
 
 
-void RenderSystem::Render(RenderNode* node, const bool& loop) 
+void RenderSystem::Render(RenderContext* node, const bool& loop) 
 {
     if (node->GetDrawFlag() && !loop) return;
     auto sources = node->GetSource();
     auto loopIn = node->GetLoopIn();
     auto loopOut = node->GetLoopOut();
-    if (loopIn && loopOut && loopIn->out == loopOut->in) assert( false && "RenderNode shouldn't loop itself, do so in shader");
+    if (loopIn && loopOut && loopIn->out == loopOut->in) assert( false && "RenderContext shouldn't loop itself, do so in shader");
     //This is a looped render path
     if (loopOut)
     {
@@ -160,7 +160,7 @@ void RenderSystem::Render(RenderNode* node, const bool& loop)
     node->SetDrawFlag(true);
 
 }
-void RenderSystem::RenderInputSources(RenderNode *node, const bool& loop)
+void RenderSystem::RenderInputSources(RenderContext *node, const bool& loop)
 {
     auto sources = node->GetSource();
     for (auto &inputSource : *sources)
@@ -190,7 +190,7 @@ void RenderSystem::RenderToFramebuffer(const Graphics::Mesh *mesh)
     glBindVertexArray(mesh->GetVAO());
     glDrawElements(GL_TRIANGLES, mesh->GetIndices()->size(), GL_UNSIGNED_INT, nullptr);
 }
-void RenderSystem::RenderFromScene(RenderNode *node)
+void RenderSystem::RenderFromScene(RenderContext *node)
 {
     auto renderScript = node->entity->GetComponent<RenderScript>();
     if (renderScript)
@@ -202,7 +202,7 @@ void RenderSystem::RenderFromScene(RenderNode *node)
     glViewport(0, 0, sceneSize.x, sceneSize.y);
     RenderModel(node);
 }
-void RenderSystem::RenderModel(RenderNode *node)
+void RenderSystem::RenderModel(RenderContext *node)
 {
     auto currentScene = wlEngine::EngineManager::GetwlEngine()->getCurrentScene();
     for (auto model : wlEngine::Model::collection)
@@ -672,7 +672,7 @@ void RenderSystem::PostInit()
 {
 	m_engine = EngineManager::GetwlEngine();
 }
-void RenderSystem::SetOutputRenderNode(RenderNode *node)
+void RenderSystem::SetOutputRenderNode(RenderContext *node)
 {
     m_outputNode = node;
 }
