@@ -45,7 +45,7 @@ void InputSystem::update()
     }
 }
 
-Uint8 InputSystem::getKeyStatus(SDL_Scancode &scancode) { return SDL_GetKeyboardState(nullptr)[scancode]; }
+Uint8 InputSystem::getKeyStatus(const SDL_Scancode &scancode) { return SDL_GetKeyboardState(nullptr)[scancode]; }
 
 void InputSystem::keyDown(const SDL_Event &event)
 {

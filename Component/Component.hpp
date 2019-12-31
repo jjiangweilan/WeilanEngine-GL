@@ -101,34 +101,34 @@ private:
 
 namespace wlEngine
 {
-class Entity;
-struct Component
-{
-public:
-    static std::size_t genComponentId(const std::string &);
-    static std::map<std::size_t, std::string> *componentIdToName; // this now is only used for Script, leave it here
-                                                                  // for extensibility
-    static std::map<std::size_t, std::string> *getComponentIdToName();
-    static std::map<std::size_t, std::function<void(Entity *, void **)>> *componentFactoryList;
-    static std::map<std::size_t, std::function<void(Entity *, void **)>> *getComponentFactoryList();
-    Component(Entity *go);
-    Entity *entity = nullptr;
+	class Entity;
+	struct Component
+	{
+	public:
+		static std::size_t genComponentId(const std::string&);
+		static std::map<std::size_t, std::string>* componentIdToName; // this now is only used for Script, leave it here
+																	  // for extensibility
+		static std::map<std::size_t, std::string>* getComponentIdToName();
+		static std::map<std::size_t, std::function<void(Entity*, void**)>>* componentFactoryList;
+		static std::map<std::size_t, std::function<void(Entity*, void**)>>* getComponentFactoryList();
+		Component(Entity* go);
+		Entity* entity = nullptr;
 
-    static const std::size_t componentId;
-    virtual bool isType(const std::size_t &typeId) const;
+		static const std::size_t componentId;
+		virtual bool isType(const std::size_t& typeId) const;
 
-    virtual void destruct(Entity *go){};
-    virtual std::size_t getId();
-    virtual ~Component(){};
-    template <class T>
-    static bool registerComponent(std::function<void(Entity *, void**)>);
-    bool enable;
-};
+		virtual void destruct(Entity* go) {};
+		virtual std::size_t getId();
+		virtual ~Component() {};
+		template <class T>
+		static bool registerComponent(std::function<void(Entity*, void**)>);
+		bool enable;
+	};
 
-template <class T>
-bool Component::registerComponent(std::function<void(Entity *, void**)> f)
-{
-    (*getComponentFactoryList())[T::componentId] = f;
-    return true;
-}
+	template <class T>
+	bool Component::registerComponent(std::function<void(Entity*, void**)> f)
+	{
+		(*getComponentFactoryList())[T::componentId] = f;
+		return true;
+	}
 } // namespace wlEngine

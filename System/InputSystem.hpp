@@ -69,7 +69,7 @@ class InputSystem : System
 
 public:
     void getMouseWheel(int &x, int &y);
-    Uint8 getKeyStatus(SDL_Scancode &);
+    Uint8 getKeyStatus(const SDL_Scancode &);
 
 private:
     int mouseX = 0;

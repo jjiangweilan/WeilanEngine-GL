@@ -76,7 +76,6 @@ EngineManager *EngineManager::GetwlEngine() {
 void EngineManager::SetScene(Scene *scene) { currentScene = scene; }
 
 void EngineManager::loop() {
-#if SETTINGS_ENGINEMODE
     while (!quit) {
         if (Settings::engineMode == Settings::EngineMode::Gameplay) {
             currentScene->update();
@@ -91,17 +90,8 @@ void EngineManager::loop() {
         }
 
         currentScene->endFrame();
+        if(InputSystem::get()->getKeyStatus(SDL_SCANCODE_F9)) quit = true;
     }
-#else
-    while (!quit) {
-        systemUpdate();
-        currentScene->update();
-        Time::update();
-		currentScene->destroyGameObjectEndOfLoop();
-    }
-#endif
-
-    
 }
 
 void EngineManager::systemUpdate() {
