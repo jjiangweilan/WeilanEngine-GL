@@ -1,11 +1,14 @@
 #pragma once
 
+#include "RenderGroup.hpp"
+
 #include <glm/glm.hpp>
 #include <string>
 #include <vector>
 #include <assimp/mesh.h>
 #include <glad/glad.h>
 #include <memory>
+#include <set>
 
 namespace wlEngine
 {
@@ -70,8 +73,10 @@ public:
     void setMaterial(Material *material) const;
     void setMaterial(const std::string &name) const;
 	void setVertices(std::vector<Vertex>&& vertices, std::vector<GLuint>&& indices);
+    void setRenderingIndex(const unsigned int& newIndex);
 
     const GLuint& GetVAO() const;
+    unsigned int GetRenderingIndex() const;
     const std::vector<GLuint>* GetIndices() const;
     const std::vector<Vertex>* GetVertices() const;
     const Material* GetMaterial() const {
@@ -83,8 +88,8 @@ public:
  * 
  */
     std::string name;
-
     ~Mesh(){};
+
 
 private:
     std::vector<GLuint> m_indices;
@@ -93,6 +98,9 @@ private:
     GLuint VAO;
     GLuint VBO;
     GLuint EBO;
+
+    //rendering index that decide the order of rendering
+    unsigned int m_renderingIndex;
 
     mutable Material *m_material;
 	mutable std::unique_ptr<Material> m_uniqueMaterial;

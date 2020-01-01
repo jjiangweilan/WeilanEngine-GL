@@ -42,15 +42,15 @@ public:
      * 
      * @param mesh 
      */
-	void addMesh(Mesh&& mesh);
+	void AddMesh(Mesh&& mesh);
     /**
      * @brief copy a mesh to the meshes
      * 
      * @param mesh 
      */
-	void addMesh(const Mesh& mesh);
+	void AddMesh(const Mesh& mesh);
 
-    AABB getAABB() const;
+    AABB GetAABB() const;
 private:
     std::vector<Mesh> m_meshes;
     bool m_gammaCorrection;
@@ -62,10 +62,10 @@ private:
 
 /* Static ----*/
 public:
-    static Model* get(const std::string& id);
+    static Model* Get(const std::string& id);
     template<typename ...Args>
     static Model* Add(const std::string& id, Args&& ... args);
-    static void remove(const std::string& id);
+    static void Remove(const std::string& id);
 private:
     static std::unordered_map<std::string, Model> collection;
 

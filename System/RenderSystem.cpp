@@ -255,7 +255,7 @@ void RenderSystem::RenderModel(RenderContext *node)
         if (!keyPressed) lastFramePressed = false;
         if (show)
         {
-            auto aabb = modelM->getAABB(); 
+            auto aabb = modelM->GetAABB(); 
             //small offset to prevent collision
             const float offset = 0.001;
             Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, model->entity->GetComponent<Transform>()->getModel());
@@ -632,7 +632,7 @@ void RenderSystem::render(Model* model)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 #ifdef DEBUG
-	auto aabb = modelM->getAABB();
+	auto aabb = modelM->GetAABB();
 	//small offset to prevent collision
 	const float offset = 0.001;
 	Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, model->entity->GetComponent<Transform>()->getModel());

@@ -114,17 +114,17 @@ const Mesh *Model::GetMesh(const std::string &name) const
     return nullptr;
 }
 
-void Model::addMesh(Mesh &&mesh)
+void Model::AddMesh(Mesh &&mesh)
 {
     m_meshes.emplace_back(std::move(mesh));
 }
 
-void Model::addMesh(const Mesh &mesh)
+void Model::AddMesh(const Mesh &mesh)
 {
     m_meshes.push_back(mesh);
 }
 
-Model *Model::get(const std::string &id)
+Model *Model::Get(const std::string &id)
 {
     auto iter = collection.find(id);
     if (iter == collection.end())
@@ -132,12 +132,12 @@ Model *Model::get(const std::string &id)
     return &iter->second;
 }
 
-void Model::remove(const std::string &id)
+void Model::Remove(const std::string &id)
 {
     collection.erase(id);
 }
 
-AABB Model::getAABB() const
+AABB Model::GetAABB() const
 {
     float top = FLT_MIN;
     float down = FLT_MAX;

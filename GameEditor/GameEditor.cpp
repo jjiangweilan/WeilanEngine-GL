@@ -98,7 +98,7 @@ void GameEditor::pickObject()
         {
             auto gModel = model->GetModel();
 			auto transform = model->entity->GetComponent<Transform>();
-            auto aabb = gModel->getAABB();
+            auto aabb = gModel->GetAABB();
 			glm::vec4 minw = transform->rotation * transform->scaleMat4 * glm::vec4(aabb.min ,1.0);
             glm::vec4 maxw = transform->rotation * transform->scaleMat4 * glm::vec4(aabb.max, 1.0);
             float distance;

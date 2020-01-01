@@ -7,11 +7,11 @@ COMPONENT_DEFINATION(Component, Model, 32);
 
 Model::Model(Entity * entity, const std::string &id, const bool& copy): Component(entity), m_drawMode(DrawMode::Fill)
 {
-	if(!copy)m_model = Graphics::Model::get(id);
+	if(!copy)m_model = Graphics::Model::Get(id);
 	else
 	{
 		m_model = nullptr;
-		m_uniqueModel = std::make_unique<Graphics::Model>(*Graphics::Model::get(id));
+		m_uniqueModel = std::make_unique<Graphics::Model>(*Graphics::Model::Get(id));
 	}
 }
 
