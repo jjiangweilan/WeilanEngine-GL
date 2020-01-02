@@ -76,7 +76,6 @@ public:
     void setRenderingIndex(const unsigned int& newIndex);
 
     const GLuint& GetVAO() const;
-    unsigned int GetRenderingIndex() const;
     const std::vector<GLuint>* GetIndices() const;
     const std::vector<Vertex>* GetVertices() const;
     const Material* GetMaterial() const {
@@ -100,7 +99,6 @@ private:
     GLuint EBO;
 
     //rendering index that decide the order of rendering
-    unsigned int m_renderingIndex;
 
     mutable Material *m_material;
 	mutable std::unique_ptr<Material> m_uniqueMaterial;

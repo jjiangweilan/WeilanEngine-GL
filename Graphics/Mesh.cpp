@@ -71,7 +71,6 @@ Mesh::Mesh(Mesh &&mesh) noexcept
     this->m_material = mesh.m_material;
     this->m_uniqueMaterial = std::move(m_uniqueMaterial);
     this->name = mesh.name;
-    this->m_renderingIndex = mesh.m_renderingIndex;
 }
 Mesh &Mesh::operator=(Mesh &&mesh)
 {
@@ -83,7 +82,6 @@ Mesh &Mesh::operator=(Mesh &&mesh)
     this->m_material = mesh.m_material;
     this->m_uniqueMaterial = std::move(m_uniqueMaterial);
     this->name = mesh.name;
-    this->m_renderingIndex = mesh.m_renderingIndex;
     return *this;
 }
 Mesh::Mesh(aiMesh *mesh, Material *m, const std::string &name) : m_material(m), name(name)
@@ -205,10 +203,6 @@ void Mesh::setMaterial(const std::string &name) const
     m_material = Material::Get(name);
 }
 
-unsigned int Mesh::GetRenderingIndex() const
-{
-    return m_renderingIndex;
-}
 
 void Mesh::setVertices(std::vector<Vertex> &&vertices, std::vector<GLuint> &&indices)
 {

@@ -1,5 +1,5 @@
+#pragma once
 #include <set>
-#include "Mesh.hpp"
 
 /**
  * @brief RenderGroup is used to store Mesh pointers. The data(Meshe pointers) is sorted in multiset using the Mesh's renderingIndex
@@ -10,15 +10,12 @@ namespace wlEngine
 {
 namespace Graphics
 {
-
+class Mesh;
 class RenderGroup
 {
     struct RenderGroupComp
     {
-        bool operator()(Mesh *&first, Mesh *&second)
-        {
-            return first->GetRenderingIndex() < second->GetRenderingIndex();
-        }
+        bool operator()(Mesh *first, Mesh *second);
     };
     std::multiset<Mesh *, RenderGroupComp> m_data;
 
