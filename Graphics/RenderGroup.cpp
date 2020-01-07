@@ -25,7 +25,7 @@ std::multiset<Mesh *, RenderGroup::RenderGroupComp>::iterator RenderGroup::end()
 
 bool RenderGroup::RenderGroupComp::operator()(Mesh *first, Mesh *second)
 {
-    return first->GetRenderingIndex() < second->GetRenderingIndex();
+    return false;
 }
 
 } // namespace Graphics

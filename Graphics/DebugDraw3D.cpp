@@ -14,14 +14,14 @@ DebugDraw3D::DebugDraw3D()
     }, {
         0
     });
-    m_mesh.setMaterial("DebugDrawLine");
+    m_mesh.SetMaterial("DebugDrawLine");
 }
 
 void DebugDraw3D::drawBox(const glm::vec3& min, const glm::vec3& max, const glm::mat4& model)
 {
      
     glBindVertexArray(m_mesh.GetVAO());
-	m_mesh.setMaterial("DebugDrawBox");
+	m_mesh.SetMaterial("DebugDrawBox");
     m_mesh.GetMaterial()->GetShader()->Use();
     Shader::setUniform(0, model);
     Shader::setUniform(1, min);
@@ -33,7 +33,7 @@ void DebugDraw3D::drawBox(const glm::vec3& min, const glm::vec3& max, const glm:
 void DebugDraw3D::drawLine(const glm::vec3 &from, const glm::vec3 &to, const glm::vec3 &color)
 {
     glBindVertexArray(m_mesh.GetVAO());
-	m_mesh.setMaterial("DebugDrawLine");
+	m_mesh.SetMaterial("DebugDrawLine");
     m_mesh.GetMaterial()->GetShader()->Use();
     Shader::setUniform(0, from);
     Shader::setUniform(1, to);

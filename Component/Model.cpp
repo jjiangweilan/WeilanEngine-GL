@@ -42,7 +42,7 @@ void Model::setModel(Graphics::Model *model)
 void Model::SetAllMaterials(const std::string& id) {
 	for (auto& m : *m_model->GetMeshes())
 	{
-		m.setMaterial(id);
+		m.SetMaterial(id);
 	}
 }
 
@@ -50,7 +50,7 @@ void Model::SetAllMaterials(Graphics::Material* mat)
 {
 	for (auto& m : *m_model->GetMeshes())
 	{
-		m.setMaterial(mat);
+		m.SetMaterial(mat);
 	}
 }
 

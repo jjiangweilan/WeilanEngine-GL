@@ -4,8 +4,10 @@ namespace wlEngine
 {
 namespace Graphics
 {
-Mesh::Mesh(const PrimitiveMeshType &meshType, Material *mat, const std::string &name) : m_material(mat), name(name)
+Mesh::Mesh(const PrimitiveMeshType &meshType, Material *mat, const std::string &name) : name(name), m_materialIndex(0)
 {
+    assert(0 && "not yet implemented");
+    SetMaterialWithoutDetach(mat);
     switch (meshType)
     {
     case Cube:
@@ -15,18 +17,29 @@ Mesh::Mesh(const PrimitiveMeshType &meshType, Material *mat, const std::string &
         break;
     }
 }
-Mesh::Mesh(const std::vector<GLuint> &indices, const std::vector<Vertex> &vertices, Material *mat, const std::string &name) : m_indices(indices), m_vertices(vertices), m_material(mat), name(name)
+Mesh::Mesh(const std::vector<GLuint> &indices, const std::vector<Vertex> &vertices, Material *mat, const std::string &name) : m_indices(indices), m_vertices(vertices), name(name), m_materialIndex(0)
 {
     EBO = 0;
     VAO = 0;
     VBO = 0;
+    SetMaterialWithoutDetach(mat);
     setupMesh();
 }
-Mesh::Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices, Material *mat, const std::string &name) : m_indices(indices), m_vertices(vertices), m_material(mat), name(name)
+Mesh::Mesh(std::vector<GLuint> &&indices, std::vector<Vertex> &&vertices, Material *mat, const std::string &name) : m_indices(indices), m_vertices(vertices),  name(name), m_materialIndex(0)
 {
     EBO = 0;
     VAO = 0;
     VBO = 0;
+    SetMaterialWithoutDetach(mat);
+    setupMesh();
+}
+Mesh::Mesh(aiMesh *mesh, Material *m, const std::string &name) : m_material(m), name(name), m_materialIndex(0)
+{
+    EBO = 0;
+    VAO = 0;
+    VBO = 0;
+    SetMaterialWithoutDetach(m);
+    loadFromAssimp(mesh);
     setupMesh();
 }
 void Mesh::setupMesh()
@@ -71,6 +84,7 @@ Mesh::Mesh(Mesh &&mesh) noexcept
     this->m_material = mesh.m_material;
     this->m_uniqueMaterial = std::move(m_uniqueMaterial);
     this->name = mesh.name;
+    this->m_materialIndex = mesh.m_materialIndex;
 }
 Mesh &Mesh::operator=(Mesh &&mesh)
 {
@@ -82,15 +96,8 @@ Mesh &Mesh::operator=(Mesh &&mesh)
     this->m_material = mesh.m_material;
     this->m_uniqueMaterial = std::move(m_uniqueMaterial);
     this->name = mesh.name;
+    this->m_materialIndex = mesh.m_materialIndex;
     return *this;
-}
-Mesh::Mesh(aiMesh *mesh, Material *m, const std::string &name) : m_material(m), name(name)
-{
-    EBO = 0;
-    VAO = 0;
-    VBO = 0;
-    loadFromAssimp(mesh);
-    setupMesh();
 }
 void Mesh::loadFromAssimp(aiMesh *mesh)
 {
@@ -150,9 +157,17 @@ void Mesh::loadFromAssimp(aiMesh *mesh)
         }
     }
 }
-void Mesh::setMaterial(Material *material) const
+void Mesh::SetMaterial(Material *material) const
+{
+    material->DetachFromMesh(this);
+    SetMaterialWithoutDetach(material);
+    std::cout << "wawa";
+}
+
+void Mesh::SetMaterialWithoutDetach(Material* material) const
 {
     m_material = material;
+    m_materialIndex = material->AttachToMesh(this);
 }
 
 Mesh &Mesh::operator=(const Mesh &other)
@@ -174,6 +189,7 @@ Mesh &Mesh::operator=(const Mesh &other)
     {
         m_uniqueMaterial = std::make_unique<Material>(*other.m_uniqueMaterial);
     }
+    m_uniqueMaterial->AttachToMesh(this);
     return *this;
 }
 
@@ -196,13 +212,13 @@ Mesh::Mesh(const Mesh &other)
     {
         m_uniqueMaterial = std::make_unique<Material>(*other.m_uniqueMaterial);
     }
+    m_uniqueMaterial->AttachToMesh(this);
 }
 
-void Mesh::setMaterial(const std::string &name) const
+void Mesh::SetMaterial(const std::string &name) const
 {
-    m_material = Material::Get(name);
+    SetMaterial(Material::Get(name));
 }
-
 
 void Mesh::setVertices(std::vector<Vertex> &&vertices, std::vector<GLuint> &&indices)
 {

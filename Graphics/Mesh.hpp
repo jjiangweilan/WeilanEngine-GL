@@ -70,8 +70,8 @@ public:
      * 
      * @param material 
      */
-    void setMaterial(Material *material) const;
-    void setMaterial(const std::string &name) const;
+    void SetMaterial(Material *material) const;
+    void SetMaterial(const std::string &name) const;
 	void setVertices(std::vector<Vertex>&& vertices, std::vector<GLuint>&& indices);
     void setRenderingIndex(const unsigned int& newIndex);
 
@@ -100,12 +100,15 @@ private:
 
     //rendering index that decide the order of rendering
 
-    mutable Material *m_material;
+    mutable size_t m_materialIndex; // used to quickly locate the position in the Material's attached meshes
+    mutable const Material *m_material;
 	mutable std::unique_ptr<Material> m_uniqueMaterial;
 
     void setupMesh();
+    void SetMaterialWithoutDetach(Material* material) const;  
     friend class RenderSystem;
     friend class Model;
+    friend class Material;
 };
 } // namespace Graphics
 } // namespace wlEngine

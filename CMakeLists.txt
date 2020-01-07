@@ -8,10 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DRELEASE")
 
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/Box2D/)
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/SDL2/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/glad/)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/third_party/freetype/)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/UnitTest/)
 
 add_compile_definitions(ROOT_DIR=std::string\(\"${CMAKE_CURRENT_SOURCE_DIR}\"\))
 

@@ -83,7 +83,7 @@ void Model::processNode(aiNode *node, const aiScene *scene)
 		if (pos == matName.npos)
 			pos = matName.find_last_of("-");
 		if (pos == matName.npos)
-			pos == matName.find_last_of(" ");
+			pos = matName.find_last_of(" ");
 		if (pos == matName.npos) pos = matName.size();
 		matName = matName.substr(0, pos);
 
