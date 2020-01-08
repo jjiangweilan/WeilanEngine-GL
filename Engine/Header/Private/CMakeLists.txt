@@ -1,0 +1,5 @@
+add_subdirectory(GameEditor/)
+add_subdirectory(Manager/)
+add_subdirectory(System/)
+add_subdirectory(Utility/)
+add_subdirectory(Component/)

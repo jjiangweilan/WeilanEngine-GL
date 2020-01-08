@@ -1,0 +1,14 @@
+target_sources(
+    wlEngine
+    PRIVATE
+    "AnimationSystem.hpp"
+    "AudioSystem.hpp"
+    "InputSystem.hpp"
+    "LuaScriptSystem.hpp"
+    "NpcSystem.hpp"
+    "PhysicsSystem.hpp"
+    "RenderSystem.hpp"
+    "ScriptSystem.hpp"
+    "StateMachineSystem.hpp"
+    "System.hpp"
+)

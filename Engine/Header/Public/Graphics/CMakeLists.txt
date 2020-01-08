@@ -1,0 +1,15 @@
+target_sources(wlEngine
+    PUBLIC
+    "Character.hpp"
+    "DebugDraw3D.hpp"
+    "GlobalShaderParameter.hpp"
+    "Material.hpp"
+    "Mesh.hpp"
+    "Mesh2D.hpp"
+    "Model.hpp"
+    "RenderGroup.hpp"
+    "Shader.hpp"
+    "ShaderParameter.hpp"
+    "ShaderParameterDefines.hpp"
+    "Texture.hpp"
+)

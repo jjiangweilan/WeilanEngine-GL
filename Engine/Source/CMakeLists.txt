@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.15.0)
+
+add_subdirectory(Component/)
+add_subdirectory(GameObject/)
+add_subdirectory(Graphics/)
+add_subdirectory(GameEditor/)
+add_subdirectory(Global/)
+add_subdirectory(System/)
+add_subdirectory(Manager/)
+add_subdirectory(Utility/)
