@@ -1,15 +1,3 @@
-# wlEngine
+# KuangyeEngine
 
-#### Description
-the readme will be updated soon
-
-#### How to run demo
-
-1.  Clone the repository into local
-2.  Run `Python setup-demo.py`. This will copy the demo to the parent folder and run `cmake ..` within the build folder
-
-#### Instructions
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
+The Engine is still under rapid development, please see Wiki if you are interested in the engine design and my [Twitter](https://twitter.com/jjiangweilan) for development progress
