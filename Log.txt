@@ -1,0 +1,4 @@
+1. 完善Test部分，使用cmake调整VS的Code Generation C
+2. 如何游戏Project使用sdl2_mixer的dll部分 C
+3. 区分Public和Private Headers的逻辑
+4. imGUI不能在第一次cmake的时候找到SDL2 library
