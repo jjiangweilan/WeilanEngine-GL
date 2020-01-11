@@ -40,13 +40,13 @@ RenderSystem::RenderSystem()
     ImGuiInit();
     initSceneFrambufferData();
 
-    auto shaderPath = ROOT_DIR + "/Graphics/Material/Shader/";
-    Graphics::Shader::Add("Text", ROOT_DIR + "/Graphics/Material/Shader/Text.vert", ROOT_DIR + "/Graphics/Material/Shader/Text.frag");
+    auto shaderPath = ROOT_DIR + "/Extra/Material/Shader/";
+    Graphics::Shader::Add("Text", ROOT_DIR + "/Extra/Material/Shader/Text.vert", ROOT_DIR + "/Extra/Material/Shader/Text.frag");
 
 #ifdef DEBUG
     physicsDebugDrawShader = Graphics::Shader::Add("PhysicsDebugDrawShader",
-                                                   ROOT_DIR + "/Graphics/Material/Shader/PhysicsDebugDraw.vert",
-                                                   ROOT_DIR + "/Graphics/Material/Shader/PhysicsDebugDraw.frag");
+                                                   ROOT_DIR + "/Extra/Material/Shader/PhysicsDebugDraw.vert",
+                                                   ROOT_DIR + "/Extra/Material/Shader/PhysicsDebugDraw.frag");
     glGenVertexArrays(1, &physicsDebugVAO);
     glGenBuffers(1, &physicsDebugVBO);
 #endif

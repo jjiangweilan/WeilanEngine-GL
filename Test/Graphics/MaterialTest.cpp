@@ -1,10 +1,8 @@
 #include <gtest/gtest.h>
-#include "Global/KuangyeEngine.hpp"
+#include "Graphics/Material.hpp"
 
+using namespace KuangyeEngine;
 TEST(Material, Initialization)
 {
-	auto engine = KuangyeEngine::EngineManager::GetKuangyeEngine();
-	KuangyeEngine::Scene scene;
-	engine->SetScene(&scene);
-	engine->Start();
+
 }

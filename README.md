@@ -1,3 +1,9 @@
 # KuangyeEngine
 
-The Engine is still under rapid development, please see Wiki if you are interested in the engine design and my [Twitter](https://twitter.com/jjiangweilan) for development progress
+## How to Build Testing
+1. `cd KuangyeEngine/`
+2. `mkdir Build`
+3. `cmake .. -DBUILD_TESTING=ON`
+
+Please set EngineTest as the start-up project
+

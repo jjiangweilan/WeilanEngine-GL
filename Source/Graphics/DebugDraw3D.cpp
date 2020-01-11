@@ -5,7 +5,7 @@ namespace Graphics
 {
 DebugDraw3D::DebugDraw3D()
 {
-    std::string path = ROOT_DIR + "/Graphics/Material/Shader/DebugDraw/";
+    std::string path = ROOT_DIR + "/Extra/Material/Shader/DebugDraw/";
     Material::Add("DebugDrawLine", Shader::Add("DebugDrawLine", path + "Debug.vert", "", "", path + "Line.geom", path + "Line.frag"));
     Material::Add("DebugDrawBox", Shader::Add("DebugDrawBox", path + "Debug.vert", "", "", path + "Box.geom", path + "Box.frag"));
 

@@ -54,10 +54,6 @@ TARGET_LINK_LIBRARIES(KuangyeEngine
 
 add_compile_definitions(ROOT_DIR=std::string\(\"${CMAKE_CURRENT_SOURCE_DIR}\"\))
 
-function(MoveDLL)
-
-endfunction(MoveDLL)
-
 #Test
 if (BUILD_TESTING)
     message(STATUS "Testing Enabled")

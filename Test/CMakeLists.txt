@@ -12,6 +12,8 @@ target_include_directories(EngineTest
     ../Header/Private
 )
 
+set_property(TARGET EngineTest PROPERTY VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+set_property(TARGET EngineTest PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 #set_property(TARGET EngineTest PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
@@ -28,10 +30,10 @@ file(GLOB SDL2_mixer_lib
 )
 
 foreach(FILE ${SDL2_mixer_lib})
-        configure_file(${FILE} ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+        configure_file(${FILE} ${CMAKE_CURRENT_SOURCE_DIR}/bin COPYONLY)
 endforeach()
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../Extern/assimp/lib/windows/assimp-vc140-mt.dll ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../Extern/SDL2/lib/x64/SDL2.dll ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../Extern/assimp/lib/windows/assimp-vc140-mt.dll ${CMAKE_CURRENT_SOURCE_DIR}/bin COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../Extern/SDL2/lib/x64/SDL2.dll ${CMAKE_CURRENT_SOURCE_DIR}/bin COPYONLY)
 
 add_subdirectory(Graphics/)
 
