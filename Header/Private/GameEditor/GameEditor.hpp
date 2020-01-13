@@ -74,7 +74,7 @@ private:
     void dragDropGameObject();
     GameObjectPack goPack;
 
-    void showMenu();
+    void ShowMenu();
 
     void showComponent(Entity *, Component *, const std::string &name, std::function<void(Entity *)>);
     void showTRigidbodyInfo(Entity *);
@@ -90,7 +90,7 @@ private:
     void showGameWindow(void **data);
 
     void showResourceWindow();
-    void showResourceInDirectory(const std::string &path);
+    void ShowResourceInDirectory(const std::string &resourceDir);
     void dropSprite(Entity *parent);
     void pickObject();
 

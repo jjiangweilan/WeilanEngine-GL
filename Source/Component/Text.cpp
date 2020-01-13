@@ -18,7 +18,7 @@ void Text::loadFromFile(const std::string &fileName)
 
 void Text::loadText(const std::wstring &textStr)
 {
-    auto resourceManager = ResourceManager::get();
+    auto resourceManager = ResourceManager::Get();
     int advance = 0;
     int offsetY = 0;
     for (const wchar_t &rawCharacter : textStr)
@@ -29,7 +29,7 @@ void Text::loadText(const std::wstring &textStr)
             advance = 0;
             continue;
         }
-        auto character = resourceManager->getCharacter(rawCharacter, 24, 24);
+        auto character = resourceManager->GetCharacter(rawCharacter, 24, 24);
 
         text.emplace_back(character, advance, offsetY);
         advance += character->getFace()->glyph->advance.x >> 6; // The advance vector is expressed in 1/64th of pixels
@@ -66,12 +66,12 @@ void Text::loadText(const std::string &textStr, const int &maxLineWidth, const i
 
 void Text::loadChinese(const std::wstring &textStr, const int &maxLineWidth, const int &lineSpace, const int &charWidth, const int &charHeight)
 {
-    auto resourceManager = ResourceManager::get();
+    auto resourceManager = ResourceManager::Get();
     int totalAdvance = 0;
     int offsetY = 0;
     for (const wchar_t &rawCharacter : textStr)
     {
-        auto character = resourceManager->getCharacter(rawCharacter, charWidth, charHeight);
+        auto character = resourceManager->GetCharacter(rawCharacter, charWidth, charHeight);
 
         if (rawCharacter == L'\n')
         {
@@ -94,7 +94,7 @@ void Text::loadChinese(const std::wstring &textStr, const int &maxLineWidth, con
 
 void Text::loadEnglish(const std::wstring &textStr, const int &maxLineWidth, const int &lineSpace, const int &charWidth, const int &charHeight)
 {
-    auto resourceManager = ResourceManager::get();
+    auto resourceManager = ResourceManager::Get();
     int totalAdvance = 0;
     int offsetY = 0;
     for (int i = 0; i < textStr.size(); i++)
@@ -115,7 +115,7 @@ void Text::loadEnglish(const std::wstring &textStr, const int &maxLineWidth, con
             int wordWidth = 0;
             while (textStr[i] != L'\n' && i < textStr.size())
             {
-                auto character = resourceManager->getCharacter(textStr[i], charWidth, charHeight);
+                auto character = resourceManager->GetCharacter(textStr[i], charWidth, charHeight);
                 word.push_back(character);
                 wordWidth += character->getFace()->glyph->advance.x >> 6;
                 if (textStr[i] == L' ')

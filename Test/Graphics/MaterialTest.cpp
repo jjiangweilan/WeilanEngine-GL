@@ -4,5 +4,5 @@
 using namespace KuangyeEngine;
 TEST(Material, Initialization)
 {
-
+	
 }

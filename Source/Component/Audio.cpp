@@ -14,7 +14,7 @@ Audio::Audio(Entity *entity) : Component(entity)
 
 void Audio::play(const std::string &file)
 {
-    auto chunk = ResourceManager::get()->getAudioChunk(file);
+    auto chunk = ResourceManager::Get()->getAudioChunk(file);
 
     if (Mix_PlayChannel(-1, chunk, 0) == -1)
     {

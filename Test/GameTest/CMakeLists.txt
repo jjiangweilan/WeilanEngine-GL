@@ -1,4 +1,4 @@
 target_sources(EngineTest
     PRIVATE
-    MaterialTest.cpp
+    GameTest.cpp
 )

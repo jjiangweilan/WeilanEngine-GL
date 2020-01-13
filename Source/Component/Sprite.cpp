@@ -28,7 +28,7 @@ Sprite::Sprite(Entity *go, void **args) : Sprite(go)
     {
         std::string path(*static_cast<std::string *>(args[0]));
         std::string shader(*static_cast<std::string *>(args[1]));
-        auto resourceManager = ResourceManager::get();
+        auto resourceManager = ResourceManager::Get();
 		if (path.size() != 0)
         {
             m_mesh.addTexture(path);
@@ -43,7 +43,7 @@ Sprite::Sprite(Entity *go, void **args) : Sprite(go)
 
 Sprite::Sprite(Entity *go, const std::string &path) : Component(go), transparency(1)
 {
-    auto resourceManager = ResourceManager::get();
+    auto resourceManager = ResourceManager::Get();
 	loadTexture(path);
     useShader("Sprite");
 }

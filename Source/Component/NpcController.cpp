@@ -10,7 +10,7 @@ COMPONENT_EDITABLE_DEF(NpcController);
 
 NpcController::NpcController(Entity *entity, const std::string &id)
     : Component(entity), todaysBehaviorIndex(0), currentMovementIndex(0)  {
-    auto resourceManager = ResourceManager::get();
+    auto resourceManager = ResourceManager::Get();
     Json &npcData = resourceManager->getNpcJsonData()[id];
     this->id = id;
     name = npcData["name"].get<std::string>();

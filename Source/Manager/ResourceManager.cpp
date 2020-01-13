@@ -22,8 +22,9 @@ ResourceManager::~ResourceManager()
     Mix_CloseAudio();
 }
 
-ResourceManager::ResourceManager()
+ResourceManager::ResourceManager() : m_resourceDir()
 {
+    LocateResourcePath();
     //load text resource
     FT_Error error = FT_Init_FreeType(&m_freeTypeLibrary);
     if (error)
@@ -38,26 +39,37 @@ ResourceManager::ResourceManager()
         std::cerr << "FT Face Init Error\n";
     }
 
-    //npc json data
-    std::ifstream ifs;
-    ifs.open("../NpcData/NpcJsonData.json");
-    if (ifs)
-    {
-        std::ostringstream oss;
-        oss << ifs.rdbuf();
-        m_npcJsonData = Json::parse(oss.str());
-    }
-    ifs.close();
+    /* this looks like a game specific game*/
+   // //npc json data
+   // std::ifstream ifs;
+   // ifs.open("../NpcData/NpcJsonData.json");
+   // if (ifs)
+   // {
+   //     std::ostringstream oss;
+   //     oss << ifs.rdbuf();
+   //     m_npcJsonData = Json::parse(oss.str());
+   // }
+   // ifs.close();
 
-    ifs.close();
 }
+
+void ResourceManager::LocateResourcePath()
+{
+    m_resourceDir = "./Resource";
+}
+
+const std::string &ResourceManager::GetResourceDir()
+{
+    return m_resourceDir;
+}
+
 void ResourceManager::init()
 {
     resourceManager = new ResourceManager();
     setlocale(LC_ALL, "");
 }
 
-Graphics::Character *ResourceManager::getCharacter(const wchar_t &wideCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight)
+Graphics::Character *ResourceManager::GetCharacter(const wchar_t &wideCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight)
 {
     std::wstring id = std::wstring(1, wideCharacter) + L"_" + std::to_wstring(pixelSizeWidth) + L"_" + std::to_wstring(pixelSizeHeight); // IMPROVE: we can write this as a struct to improve performance
     auto iter = m_characters.find(id);
@@ -102,6 +114,17 @@ Mix_Chunk *ResourceManager::getAudioChunk(const std::string &file)
     else
         std::cerr << "audio chunk loads failed: " << file << std::endl;
     return rlt;
+}
+
+void ResourceManager::SetResourceDir(std::string &dir)
+{
+    auto size = dir.find_first_of('\0');
+    m_resourceDir.resize(size);
+    dir.copy(&m_resourceDir[0], size);
+    for (auto& character : m_resourceDir)
+    {
+        if (character == '\\') character = '/'; 
+    }
 }
 
 void ResourceManager::freeAudioChunk(const std::string &file)

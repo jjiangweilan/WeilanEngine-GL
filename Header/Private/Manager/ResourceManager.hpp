@@ -20,11 +20,11 @@ class ResourceManager
 {
 public:
     static void init();
-    static ResourceManager *get() { return resourceManager; };
+    static ResourceManager *Get() { return resourceManager; };
     ~ResourceManager();
 
     /* FreeType *************************************/
-    Graphics::Character *getCharacter(const wchar_t &wildCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight);
+    Graphics::Character *GetCharacter(const wchar_t &wildCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight);
 
     /* Get Data ***********************************/
     Json &getNpcJsonData();
@@ -35,7 +35,11 @@ public:
     void freeAudioChunk(const std::string &file);
     void freeAudioChunk();
 
+    const std::string& GetResourceDir();
+    void SetResourceDir(std::string& dir);
+
 private:
+    std::string m_resourceDir;
     static ResourceManager *resourceManager;
     ResourceManager();
     CharacterMap m_characters;
@@ -49,5 +53,8 @@ private:
     FT_Face m_face;
 
     std::map<std::string, Mix_Chunk *> m_audioChunks;
+
+    //Resource Path
+    void LocateResourcePath();
 };
 } // namespace KuangyeEngine
