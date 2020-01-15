@@ -29,7 +29,7 @@
 #include <dirent.h>
 #include <imgui/imgui.h>
 #include <vector>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 GameEditor::GameEditor() : selectedGameObject(nullptr), selectedTRigidbody(nullptr), editVertex(false), editLine(false), m_isGameSceneFocused(true), scene(nullptr)
 {
@@ -42,7 +42,7 @@ GameEditor::~GameEditor()
 
 void GameEditor::render(void **data)
 {
-    scene = EngineManager::GetKuangyeEngine()->getCurrentScene();
+    scene = EngineManager::GetWeilanEngine()->getCurrentScene();
     ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
     if (Input::getKeyStatus(SDL_SCANCODE_ESCAPE))
@@ -51,7 +51,7 @@ void GameEditor::render(void **data)
     }
 
     showGameWindow(data);
-    showMenu();
+    ShowMenu();
     showAllGameObjects();
     showResourceWindow();
 
@@ -118,7 +118,7 @@ void GameEditor::pickObject()
         mousePressingOnScene(relX, relY);
         relX = relX - x;
         relY = relY - y;
-        auto camera = EngineManager::GetKuangyeEngine()->getCurrentScene()->getCamera()->GetComponent<Camera3D>();
+        auto camera = EngineManager::GetWeilanEngine()->getCurrentScene()->getCamera()->GetComponent<Camera3D>();
         auto front = camera->front;
         auto right = camera->right;
 
@@ -202,7 +202,7 @@ void GameEditor::showAllGameObjects()
     ImGui::SetNextWindowPos({5, 415}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({150, 350}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Scene Graph", nullptr, ImGuiWindowFlags_None);
-    if (ImGui::BeginPopupContextItem())
+    if (ImGui::BeginPopupContextWindow())
     {
         if (ImGui::MenuItem("Add Game Object"))
         {
@@ -558,7 +558,7 @@ void GameEditor::showTRigidbodyInfo(Entity *entity)
         PolygonShape *pShape = static_cast<PolygonShape *>(trb->shape);
         for (int i = 0; i < pShape->points.size(); i++)
         {
-            int ver[2] = {pShape->points[i].x, pShape->points[i].y};
+            int ver[2] = {(int)pShape->points[i].x, (int)pShape->points[i].y};
             bool set = ImGui::InputInt2(std::string("vertex " + std::to_string(i)).c_str(), ver);
             if (set)
             {
@@ -723,7 +723,7 @@ void GameEditor::showTRigidbodyInfo(Entity *entity)
     }
 }
 
-void GameEditor::showMenu()
+void GameEditor::ShowMenu()
 {
     if (ImGui::BeginMainMenuBar())
     {
@@ -793,30 +793,49 @@ void GameEditor::showMenu()
             }
             ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu("Settings"))
+        static bool preferencesOpen = false;//for ImGui
+        if (ImGui::MenuItem("Settings"))
         {
-            static int dimension = 2;
-            if (dimension = 2)
+            ImGui::OpenPopup("Preferences");
+            preferencesOpen = true;
+                // static int dimension = 2;
+                // if (dimension = 2)
+                // {
+                //     ImGui::MenuItem("Switch To 3D");
+                //     if (ImGui::IsItemClicked())
+                //     {
+                //         auto cameraEntity = EngineManager::GetWeilanEngine()->getCurrentScene()->getCamera();
+                //         Json &j = scene->sceneData.getData(cameraEntity);
+                //         auto &cameraComponentJson = *Utility::findComponentWithName(j, "Camera2D");
+                //         //cameraComponentJson["name"] = "Camera3D";
+                //         cameraEntity->removeComponent<Camera2D>();
+                //         cameraEntity->AddComponent<Camera3D>();
+                //     }
+                // }
+                // else if (dimension = 3)
+                // {
+                //     ImGui::MenuItem("Switch To 2D");
+                //     if (ImGui::IsItemClicked())
+                //     {
+                //     }
+                // }
+        }
+
+        if (preferencesOpen)
+        {
+            auto resourceManager = ResourceManager::Get();
+            if (ImGui::BeginPopupModal("Preferences", &preferencesOpen))
             {
-                ImGui::MenuItem("Switch To 3D");
-                if (ImGui::IsItemClicked())
-                {
-                    auto cameraEntity = EngineManager::GetKuangyeEngine()->getCurrentScene()->getCamera();
-                    Json &j = scene->sceneData.getData(cameraEntity);
-                    auto &cameraComponentJson = *Utility::findComponentWithName(j, "Camera2D");
-                    //cameraComponentJson["name"] = "Camera3D";
-                    cameraEntity->removeComponent<Camera2D>();
-                    cameraEntity->AddComponent<Camera3D>();
-                }
+                auto resourceDir = resourceManager->GetResourceDir();
+                resourceDir.resize(256);
+                ImGui::InputText("Resource Path", &resourceDir[0], 256);
+                resourceManager->SetResourceDir(resourceDir);
+                ImGui::EndPopup();
             }
-            else if (dimension = 3)
+            else
             {
-                ImGui::MenuItem("Switch To 2D");
-                if (ImGui::IsItemClicked())
-                {
-                }
+                ResourceManager::Get()->SaveResourcePreferences();
             }
-            ImGui::EndMenu();
         }
         ImGui::EndMainMenuBar();
     }
@@ -893,7 +912,9 @@ void GameEditor::showResourceWindow()
     ImGui::SetNextWindowPos({5, 30}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({430, 160}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Resource", nullptr, ImGuiWindowFlags_HorizontalScrollbar);
-    showResourceInDirectory("resource");
+
+    auto &dir = ResourceManager::Get()->GetResourceDir();
+    ShowResourceInDirectory(dir);
     ImGui::End();
 }
 void GameEditor::showSpriteInfo(Entity *go)
@@ -902,15 +923,17 @@ void GameEditor::showSpriteInfo(Entity *go)
     auto mainTexture = sprite->getMesh()->getTextures()->at(0);
     ImGui::Image((void *)mainTexture->GetId(), {(float)mainTexture->getWidth(), (float)mainTexture->getHeight()}, {0, 1}, {1, 0});
 }
-void GameEditor::showResourceInDirectory(const std::string &path)
+void GameEditor::ShowResourceInDirectory(const std::string &resourceDir)
 {
     DIR *dir;
     struct dirent *ent;
     /* Open directory stream */
-    dir = opendir(path.data());
+    auto lastFolderStartPos = resourceDir.find_last_of('/') + 1;
+    dir = opendir(resourceDir.data());
     if (dir != NULL)
     {
-        if (ImGui::TreeNodeEx(path.data()))
+        std::string dirSub = resourceDir.substr(lastFolderStartPos);
+        if (ImGui::TreeNodeEx(dirSub.data()))
         {
             std::vector<std::string> directory;
             std::vector<std::string> files;
@@ -920,13 +943,13 @@ void GameEditor::showResourceInDirectory(const std::string &path)
                 {
                 case DT_REG:
                 {
-                    files.push_back(path + "/" + ent->d_name);
+                    files.push_back(ent->d_name);
                     break;
                 }
 
                 case DT_DIR:
                     if (ent->d_name[0] != '.')
-                        directory.push_back(path + "/" + ent->d_name);
+                        directory.push_back(ent->d_name);
                     break;
 
                 default:
@@ -936,7 +959,7 @@ void GameEditor::showResourceInDirectory(const std::string &path)
 
             for (auto &dir : directory)
             {
-                showResourceInDirectory(dir);
+                ShowResourceInDirectory(resourceDir + "/" + dir);
             }
             for (auto &filePath : files)
             {
@@ -965,10 +988,6 @@ void GameEditor::showResourceInDirectory(const std::string &path)
         }
 
         closedir(dir);
-    }
-    else
-    {
-        std::cerr << "Resource Manager path error\n";
     }
 }
 
@@ -1324,4 +1343,4 @@ void GameEditor::setSelectedGameObject(Entity *newOne)
     selectedGameObject = newOne;
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

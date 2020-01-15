@@ -1,5 +1,5 @@
 target_sources(
-    KuangyeEngine
+    WeilanEngine
     PRIVATE
     "AnimationSystem.hpp"
     "AudioSystem.hpp"

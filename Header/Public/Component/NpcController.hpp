@@ -5,7 +5,7 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <map>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 
 struct NpcMovement
@@ -51,4 +51,4 @@ public:
     int todaysBehaviorIndex;
     int currentMovementIndex;
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

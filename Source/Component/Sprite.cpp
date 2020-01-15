@@ -10,7 +10,7 @@
 
 #include "Manager/ResourceManager.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 COMPONENT_DEFINATION(Component, Sprite, 64);
 COMPONENT_EDITABLE_DEF(Sprite);
@@ -28,7 +28,7 @@ Sprite::Sprite(Entity *go, void **args) : Sprite(go)
     {
         std::string path(*static_cast<std::string *>(args[0]));
         std::string shader(*static_cast<std::string *>(args[1]));
-        auto resourceManager = ResourceManager::get();
+        auto resourceManager = ResourceManager::Get();
 		if (path.size() != 0)
         {
             m_mesh.addTexture(path);
@@ -43,7 +43,7 @@ Sprite::Sprite(Entity *go, void **args) : Sprite(go)
 
 Sprite::Sprite(Entity *go, const std::string &path) : Component(go), transparency(1)
 {
-    auto resourceManager = ResourceManager::get();
+    auto resourceManager = ResourceManager::Get();
 	loadTexture(path);
     useShader("Sprite");
 }
@@ -77,4 +77,4 @@ Graphics::Texture *Sprite::getMainTexture() const
 {
     return m_mesh.getTextures()->at(0);
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

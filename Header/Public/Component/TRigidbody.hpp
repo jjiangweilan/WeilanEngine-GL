@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <functional>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 #define SpatialHashCellBoxWidth 400;
 #define SpatialHashCellBoxHeight 400;
@@ -135,4 +135,4 @@ void TRigidbody::pushbackVertex(const glm::vec2 &vertex)
 
     addToSpatialHash(this);
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

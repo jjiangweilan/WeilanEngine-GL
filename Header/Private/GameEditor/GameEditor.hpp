@@ -5,7 +5,7 @@
 #include <string>
 #include <json.hpp>
 #include <functional>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class Entity;
 class Sprite;
@@ -74,7 +74,7 @@ private:
     void dragDropGameObject();
     GameObjectPack goPack;
 
-    void showMenu();
+    void ShowMenu();
 
     void showComponent(Entity *, Component *, const std::string &name, std::function<void(Entity *)>);
     void showTRigidbodyInfo(Entity *);
@@ -90,7 +90,7 @@ private:
     void showGameWindow(void **data);
 
     void showResourceWindow();
-    void showResourceInDirectory(const std::string &path);
+    void ShowResourceInDirectory(const std::string &resourceDir);
     void dropSprite(Entity *parent);
     void pickObject();
 
@@ -151,4 +151,4 @@ void GameEditor::createComponentJsonHelper(Json &params, int index, T &&arg, Arg
     params[index] = arg;
     createComponentJsonHelper(params, index + 1, args...);
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

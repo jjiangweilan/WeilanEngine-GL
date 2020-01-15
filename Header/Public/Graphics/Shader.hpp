@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <functional>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class GameEditor;
 class Entity;
@@ -181,4 +181,4 @@ private:
     friend class GameEditor;
 };
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

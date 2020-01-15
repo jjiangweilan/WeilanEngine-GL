@@ -2,7 +2,7 @@
 #include "Graphics/Material.hpp"
 #include "System/RenderSystem.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 COMPONENT_DEFINATION_NEW(Component, RenderContext)
 
@@ -137,8 +137,8 @@ void RenderContext::AttachTexture2D(const PredefinedAttachmentType &choice)
 			Graphics::Texture::InternalFormat::RGBA8,
 			Graphics::Texture::DataFormat::RGBA,
 			Graphics::Texture::DataType::UnsignedByte,
-			KuangyeEngine::RenderSystem::Get()->GetSceneSize().x,
-			KuangyeEngine::RenderSystem::Get()->GetSceneSize().y);
+			WeilanEngine::RenderSystem::Get()->GetSceneSize().x,
+			WeilanEngine::RenderSystem::Get()->GetSceneSize().y);
 		break;
     case PredefinedAttachmentType::HDR:
 
@@ -146,8 +146,8 @@ void RenderContext::AttachTexture2D(const PredefinedAttachmentType &choice)
                         Graphics::Texture::InternalFormat::RGBA16F,
                         Graphics::Texture::DataFormat::RGBA,
                         Graphics::Texture::DataType::HalfFloat,
-                        KuangyeEngine::RenderSystem::Get()->GetSceneSize().x,
-                        KuangyeEngine::RenderSystem::Get()->GetSceneSize().y);
+                        WeilanEngine::RenderSystem::Get()->GetSceneSize().x,
+                        WeilanEngine::RenderSystem::Get()->GetSceneSize().y);
         break;
 
     case PredefinedAttachmentType::Depth:
@@ -155,8 +155,8 @@ void RenderContext::AttachTexture2D(const PredefinedAttachmentType &choice)
                         Graphics::Texture::InternalFormat::DepthComponent,
                         Graphics::Texture::DataFormat::Depth,
                         Graphics::Texture::DataType::UnsignedInt,
-                        KuangyeEngine::RenderSystem::Get()->GetSceneSize().x,
-                        KuangyeEngine::RenderSystem::Get()->GetSceneSize().y);
+                        WeilanEngine::RenderSystem::Get()->GetSceneSize().x,
+                        WeilanEngine::RenderSystem::Get()->GetSceneSize().y);
         break;
     }
 }
@@ -188,4 +188,4 @@ const Graphics::Texture *RenderContext::GetStencilAttachment() const
 {
     return m_attachment.stencil.get();
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

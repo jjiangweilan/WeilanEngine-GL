@@ -10,9 +10,10 @@ target_include_directories(EngineTest
     gtest/googletest/include
     gtest/googlemock/include
     ../Header/Private
+    Resource/Script
 )
 
-set_property(TARGET EngineTest PROPERTY VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
+set_property(TARGET EngineTest PROPERTY VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 set_property(TARGET EngineTest PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
 #set_property(TARGET EngineTest PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -20,20 +21,24 @@ set_property(TARGET EngineTest PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT
 target_link_libraries(EngineTest
     gtest
     gmock
-    KuangyeEngine
+    WeilanEngine
 )
 
 #Copy DLL
+set(DLL_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin/$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>")
 
-file(GLOB SDL2_mixer_lib
+
+file(GLOB SDL2_MIXER_DLL
     ${CMAKE_CURRENT_SOURCE_DIR}/../Extern/SDL2_mixer/lib/*.dll
 )
 
-foreach(FILE ${SDL2_mixer_lib})
-        configure_file(${FILE} ${CMAKE_CURRENT_SOURCE_DIR}/bin COPYONLY)
-endforeach()
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../Extern/assimp/lib/windows/assimp-vc140-mt.dll ${CMAKE_CURRENT_SOURCE_DIR}/bin COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../Extern/SDL2/lib/x64/SDL2.dll ${CMAKE_CURRENT_SOURCE_DIR}/bin COPYONLY)
+add_custom_command(TARGET EngineTest POST_BUILD        
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different  
+    ${SDL2_MIXER_DLL}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Extern/assimp/lib/windows/assimp-vc140-mt.dll 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Extern/SDL2/lib/x64/SDL2.dll
+    ${DLL_OUTPUT_DIR})                      
 
 add_subdirectory(Graphics/)
-
+add_subdirectory(GameTest/)
+add_subdirectory(Resource/)

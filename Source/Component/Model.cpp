@@ -1,7 +1,7 @@
 #include "Component/Model.hpp"
 #include "Manager/ResourceManager.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 COMPONENT_DEFINATION(Component, Model, 32);
 
@@ -63,4 +63,4 @@ const DrawMode &Model::GetDrawMode()
 {
 	return m_drawMode;
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

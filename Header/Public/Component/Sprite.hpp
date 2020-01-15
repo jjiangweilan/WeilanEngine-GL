@@ -11,7 +11,7 @@
 #include "GameObject/Entity.hpp"
 #include "Graphics/Shader.hpp"
 #include "Graphics/Mesh2D.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 /* class Texture
  * @description: use initialized GraphicsManager to draw picture on
@@ -55,5 +55,5 @@ private:
   Graphics::Mesh2D m_mesh;
   Graphics::Shader *m_shader;
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine
 #endif

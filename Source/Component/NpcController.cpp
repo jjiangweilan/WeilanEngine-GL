@@ -3,14 +3,14 @@
 
 #include <fstream>
 
-namespace KuangyeEngine {
+namespace WeilanEngine {
 
 COMPONENT_DEFINATION(Component, NpcController, 32);
 COMPONENT_EDITABLE_DEF(NpcController);
 
 NpcController::NpcController(Entity *entity, const std::string &id)
     : Component(entity), todaysBehaviorIndex(0), currentMovementIndex(0)  {
-    auto resourceManager = ResourceManager::get();
+    auto resourceManager = ResourceManager::Get();
     Json &npcData = resourceManager->getNpcJsonData()[id];
     this->id = id;
     name = npcData["name"].get<std::string>();
@@ -54,4 +54,4 @@ NpcController::NpcController(Entity *entity, void **args) : Component(entity) {
 
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15.0)
 cmake_policy(SET CMP0091 NEW) #for unit testing
 
-project(KuangyeEngine)
+project(WeilanEngine)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -23,12 +23,12 @@ add_subdirectory(Extern/imgui/)
 add_subdirectory(Extern/lua/)
 
 #Engine
-add_library(KuangyeEngine)
+add_library(WeilanEngine)
 
 add_subdirectory(Header/)
 add_subdirectory(Source/)
 
-target_include_directories(KuangyeEngine
+target_include_directories(WeilanEngine
     PUBLIC 
     Extern/glm/
     Extern/json/include/
@@ -41,7 +41,7 @@ target_include_directories(KuangyeEngine
     Extern/SDL2_mixer/include/
 )
 
-TARGET_LINK_LIBRARIES(KuangyeEngine
+TARGET_LINK_LIBRARIES(WeilanEngine
     glad
     freetype
     imGUI
@@ -55,7 +55,4 @@ TARGET_LINK_LIBRARIES(KuangyeEngine
 add_compile_definitions(ROOT_DIR=std::string\(\"${CMAKE_CURRENT_SOURCE_DIR}\"\))
 
 #Test
-if (BUILD_TESTING)
-    message(STATUS "Testing Enabled")
-    add_subdirectory(Test/)
-endif(BUILD_TESTING)
+add_subdirectory(Test/)

@@ -10,7 +10,7 @@
 #include <SDL_mixer.h>
 #include <json.hpp>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 using Json = nlohmann::json;
 
@@ -20,11 +20,11 @@ class ResourceManager
 {
 public:
     static void init();
-    static ResourceManager *get() { return resourceManager; };
+    static ResourceManager *Get() { return resourceManager; };
     ~ResourceManager();
 
     /* FreeType *************************************/
-    Graphics::Character *getCharacter(const wchar_t &wildCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight);
+    Graphics::Character *GetCharacter(const wchar_t &wildCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight);
 
     /* Get Data ***********************************/
     Json &getNpcJsonData();
@@ -32,10 +32,16 @@ public:
 
     /* Audio */
     Mix_Chunk *getAudioChunk(const std::string &file);
-    void freeAudioChunk(const std::string &file);
-    void freeAudioChunk();
+    void FreeAudioChunk(const std::string &file);
+    void FreeAudioChunk();
+
+    const std::string& GetResourceDir();
+    void SetResourceDir(std::string& dir);
+
+    void SaveResourcePreferences();
 
 private:
+    std::string m_resourceDir;
     static ResourceManager *resourceManager;
     ResourceManager();
     CharacterMap m_characters;
@@ -44,10 +50,14 @@ private:
     Json m_npcJsonData;
     Json m_savedGameData;
     Json m_monsterData;
+    Json m_EngineConfig;
 
     FT_Library m_freeTypeLibrary;
     FT_Face m_face;
 
     std::map<std::string, Mix_Chunk *> m_audioChunks;
+
+    //Resource Path
+    void LocateResourceDirectory();
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

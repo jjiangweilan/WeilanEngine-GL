@@ -3,10 +3,10 @@
 
 #include <SDL_audio.h>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class AudioSystem : public System
 {
     SYSTEM_DECLARATION(AudioSystem);
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

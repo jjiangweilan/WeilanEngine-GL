@@ -1,5 +1,5 @@
 #include "Component/StateMachine.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 COMPONENT_DEFINATION(Component, StateMachine, 8);
 StateMachine::StateMachine(Entity *go, const StateType &initialState) : Component(go), currentState(initialState)
@@ -36,4 +36,4 @@ void StateMachine::addState(const StateType &name)
 {
     states[name];
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

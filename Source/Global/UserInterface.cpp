@@ -9,11 +9,11 @@
 #include "Component/Sprite.hpp"
 #include "GameObject/Entity.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 Entity *UserInterface::showDialog(NpcController *npcController)
 {
-    auto engineManager = EngineManager::GetKuangyeEngine();
+    auto engineManager = EngineManager::GetWeilanEngine();
     auto renderSystem = RenderSystem::Get();
     auto scene = engineManager->getCurrentScene();
     auto dialog = scene->CreateGameObject("Dialog", scene->getCamera());
@@ -34,4 +34,4 @@ Entity *UserInterface::showDialog(NpcController *npcController)
 }
 
 void UserInterface::switchToUIMode() {}
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

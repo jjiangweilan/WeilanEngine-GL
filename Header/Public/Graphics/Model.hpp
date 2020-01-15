@@ -9,7 +9,7 @@
 #include <vector>
 #include <unordered_map>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class GameEditor;
 namespace Graphics
@@ -83,4 +83,4 @@ Model* Model::Add(const std::string& id, Args&& ... args)
 }
 
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -2,7 +2,7 @@
 #include "GameObject/Entity.hpp"
 #include "Graphics/Shader.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 COMPONENT_DEFINATION(Component, VolumetricLight, 32);
 COMPONENT_EDITABLE_DEF(VolumetricLight);
@@ -28,4 +28,4 @@ void VolumetricLight::loadTexture(const std::string &file)
     m_mesh.addTexture(file);
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

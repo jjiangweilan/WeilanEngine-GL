@@ -8,7 +8,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-namespace KuangyeEngine {
+namespace WeilanEngine {
 class Entity;
 namespace Utility {
 using Unicode = wchar_t;
@@ -47,5 +47,6 @@ bool TestRayOBBIntersection(
 	glm::mat4 ModelMatrix,       // Transformation applied to the mesh (which will thus be also applied to its bounding box)
 	float& intersection_distance // Output : distance between ray_origin and the intersection with the OBB
 );
+
 } // namespace Utility
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

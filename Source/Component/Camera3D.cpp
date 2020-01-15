@@ -7,7 +7,7 @@
 
 #include "Global/Time.hpp"
 #include "Global/Input.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 COMPONENT_DEFINATION_NEW(Camera, Camera3D);
 COMPONENT_EDITABLE_DEF(Camera3D);
@@ -120,4 +120,4 @@ void Camera3D::updatePosition()
 		}
 	}
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -2,7 +2,7 @@
 #include "Graphics/ShaderParameterDefines.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -193,9 +193,9 @@ void ShaderParameter::ShaderParameterType<TextureUnitBinding>::Use()
 }
 
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -212,4 +212,4 @@ ParameterType ShaderParameter::ShaderParameterBase::GetType()
     return m_type;
 }
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

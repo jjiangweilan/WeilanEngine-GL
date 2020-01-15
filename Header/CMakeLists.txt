@@ -1,4 +1,4 @@
-target_include_directories(KuangyeEngine
+target_include_directories(WeilanEngine
     PUBLIC
     Public/
     PRIVATE

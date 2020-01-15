@@ -2,7 +2,7 @@
 #include "GameObject/Entity.hpp"
 #include "System/RenderSystem.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 
 COMPONENT_DEFINATION_NEW(Camera, Camera2D);
@@ -60,4 +60,4 @@ void Camera2D::update()
         auto size = RenderSystem::Get()->GetSceneSize();
         SetProjectionMatrix(0, size.x, 0, size.y, -100000,100000);
 	}
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -1,7 +1,7 @@
 #include "Graphics/Character.hpp"
 #include "Manager/ResourceManager.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -28,4 +28,4 @@ const Mesh2D *Character::getMesh() const
     return &m_mesh;
 }
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

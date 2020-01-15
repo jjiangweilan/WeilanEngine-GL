@@ -1,6 +1,6 @@
 #pragma once
 #include <chrono>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class Time
 {
@@ -20,4 +20,4 @@ public:
 private:
     static std::chrono::time_point<std::chrono::steady_clock> oldTime;
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

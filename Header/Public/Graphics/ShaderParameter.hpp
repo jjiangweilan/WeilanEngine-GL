@@ -4,7 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <functional>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -33,7 +33,7 @@ struct TextureUnitBinding
 
 class ShaderParameter
 {
-    friend class KuangyeEngine::GameEditor;
+    friend class WeilanEngine::GameEditor;
 
 public:
     ShaderParameter(){};
@@ -179,4 +179,4 @@ std::unique_ptr<ShaderParameter::ShaderParameterBase> ShaderParameter::ShaderPar
     return std::make_unique<ShaderParameter::ShaderParameterType<T>>(*this);
 }
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

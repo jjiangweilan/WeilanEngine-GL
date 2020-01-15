@@ -1,9 +1,9 @@
 #include "Utility/Utility.hpp"
 #include <vector>
 
-#include "Global/KuangyeEngine.hpp"
+#include "Global/WeilanEngine.hpp"
 #include "System/RenderSystem.hpp"
-namespace KuangyeEngine {
+namespace WeilanEngine {
 namespace Utility {
 Json *Utility::findComponentWithName(Json &j, const std::string &name) {
     for (auto &component : j["components"]) {
@@ -149,7 +149,7 @@ bool Utility::TestRayOBBIntersection(
 
 void Utility::getRayFromScreenToWorld(const float& x, const float& y, glm::vec3& origin, glm::vec3& end) {
 	auto sceneSize = RenderSystem::Get()->GetSceneSize();
-	auto camera = EngineManager::GetKuangyeEngine()->getCurrentScene()->getCamera();
+	auto camera = EngineManager::GetWeilanEngine()->getCurrentScene()->getCamera();
 	auto camera3d = camera->GetComponent<Camera3D>();
 
 	float xf = (2.0 * x) / sceneSize.x - 1.0f;
@@ -167,5 +167,6 @@ void Utility::getRayFromScreenToWorld(const float& x, const float& y, glm::vec3&
 }
 
 std::vector<Entity *>::iterator Utility::findEntity(std::vector<Entity *> &allEntities, Entity *entity) { return std::lower_bound(allEntities.begin(), allEntities.end(), entity); }
+
 } // namespace Utility
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

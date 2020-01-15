@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class NpcController;
 class Entity;
@@ -12,4 +12,4 @@ public:
   static void showSettings();
   static void switchToUIMode();
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

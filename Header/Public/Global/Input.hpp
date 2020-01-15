@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "System/InputSystem.hpp"
-namespace KuangyeEngine {
+namespace WeilanEngine {
     using ControllerAxisType=Sint16;
 	using ControllerButtonType=Uint8;
 

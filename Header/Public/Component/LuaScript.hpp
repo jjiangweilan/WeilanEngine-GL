@@ -2,7 +2,7 @@
 #include "Component.hpp"
 #include <string>
 class lua_State;
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class LuaScript : public Component
 {
@@ -17,4 +17,4 @@ private:
     std::string file;
 
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

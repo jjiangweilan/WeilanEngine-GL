@@ -4,7 +4,7 @@
 #include "Global/Settings.hpp"
 #include <memory>
 
-namespace KuangyeEngine {
+namespace WeilanEngine {
     class Scene;
     class Entity {
     public:

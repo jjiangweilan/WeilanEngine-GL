@@ -4,8 +4,8 @@
 #include "Component/Transform.hpp"
 #include "GameObject/Entity.hpp"
 #include "Utility/Utility.hpp"
-extern KuangyeEngine::Entity *player;
-namespace KuangyeEngine
+extern WeilanEngine::Entity *player;
+namespace WeilanEngine
 {
 PhysicsSystem *PhysicsSystem::system = nullptr;
 
@@ -30,7 +30,7 @@ void PhysicsSystem::update()
     }*/
 
     // update cells
-    auto scene = EngineManager::GetKuangyeEngine()->getCurrentScene();
+    auto scene = EngineManager::GetWeilanEngine()->getCurrentScene();
     TRigidbody::dynamicSpaticalHash.clear();
     for (auto &body : TRigidbody::collection)
     {
@@ -613,4 +613,4 @@ void PhysicsSystem::contactBeginHelper(TRigidbody *body1, TRigidbody *body2)
     }
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

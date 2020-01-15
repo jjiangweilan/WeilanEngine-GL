@@ -99,7 +99,7 @@ private:
 #define COMPONENT_EDITABLE_DEF(T)                                                                                       \
     bool T::isComponentReg = registerComponent<T>([](Entity *go, void **args) { go->AddComponent<T>(args); });
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 	class Entity;
 	struct Component
@@ -131,4 +131,4 @@ namespace KuangyeEngine
 		(*getComponentFactoryList())[T::componentId] = f;
 		return true;
 	}
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

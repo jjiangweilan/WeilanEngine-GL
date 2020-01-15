@@ -5,11 +5,11 @@
 #include "GameObject/Scene.hpp"
 #include "Global/Time.hpp"
 
-namespace KuangyeEngine {
+namespace WeilanEngine {
     class System;
     class EngineManager {
         public:
-            static EngineManager* GetKuangyeEngine();
+            static EngineManager* GetWeilanEngine();
 
             void SetScene(Scene*);
 
@@ -48,6 +48,6 @@ namespace KuangyeEngine {
             void SDLinit();
     };
 
-    } // namespace KuangyeEngine
+    } // namespace WeilanEngine
 
 #endif

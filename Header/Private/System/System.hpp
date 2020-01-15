@@ -27,7 +27,7 @@ private:                               \
         return system;                        \
     }
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class System
 {
@@ -39,4 +39,4 @@ public:
 protected:
     static void registerSystem(System *); //register the system to collection
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

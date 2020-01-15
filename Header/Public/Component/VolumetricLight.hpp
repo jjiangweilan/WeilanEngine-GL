@@ -1,7 +1,7 @@
 #pragma once
 #include "Component.hpp"
 #include "../Graphics/Mesh2D.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class Shader;
 class VolumetricLight : public Component
@@ -22,4 +22,4 @@ private:
     Graphics::Shader *m_shader;
 };
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

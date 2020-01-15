@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include FT_FREETYPE_H
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -151,4 +151,4 @@ Texture *Texture::Add(const std::string &id, Args &&... args)
     return &pair.first->second;
 }
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -2,7 +2,7 @@
 
 #include "System.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class NpcController;
 class NpcSystem : public System
@@ -19,4 +19,4 @@ private:
     void move(NpcController *npcController);
     void trade(NpcController *npcController);
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

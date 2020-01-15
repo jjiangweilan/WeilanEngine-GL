@@ -1,7 +1,7 @@
 #include "Graphics/Material.hpp"
 #include "Graphics/Shader.hpp"
 #include "Graphics/Mesh.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -110,4 +110,4 @@ void Material::SetRenderIndex(const unsigned int& index)
     m_renderIndex = index;
 }
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

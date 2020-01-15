@@ -7,7 +7,7 @@
 #include <vector>
 #include <utility>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 	namespace Graphics {
 		class Texture;
@@ -61,4 +61,4 @@ private:
   friend class AnimationSystem;
   friend class GameEditor;
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

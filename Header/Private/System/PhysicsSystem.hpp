@@ -18,7 +18,7 @@ ps: define A as the main, B is the obejct being collided with A
 
   we have rules 2 and 3 because the system will only actively test dynamic body, static body is passive
 */
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class Entity;
 class TRigidbody;
@@ -58,4 +58,4 @@ private:
 
   friend struct Physics;
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

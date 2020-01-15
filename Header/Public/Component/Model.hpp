@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <functional>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -36,4 +36,4 @@ private:
 	Graphics::Model* m_model;
 	std::unique_ptr<Graphics::Model> m_uniqueModel;
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

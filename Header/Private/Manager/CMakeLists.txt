@@ -1,5 +1,5 @@
 target_sources(
-    KuangyeEngine
+    WeilanEngine
     PRIVATE
     ResourceManager.hpp
 )

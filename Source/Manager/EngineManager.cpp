@@ -19,14 +19,14 @@
 #include "Manager/ResourceManager.hpp"
 #include <SDL_mixer.h>
 
-namespace KuangyeEngine {
+namespace WeilanEngine {
 EngineManager *EngineManager::engine = nullptr;
 
 EngineManager::EngineManager() {
     quit = false;
+    initializeManagers();
     SDLinit();
     initializeSystems();
-    initializeManagers();
 };
 
 void EngineManager::SDLinit() {
@@ -64,7 +64,7 @@ void EngineManager::postInitialization() {
     }
 }
 
-EngineManager *EngineManager::GetKuangyeEngine() {
+EngineManager *EngineManager::GetWeilanEngine() {
     if (engine)
         return engine;
 
@@ -132,4 +132,4 @@ void EngineManager::Start() {
     postInitialization();
     loop();
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -2,14 +2,14 @@
 #include "GameObject/Scene.hpp"
 #include "Component/Transform.hpp"
 #include "Manager/EngineManager.hpp"
-namespace KuangyeEngine {
+namespace WeilanEngine {
     Entity::Entity(const std::string& name) : name(name), transform(nullptr), enable(true) { }
 	
     void Entity::SetParent(Entity* newParent) {
         //remove from previous hierachy
         if (auto preParent = this->parent) preParent->children.erase(this);
         else {
-            EngineManager::GetKuangyeEngine()->getCurrentScene()->sceneGraph.erase(this);
+            EngineManager::GetWeilanEngine()->getCurrentScene()->sceneGraph.erase(this);
         }
         
         //add to new hierachy
@@ -18,7 +18,7 @@ namespace KuangyeEngine {
             newParent->children.insert(this);
         }
         else {
-            EngineManager::GetKuangyeEngine()->getCurrentScene()->sceneGraph.insert(this);
+            EngineManager::GetWeilanEngine()->getCurrentScene()->sceneGraph.insert(this);
             this->parent = nullptr;
         }
 

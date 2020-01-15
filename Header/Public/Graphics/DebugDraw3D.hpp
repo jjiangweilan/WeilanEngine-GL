@@ -5,7 +5,7 @@
 #include "Mesh.hpp"
 #include "Shader.hpp"
 #include "Material.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -22,4 +22,4 @@ class DebugDraw3D
     static DebugDraw3D* instance;
 };
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

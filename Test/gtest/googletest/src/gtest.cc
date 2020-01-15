@@ -157,7 +157,7 @@ static const char kDisableTestFilter[] = "DISABLED_*:*/DISABLED_*";
 static const char kDeathTestSuiteFilter[] = "*DeathTest:*DeathTest/*";
 
 // A test filter that matches everything.
-static const char KuangyeversalFilter[] = "*";
+static const char WeilanversalFilter[] = "*";
 
 // The default output format.
 static const char kDefaultOutputFormat[] = "xml";
@@ -206,7 +206,7 @@ static const char* GetDefaultFilter() {
   if (testbridge_test_only != nullptr) {
     return testbridge_test_only;
   }
-  return KuangyeversalFilter;
+  return WeilanversalFilter;
 }
 
 GTEST_DEFINE_bool_(
@@ -538,7 +538,7 @@ bool UnitTestOptions::FilterMatchesTest(const std::string& test_suite_name,
     negative = std::string(dash + 1);  // Everything after the dash
     if (positive.empty()) {
       // Treat '-test1' as the same as '*-test1'
-      positive = KuangyeversalFilter;
+      positive = WeilanversalFilter;
     }
   }
 
@@ -3147,7 +3147,7 @@ void PrettyUnitTestResultPrinter::OnTestIterationStart(
 
   // Prints the filter if it's not *.  This reminds the user that some
   // tests may be skipped.
-  if (!String::CStringEquals(filter, KuangyeversalFilter)) {
+  if (!String::CStringEquals(filter, WeilanversalFilter)) {
     ColoredPrintf(COLOR_YELLOW,
                   "Note: %s filter = %s\n", GTEST_NAME_, filter);
   }

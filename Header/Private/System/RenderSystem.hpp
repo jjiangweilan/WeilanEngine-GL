@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include <stb_image.hpp>
 //NOTE: The G-Syn is limiting the frame rate to 60!
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics {
 		class Shader;
@@ -125,4 +125,4 @@ private:
   void genFramebuffer(GLuint &fb, GLuint &ft, GLuint &ds);
   void initSceneFrambufferData();
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

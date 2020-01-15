@@ -6,7 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #define COMPONENT_ALLOCATION_SIZE 1000
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class Entity;
 class Transform : public Component
@@ -52,6 +52,6 @@ public:
 private:
     friend class Entity;
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine
 
 #endif

@@ -1,5 +1,5 @@
 #pragma once
-namespace KuangyeEngine {
+namespace WeilanEngine {
     struct Rect {
         int x;
         int y;

@@ -6,7 +6,7 @@
  *   
  */
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -27,4 +27,4 @@ public:
     std::multiset<Mesh *, RenderGroupComp>::iterator end();
 };
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

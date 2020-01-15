@@ -12,7 +12,7 @@
 
 //Defination for LuaScriptBridge
 //The implementation is moved here because the sizes of the arrays need to be known prior to using them
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 	const luaL_Reg LuaScriptBridge::transformLib[] = {
 		COMPONENT_LIB,
@@ -399,7 +399,7 @@ namespace KuangyeEngine
 	}
 }
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 COMPONENT_DEFINATION(Component, LuaScript, 32);
 
@@ -455,4 +455,4 @@ void LuaScript::PostInit()
         std::cout << lua_tostring(state, -1);
     }
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

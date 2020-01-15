@@ -1,6 +1,6 @@
 #include "Graphics/Mesh2D.hpp"
 #include "Manager/ResourceManager.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -37,7 +37,7 @@ void Mesh2D::addTexture(const std::string &file)
 	//update vertices update according to the first texture (the main texture)
 	if (m_textures.size() == 1)
 	{
-		KuangyeEngine::Rect m_rect(0, 0, m_textures[0]->getWidth(), m_textures[0]->getHeight());
+		WeilanEngine::Rect m_rect(0, 0, m_textures[0]->getWidth(), m_textures[0]->getHeight());
 		clip(&m_rect);
 	}
 }
@@ -48,11 +48,11 @@ void Mesh2D::addTexture(Texture *texture)
 
 	if (m_textures.size() == 1)
 	{
-		KuangyeEngine::Rect m_rect(0, 0, m_textures[0]->getWidth(), m_textures[0]->getHeight());
+		WeilanEngine::Rect m_rect(0, 0, m_textures[0]->getWidth(), m_textures[0]->getHeight());
 		clip(&m_rect);
 	}
 }
-void Mesh2D::clip(KuangyeEngine::Rect *rect) const
+void Mesh2D::clip(WeilanEngine::Rect *rect) const
 {
 	this->m_rect = *rect;
 
@@ -100,17 +100,17 @@ void Mesh2D::changeTexture(const int &loc, Texture *t)
 		m_textures[loc] = t;
 		if (loc == 0)
 		{
-			KuangyeEngine::Rect rect(0, 0, t->getWidth(), t->getHeight());
+			WeilanEngine::Rect rect(0, 0, t->getWidth(), t->getHeight());
 			clip(&rect);
 		}
 	}
 }
 
-const KuangyeEngine::Rect *Mesh2D::getClipRect() const { return &m_rect; }
+const WeilanEngine::Rect *Mesh2D::getClipRect() const { return &m_rect; }
 const GLuint &Mesh2D::getVAO() const { return m_VAO; }
 const std::vector<Texture *> *Mesh2D::getTextures() const
 {
 	return &m_textures;
 }
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

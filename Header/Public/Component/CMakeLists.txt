@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15.0)
 
-target_sources(KuangyeEngine
+target_sources(WeilanEngine
     PUBLIC
     "Animation.hpp"
     "Audio.hpp"

@@ -3,7 +3,7 @@
 #include "Manager/ResourceManager.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 COMPONENT_DEFINATION(Component, Text, 32);
 Text::Text(Entity *entity) : Component(entity), language(Language::English), animated(true), textRenderIndex(0), renderStarted(false), m_timePassed(0), animationSpeed(0.02)
@@ -18,7 +18,7 @@ void Text::loadFromFile(const std::string &fileName)
 
 void Text::loadText(const std::wstring &textStr)
 {
-    auto resourceManager = ResourceManager::get();
+    auto resourceManager = ResourceManager::Get();
     int advance = 0;
     int offsetY = 0;
     for (const wchar_t &rawCharacter : textStr)
@@ -29,7 +29,7 @@ void Text::loadText(const std::wstring &textStr)
             advance = 0;
             continue;
         }
-        auto character = resourceManager->getCharacter(rawCharacter, 24, 24);
+        auto character = resourceManager->GetCharacter(rawCharacter, 24, 24);
 
         text.emplace_back(character, advance, offsetY);
         advance += character->getFace()->glyph->advance.x >> 6; // The advance vector is expressed in 1/64th of pixels
@@ -40,14 +40,14 @@ void Text::loadText(const std::wstring &textStr, const int &maxLineWidth, const 
 {
     switch (language)
     {
-    case KuangyeEngine::Language::Chinese:
+    case WeilanEngine::Language::Chinese:
         loadChinese(textStr, maxLineWidth, lineSpace, charWidth, charHeight);
         break;
-    case KuangyeEngine::Language::Japanese:
+    case WeilanEngine::Language::Japanese:
         break;
-    case KuangyeEngine::Language::Korean:
+    case WeilanEngine::Language::Korean:
         break;
-    case KuangyeEngine::Language::English:
+    case WeilanEngine::Language::English:
         loadEnglish(textStr, maxLineWidth, lineSpace, charWidth, charHeight);
         break;
     default:
@@ -66,12 +66,12 @@ void Text::loadText(const std::string &textStr, const int &maxLineWidth, const i
 
 void Text::loadChinese(const std::wstring &textStr, const int &maxLineWidth, const int &lineSpace, const int &charWidth, const int &charHeight)
 {
-    auto resourceManager = ResourceManager::get();
+    auto resourceManager = ResourceManager::Get();
     int totalAdvance = 0;
     int offsetY = 0;
     for (const wchar_t &rawCharacter : textStr)
     {
-        auto character = resourceManager->getCharacter(rawCharacter, charWidth, charHeight);
+        auto character = resourceManager->GetCharacter(rawCharacter, charWidth, charHeight);
 
         if (rawCharacter == L'\n')
         {
@@ -94,7 +94,7 @@ void Text::loadChinese(const std::wstring &textStr, const int &maxLineWidth, con
 
 void Text::loadEnglish(const std::wstring &textStr, const int &maxLineWidth, const int &lineSpace, const int &charWidth, const int &charHeight)
 {
-    auto resourceManager = ResourceManager::get();
+    auto resourceManager = ResourceManager::Get();
     int totalAdvance = 0;
     int offsetY = 0;
     for (int i = 0; i < textStr.size(); i++)
@@ -115,7 +115,7 @@ void Text::loadEnglish(const std::wstring &textStr, const int &maxLineWidth, con
             int wordWidth = 0;
             while (textStr[i] != L'\n' && i < textStr.size())
             {
-                auto character = resourceManager->getCharacter(textStr[i], charWidth, charHeight);
+                auto character = resourceManager->GetCharacter(textStr[i], charWidth, charHeight);
                 word.push_back(character);
                 wordWidth += character->getFace()->glyph->advance.x >> 6;
                 if (textStr[i] == L' ')
@@ -181,4 +181,4 @@ const float &Text::getTimePassed() const
 {
     return m_timePassed;
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

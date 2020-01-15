@@ -7,7 +7,7 @@
 #include <set>
 #include <unordered_map>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class RenderSystem;
 namespace Graphics
@@ -127,4 +127,4 @@ Material *Material::Add(const std::string &id, Args &&... args)
     return &pair.first->second;
 }
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -1,8 +1,8 @@
 target_sources(
-    KuangyeEngine
+    WeilanEngine
     PUBLIC
     Input.hpp
     Settings.hpp
     UserInterface.hpp
-    KuangyeEngine.hpp
+    WeilanEngine.hpp
 )

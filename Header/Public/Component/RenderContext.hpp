@@ -3,7 +3,7 @@
 
 #include "../Graphics/Texture.hpp"
 #include "../Graphics/Mesh.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -113,4 +113,4 @@ private:
 
     friend class RenderSystem;
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

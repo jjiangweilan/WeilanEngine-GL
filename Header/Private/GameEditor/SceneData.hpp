@@ -5,7 +5,7 @@
 #include <map>
 #include <json.hpp>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 using Json = nlohmann::json;
 enum class EditableComponent
@@ -31,4 +31,4 @@ public:
 private:
     void eraseGameObjectFromChildren(const std::string &parent, const std::string &child);
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

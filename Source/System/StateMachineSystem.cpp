@@ -2,7 +2,7 @@
 #include "Manager/EngineManager.hpp"
 #include "Component/StateMachine.hpp"
 #include "GameObject/Entity.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 SYSTEM_DEFINATION(StateMachineSystem);
 
@@ -12,7 +12,7 @@ StateMachineSystem::StateMachineSystem()
 
 void StateMachineSystem::update()
 {
-    auto currentScene = EngineManager::GetKuangyeEngine()->getCurrentScene();
+    auto currentScene = EngineManager::GetWeilanEngine()->getCurrentScene();
     for (auto &sm : StateMachine::collection)
     {
         if (!sm->entity->IsEnable() || sm->entity->GetScene() != currentScene)
@@ -49,4 +49,4 @@ void StateMachineSystem::update()
         }
     }
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine
