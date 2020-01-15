@@ -10,7 +10,7 @@
 #include <SDL_mixer.h>
 #include <json.hpp>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 using Json = nlohmann::json;
 
@@ -32,11 +32,13 @@ public:
 
     /* Audio */
     Mix_Chunk *getAudioChunk(const std::string &file);
-    void freeAudioChunk(const std::string &file);
-    void freeAudioChunk();
+    void FreeAudioChunk(const std::string &file);
+    void FreeAudioChunk();
 
     const std::string& GetResourceDir();
     void SetResourceDir(std::string& dir);
+
+    void SaveResourcePreferences();
 
 private:
     std::string m_resourceDir;
@@ -48,6 +50,7 @@ private:
     Json m_npcJsonData;
     Json m_savedGameData;
     Json m_monsterData;
+    Json m_EngineConfig;
 
     FT_Library m_freeTypeLibrary;
     FT_Face m_face;
@@ -55,6 +58,6 @@ private:
     std::map<std::string, Mix_Chunk *> m_audioChunks;
 
     //Resource Path
-    void LocateResourcePath();
+    void LocateResourceDirectory();
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

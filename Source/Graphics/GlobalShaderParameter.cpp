@@ -1,7 +1,7 @@
 
 #include "Graphics/GlobalShaderParameter.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -56,4 +56,4 @@ GLuint GlobalShaderParameter::GetGlobalParameterIndex(const std::string& name)
 	return m_UBOs[name];
 }
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

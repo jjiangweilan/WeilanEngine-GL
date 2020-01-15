@@ -1,7 +1,7 @@
 #include "Component/Transform.hpp"
 #include "GameObject/Entity.hpp"
 
-namespace KuangyeEngine {
+namespace WeilanEngine {
 COMPONENT_DEFINATION(Component, Transform, COMPONENT_ALLOCATION_SIZE);
 COMPONENT_EDITABLE_DEF(Transform);
 
@@ -149,4 +149,4 @@ glm::vec3 Transform::getLocalPosition()
         return position;
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

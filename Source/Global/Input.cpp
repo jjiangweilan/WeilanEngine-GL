@@ -6,7 +6,7 @@
 #include "GameEditor/GameEditor.hpp"
 #endif
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 int Input::getKeyStatus(SDL_Scancode scancode)
 {
@@ -78,4 +78,4 @@ bool Input::isMouseClicked(const MouseButton::MouseButton &button)
     return InputSystem::get()->mouseClickedState[button];
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

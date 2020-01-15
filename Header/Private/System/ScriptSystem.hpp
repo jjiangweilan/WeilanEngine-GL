@@ -1,6 +1,6 @@
 #pragma once
 #include "System.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class ScriptSystem : public System
 {
@@ -15,4 +15,4 @@ private:
 	static ScriptSystem *system;
 	ScriptSystem();
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

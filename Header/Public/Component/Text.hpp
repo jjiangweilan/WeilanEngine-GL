@@ -7,7 +7,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 
 enum class Language
@@ -81,4 +81,4 @@ private:
 	void loadEnglish(const std::wstring &textStr, const int &maxLineWidth, const int &lineSpace, const int &charWidth, const int &charHeight);
 	void loadChinese(const std::wstring &textStr, const int &maxLineWidth, const int &lineSpace, const int &charWidth, const int &charHeight);
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

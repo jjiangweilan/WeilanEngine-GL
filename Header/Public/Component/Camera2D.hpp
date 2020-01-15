@@ -5,7 +5,7 @@
 #include "GameObject/Entity.hpp"
 #include "Global/Input.hpp"
 #include "Global/Time.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 
 struct Camera2D : public Camera
@@ -24,4 +24,4 @@ public:
 
 	void update();
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

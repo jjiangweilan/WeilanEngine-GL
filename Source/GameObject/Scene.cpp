@@ -13,7 +13,7 @@
 #include <memory>
 #include <cassert>
 
-namespace KuangyeEngine {
+namespace WeilanEngine {
 void Scene::update() {
 }
 
@@ -239,4 +239,4 @@ Entity *Scene::findGameObjectByNameHelper(std::set<Entity *>::iterator iter, std
     }
     return nullptr;
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -7,7 +7,7 @@
 #include "Component/TRigidbody.hpp"
 #include "GameObject/Entity.hpp"
 #include "Global/Time.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 NpcSystem *NpcSystem::system = nullptr;
 
@@ -18,7 +18,7 @@ NpcSystem::NpcSystem() {}
 void NpcSystem::update()
 {
     // pick today's behavior
-    auto currentScene = EngineManager::GetKuangyeEngine()->getCurrentScene();
+    auto currentScene = EngineManager::GetWeilanEngine()->getCurrentScene();
     if (Time::dayTimeInSecond > Time::dayDuration)
     {
         Time::resetDayTime();
@@ -90,4 +90,4 @@ void NpcSystem::move(NpcController *npcController)
     }
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 
 void SceneData::createGameObject(Entity *go, Entity *parent, const Json *json_ptr)
@@ -129,4 +129,4 @@ void SceneData::editTransform(Entity *go, const int &x, const int &y, const int 
 		}
 	}
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

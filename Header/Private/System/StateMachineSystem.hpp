@@ -1,9 +1,9 @@
 #pragma once
 #include "System.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class StateMachineSystem : public System
 {
     SYSTEM_DECLARATION(StateMachineSystem);
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

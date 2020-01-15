@@ -1,6 +1,6 @@
 #include "Component/Component.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 std::map<std::size_t, std::string> *Component::componentIdToName =
     getComponentIdToName();
@@ -45,4 +45,4 @@ std::map<std::size_t, std::string> *Component::getComponentIdToName()
     }
     return Component::componentIdToName;
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

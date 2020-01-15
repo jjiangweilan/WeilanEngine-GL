@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Settings
 {
@@ -15,4 +15,4 @@ EngineMode engineMode = EngineMode::Gameplay;
 DebugRender debugRender = DebugRender::On;
 GameDimension gameDimension = GameDimension::Three;
 } // namespace Settings
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

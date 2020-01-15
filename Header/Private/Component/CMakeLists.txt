@@ -1,4 +1,4 @@
-target_sources(KuangyeEngine
+target_sources(WeilanEngine
     PRIVATE
     FixedArrayAllocator.hpp
     Clip.hpp

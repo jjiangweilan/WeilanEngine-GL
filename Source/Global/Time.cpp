@@ -1,6 +1,6 @@
 #include "Global/Time.hpp"
 #include <iostream>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 float Time::deltaTime = 0.0000001;
 double Time::timeAfterGameStart = 0;
@@ -28,4 +28,4 @@ void Time::resetDayTime()
 {
     dayTimeInSecond = 0;
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

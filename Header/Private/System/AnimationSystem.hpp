@@ -1,7 +1,7 @@
 #pragma once
 #include "System.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class Animation;
 class AnimationSystem : public System
@@ -10,4 +10,4 @@ class AnimationSystem : public System
 
     void updateClip(Animation *);
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

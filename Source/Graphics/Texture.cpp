@@ -1,7 +1,7 @@
 #include "Graphics/Texture.hpp"
 #include "Global/Settings.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -163,4 +163,4 @@ void Texture::remove(const std::string &id)
     collection.erase(id);
 }
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

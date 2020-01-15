@@ -5,7 +5,7 @@
 #include <string>
 #include <json.hpp>
 #include <functional>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class Entity;
 class Sprite;
@@ -151,4 +151,4 @@ void GameEditor::createComponentJsonHelper(Json &params, int index, T &&arg, Arg
     params[index] = arg;
     createComponentJsonHelper(params, index + 1, args...);
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

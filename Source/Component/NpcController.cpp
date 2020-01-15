@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-namespace KuangyeEngine {
+namespace WeilanEngine {
 
 COMPONENT_DEFINATION(Component, NpcController, 32);
 COMPONENT_EDITABLE_DEF(NpcController);
@@ -54,4 +54,4 @@ NpcController::NpcController(Entity *entity, void **args) : Component(entity) {
 
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

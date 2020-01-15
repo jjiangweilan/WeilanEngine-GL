@@ -2,7 +2,7 @@
 #include "Graphics/Mesh.hpp"
 #include "Graphics/Material.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -30,4 +30,4 @@ bool RenderGroup::RenderGroupComp::operator()(Mesh *first, Mesh *second)
 
 } // namespace Graphics
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

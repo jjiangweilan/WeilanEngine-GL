@@ -29,7 +29,7 @@
 
 
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 RenderSystem *RenderSystem::renderSystem = nullptr;
 
@@ -140,7 +140,7 @@ void RenderSystem::Render(RenderContext* node, const bool& loop)
             if (renderScript)
                 renderScript->Update();
 
-			auto sceneSize = KuangyeEngine::RenderSystem::Get()->GetSceneSize();
+			auto sceneSize = WeilanEngine::RenderSystem::Get()->GetSceneSize();
             glBindFramebuffer(GL_FRAMEBUFFER, node->GetFramebuffer()); 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear framebuffer
             glViewport(0, 0, sceneSize.x, sceneSize.y);
@@ -174,7 +174,7 @@ void RenderSystem::RenderInputSources(RenderContext *node, const bool& loop)
     auto renderScript = node->entity->GetComponent<RenderScript>();
     if (renderScript)
         renderScript->Update();
-    auto sceneSize = KuangyeEngine::RenderSystem::Get()->GetSceneSize();
+    auto sceneSize = WeilanEngine::RenderSystem::Get()->GetSceneSize();
     glBindFramebuffer(GL_FRAMEBUFFER, node->GetFramebuffer()); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear framebuffer
     glViewport(0, 0, sceneSize.x, sceneSize.y);
@@ -197,14 +197,14 @@ void RenderSystem::RenderFromScene(RenderContext *node)
 
     glBindFramebuffer(GL_FRAMEBUFFER, node->GetFramebuffer());
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    auto sceneSize = KuangyeEngine::RenderSystem::Get()->GetSceneSize();
+    auto sceneSize = WeilanEngine::RenderSystem::Get()->GetSceneSize();
     glViewport(0, 0, sceneSize.x, sceneSize.y);
     RenderModel(node);
 }
 void RenderSystem::RenderModel(RenderContext *node)
 {
-    auto currentScene = KuangyeEngine::EngineManager::GetKuangyeEngine()->getCurrentScene();
-    for (auto model : KuangyeEngine::Model::collection)
+    auto currentScene = WeilanEngine::EngineManager::GetWeilanEngine()->getCurrentScene();
+    for (auto model : WeilanEngine::Model::collection)
     {
         if (!model->entity->IsEnable() || model->entity->GetScene() != currentScene)
             continue;
@@ -434,7 +434,7 @@ void RenderSystem::SDLInit()
 	windowWidth = sceneWidth;
 	windowHeight = sceneHeight;
 #endif
-	window = SDL_CreateWindow("Kuangye Engine", 150, 50, windowWidth, windowHeight, SDL_Flags);
+	window = SDL_CreateWindow("Weilan Engine", 150, 50, windowWidth, windowHeight, SDL_Flags);
 	glContext = SDL_GL_CreateContext(window);
 	SDL_AddEventWatch(windowResizeCallbackWrapper, window);
 	gladLoadGLLoader(SDL_GL_GetProcAddress);
@@ -478,7 +478,7 @@ void RenderSystem::renderGameEditor(unsigned int& sceneTexId)
 /* Render *************/
 void RenderSystem::renderGame()
 {
-	auto currentScene = EngineManager::GetKuangyeEngine()->getCurrentScene();
+	auto currentScene = EngineManager::GetWeilanEngine()->getCurrentScene();
 
 	for (auto c : Model::collection)
 	{
@@ -669,10 +669,10 @@ void RenderSystem::initSceneFrambufferData()
 
 void RenderSystem::PostInit()
 {
-	m_engine = EngineManager::GetKuangyeEngine();
+	m_engine = EngineManager::GetWeilanEngine();
 }
 void RenderSystem::SetOutputRenderNode(RenderContext *node)
 {
     m_outputNode = node;
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -1,6 +1,6 @@
 #include "Component/Camera.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 COMPONENT_DEFINATION(Component, Camera, 2);
 Camera::Camera(Entity *entity) : Component(entity)
@@ -35,4 +35,4 @@ const int32_t &Camera::GetLayerMask()
     return m_layerMask;
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

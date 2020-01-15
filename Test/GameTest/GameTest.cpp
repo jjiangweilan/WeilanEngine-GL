@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
-#include <Global/KuangyeEngine.hpp>
+#include <Global/WeilanEngine.hpp>
 #include "Scripts.hpp"
 
-using namespace KuangyeEngine;
+using namespace WeilanEngine;
 TEST(GameTest, EngineStart)
 {
-    auto engine = KuangyeEngine::EngineManager::GetKuangyeEngine();
+    auto engine = WeilanEngine::EngineManager::GetWeilanEngine();
     Scene scene;
 
     auto renderNodes = scene.CreateGameObject("renderNodes");

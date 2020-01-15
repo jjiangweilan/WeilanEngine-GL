@@ -6,7 +6,7 @@
 #include "Component/Animation.hpp"
 #include "Global/Time.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 SYSTEM_DEFINATION(AnimationSystem);
 AnimationSystem::AnimationSystem()
@@ -15,7 +15,7 @@ AnimationSystem::AnimationSystem()
 
 void AnimationSystem::update()
 {
-    auto currentScene = EngineManager::GetKuangyeEngine()->getCurrentScene();
+    auto currentScene = EngineManager::GetWeilanEngine()->getCurrentScene();
     for (auto &c : Animation::collection)
     {
         if (!c->entity->IsEnable() || c->entity->GetScene() != currentScene)
@@ -41,4 +41,4 @@ void AnimationSystem::updateClip(Animation *a)
     }
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

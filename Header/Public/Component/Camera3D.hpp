@@ -5,7 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <SDL.h>
 
-namespace KuangyeEngine {
+namespace WeilanEngine {
     class Camera3D : public Camera {
     public:
     COMPONENT_DECLARATION_NEW(Camera, Camera3D);

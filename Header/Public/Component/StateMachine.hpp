@@ -4,7 +4,7 @@
 #include <string>
 #include <functional>
 #include <array>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 using StateType = std::string;
 using StatePriority = uint8_t;
@@ -43,4 +43,4 @@ private:
 
     friend class StateMachineSystem;
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

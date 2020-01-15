@@ -4,7 +4,7 @@
 #include "Global/Settings.hpp"
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdl.h>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 SYSTEM_DEFINATION(InputSystem);
 
@@ -56,7 +56,7 @@ void InputSystem::keyDown(const SDL_Event &event)
         if (Settings::engineMode == Settings::EngineMode::Gameplay)
         {
             Settings::engineMode = Settings::EngineMode::Editor;
-            auto currentScene = EngineManager::GetKuangyeEngine()->getCurrentScene();
+            auto currentScene = EngineManager::GetWeilanEngine()->getCurrentScene();
             currentScene->reloadScene();
         }
         else
@@ -127,4 +127,4 @@ bool InputSystem::isControllerAxisClicked(const ControllerAxis &axis)
     };
     return false;
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -8,7 +8,7 @@
  * 
  * 
  */
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -48,4 +48,4 @@ private:
     static GlobalShaderParameter* instance;
 };
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

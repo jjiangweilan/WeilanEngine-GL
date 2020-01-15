@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include <climits>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 /* Cell **************************/
 bool Cell::operator<(const Cell &other) const { return this->row + this->column < other.row + other.column; }
@@ -462,4 +462,4 @@ std::vector<Cell> TRigidbody::getCells() const
 
 SpatialHash TRigidbody::dynamicSpaticalHash = SpatialHash();
 SpatialHash TRigidbody::staticSpaticalHash = SpatialHash();
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

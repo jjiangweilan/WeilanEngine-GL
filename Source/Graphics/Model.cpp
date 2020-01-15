@@ -3,7 +3,7 @@
 #include "Manager/ResourceManager.hpp"
 
 #include <cfloat>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -169,4 +169,4 @@ AABB Model::GetAABB() const
 }
 std::unordered_map<std::string, Model> Model::collection = std::unordered_map<std::string, Model>();
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

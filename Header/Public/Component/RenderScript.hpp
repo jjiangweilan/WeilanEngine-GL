@@ -6,7 +6,7 @@
  * Use Render Script to update unique parameter to material. Or you should clone the material
  * 
  */
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 struct RenderScript : public Component
 {
@@ -59,4 +59,4 @@ public:                                                                         
         fixedArrayAllocator.deallocate(ptr);                                        \
     }                                                                               \
     COMPONENT_EDITABLE_DEF(T);
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

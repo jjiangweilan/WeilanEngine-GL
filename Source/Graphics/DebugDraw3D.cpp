@@ -1,5 +1,5 @@
 #include "Graphics/DebugDraw3D.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -49,4 +49,4 @@ DebugDraw3D *DebugDraw3D::get()
 }
 DebugDraw3D *DebugDraw3D::instance = nullptr;
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -1,7 +1,7 @@
 #pragma once
-#include "Global/KuangyeEngine.hpp"
+#include "Global/WeilanEngine.hpp"
 
-using namespace KuangyeEngine;
+using namespace WeilanEngine;
 #define UNIFORM_BLOCK_INDEX_PROJECTION_MATRICS 0
 #define UNIFORM_BLOCK_INDEX_MAIN_CAMERA 1
 class Rotate : public Script

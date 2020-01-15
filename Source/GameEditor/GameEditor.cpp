@@ -29,7 +29,7 @@
 #include <dirent.h>
 #include <imgui/imgui.h>
 #include <vector>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 GameEditor::GameEditor() : selectedGameObject(nullptr), selectedTRigidbody(nullptr), editVertex(false), editLine(false), m_isGameSceneFocused(true), scene(nullptr)
 {
@@ -42,7 +42,7 @@ GameEditor::~GameEditor()
 
 void GameEditor::render(void **data)
 {
-    scene = EngineManager::GetKuangyeEngine()->getCurrentScene();
+    scene = EngineManager::GetWeilanEngine()->getCurrentScene();
     ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly = true;
 
     if (Input::getKeyStatus(SDL_SCANCODE_ESCAPE))
@@ -118,7 +118,7 @@ void GameEditor::pickObject()
         mousePressingOnScene(relX, relY);
         relX = relX - x;
         relY = relY - y;
-        auto camera = EngineManager::GetKuangyeEngine()->getCurrentScene()->getCamera()->GetComponent<Camera3D>();
+        auto camera = EngineManager::GetWeilanEngine()->getCurrentScene()->getCamera()->GetComponent<Camera3D>();
         auto front = camera->front;
         auto right = camera->right;
 
@@ -558,7 +558,7 @@ void GameEditor::showTRigidbodyInfo(Entity *entity)
         PolygonShape *pShape = static_cast<PolygonShape *>(trb->shape);
         for (int i = 0; i < pShape->points.size(); i++)
         {
-            int ver[2] = {pShape->points[i].x, pShape->points[i].y};
+            int ver[2] = {(int)pShape->points[i].x, (int)pShape->points[i].y};
             bool set = ImGui::InputInt2(std::string("vertex " + std::to_string(i)).c_str(), ver);
             if (set)
             {
@@ -804,7 +804,7 @@ void GameEditor::ShowMenu()
                 //     ImGui::MenuItem("Switch To 3D");
                 //     if (ImGui::IsItemClicked())
                 //     {
-                //         auto cameraEntity = EngineManager::GetKuangyeEngine()->getCurrentScene()->getCamera();
+                //         auto cameraEntity = EngineManager::GetWeilanEngine()->getCurrentScene()->getCamera();
                 //         Json &j = scene->sceneData.getData(cameraEntity);
                 //         auto &cameraComponentJson = *Utility::findComponentWithName(j, "Camera2D");
                 //         //cameraComponentJson["name"] = "Camera3D";
@@ -834,6 +834,7 @@ void GameEditor::ShowMenu()
             }
             else
             {
+                ResourceManager::Get()->SaveResourcePreferences();
             }
         }
         ImGui::EndMainMenuBar();
@@ -927,11 +928,12 @@ void GameEditor::ShowResourceInDirectory(const std::string &resourceDir)
     DIR *dir;
     struct dirent *ent;
     /* Open directory stream */
-    auto lastFolderStartPos = resourceDir.find_last_of('/');
+    auto lastFolderStartPos = resourceDir.find_last_of('/') + 1;
     dir = opendir(resourceDir.data());
     if (dir != NULL)
     {
-        if (ImGui::TreeNodeEx(resourceDir.data()))
+        std::string dirSub = resourceDir.substr(lastFolderStartPos);
+        if (ImGui::TreeNodeEx(dirSub.data()))
         {
             std::vector<std::string> directory;
             std::vector<std::string> files;
@@ -957,7 +959,7 @@ void GameEditor::ShowResourceInDirectory(const std::string &resourceDir)
 
             for (auto &dir : directory)
             {
-                ShowResourceInDirectory(dir);
+                ShowResourceInDirectory(resourceDir + "/" + dir);
             }
             for (auto &filePath : files)
             {
@@ -986,10 +988,6 @@ void GameEditor::ShowResourceInDirectory(const std::string &resourceDir)
         }
 
         closedir(dir);
-    }
-    else
-    {
-        std::cout << "GameEditor: Resoure Path Error, please fix" << std::endl;
     }
 }
 
@@ -1345,4 +1343,4 @@ void GameEditor::setSelectedGameObject(Entity *newOne)
     selectedGameObject = newOne;
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

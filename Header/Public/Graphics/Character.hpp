@@ -1,7 +1,7 @@
 #pragma once
 #include "Mesh2D.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -30,4 +30,4 @@ private:
     FT_Face m_face;
 };
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -10,7 +10,7 @@
 #include <memory>
 #include <set>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -111,4 +111,4 @@ private:
     friend class Material;
 };
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

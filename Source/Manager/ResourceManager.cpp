@@ -1,7 +1,5 @@
 #include "Manager/ResourceManager.hpp"
 
-#include "Utility/Utility.hpp"
-
 #include <stb_image.hpp>
 #include <algorithm>
 #include <locale.h>
@@ -10,21 +8,27 @@
 #include <glad/glad.h>
 #include <stb_image.hpp>
 #include <sstream>
+#include "Utility/Json.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 ResourceManager *ResourceManager::resourceManager = nullptr;
 ResourceManager::~ResourceManager()
 {
     FT_Done_Face(m_face);
     FT_Done_FreeType(m_freeTypeLibrary);
-    freeAudioChunk();
+    FreeAudioChunk();
     Mix_CloseAudio();
 }
 
-ResourceManager::ResourceManager() : m_resourceDir()
+void ResourceManager::SaveResourcePreferences()
 {
-    LocateResourcePath();
+    Utility::WriteJsonToFile("WeilanEngine.cfg", m_EngineConfig);
+}
+
+ResourceManager::ResourceManager()
+{
+    LocateResourceDirectory();
     //load text resource
     FT_Error error = FT_Init_FreeType(&m_freeTypeLibrary);
     if (error)
@@ -32,7 +36,7 @@ ResourceManager::ResourceManager() : m_resourceDir()
         std::cerr << "FT Library Init Error\n";
     }
 
-    error = FT_New_Face(m_freeTypeLibrary, "../KuangyeEngine/etc/fonts/Zpix.ttf", 0, &m_face);
+    error = FT_New_Face(m_freeTypeLibrary, "../WeilanEngine/etc/fonts/Zpix.ttf", 0, &m_face);
 
     if (error)
     {
@@ -53,9 +57,21 @@ ResourceManager::ResourceManager() : m_resourceDir()
 
 }
 
-void ResourceManager::LocateResourcePath()
+void ResourceManager::LocateResourceDirectory()
 {
-    m_resourceDir = "./Resource";
+    const std::string EngineCfgName = "WeilanEngine.cfg";
+    bool hasInit = Utility::ReadJsonFromFile(EngineCfgName, m_EngineConfig); 
+    //create the init file if it doesn't exist
+    if (!hasInit)
+    {
+        Json cfg;
+        cfg["ResourceDirectory"] = "./Resource";
+        Utility::WriteJsonToFile(EngineCfgName, cfg);
+
+        m_resourceDir = "./Resource";
+    }
+
+    m_resourceDir = m_EngineConfig["ResourceDirectory"].get<std::string>();
 }
 
 const std::string &ResourceManager::GetResourceDir()
@@ -121,13 +137,23 @@ void ResourceManager::SetResourceDir(std::string &dir)
     auto size = dir.find_first_of('\0');
     m_resourceDir.resize(size);
     dir.copy(&m_resourceDir[0], size);
+
+    //replace all \ by /
     for (auto& character : m_resourceDir)
     {
         if (character == '\\') character = '/'; 
     }
+
+    //ignore the last character if it's /
+    if (m_resourceDir[m_resourceDir.size() - 1] == '/')
+    {
+        m_resourceDir.pop_back();
+    }
+
+    m_EngineConfig["ResourceDirectory"] = m_resourceDir;
 }
 
-void ResourceManager::freeAudioChunk(const std::string &file)
+void ResourceManager::FreeAudioChunk(const std::string &file)
 {
     auto chunk = m_audioChunks[file];
     if (chunk)
@@ -141,7 +167,7 @@ void ResourceManager::freeAudioChunk(const std::string &file)
     }
 }
 
-void ResourceManager::freeAudioChunk()
+void ResourceManager::FreeAudioChunk()
 {
     for (auto pair : m_audioChunks)
     {
@@ -150,4 +176,4 @@ void ResourceManager::freeAudioChunk()
     m_audioChunks.clear();
 }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

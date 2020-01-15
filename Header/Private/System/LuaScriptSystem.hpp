@@ -1,9 +1,9 @@
 #include "System.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class LuaScriptSystem : public System
 {
     SYSTEM_DECLARATION(LuaScriptSystem);
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

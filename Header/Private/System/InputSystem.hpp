@@ -5,7 +5,7 @@
 #include <SDL_mouse.h>
 #include <SDL_joystick.h>
 #include <SDL_events.h>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class RenderSystem;
 
@@ -95,4 +95,4 @@ private:
 
     friend struct Input;
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -1,7 +1,7 @@
 #pragma once
 #include "Component.hpp"
 #include <glm/matrix.hpp>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class Camera : public Component
 {
@@ -25,4 +25,4 @@ protected:
     int32_t m_layerMask;
     glm::mat4 m_projMatrix;
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

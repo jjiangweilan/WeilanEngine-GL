@@ -6,7 +6,7 @@
 #include <set>
 #include <glm/glm.hpp>
 #include <SDL.h>
-namespace KuangyeEngine {
+namespace WeilanEngine {
     class Scene {
         public:
             Scene();

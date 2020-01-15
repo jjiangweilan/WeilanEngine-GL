@@ -21,7 +21,7 @@ set_property(TARGET EngineTest PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT
 target_link_libraries(EngineTest
     gtest
     gmock
-    KuangyeEngine
+    WeilanEngine
 )
 
 #Copy DLL

@@ -21,7 +21,7 @@ set(SOURCES
     "VolumetricLight.cpp"
 )
 
-target_sources(KuangyeEngine
+target_sources(WeilanEngine
     PRIVATE 
     ${SOURCES}
 )

@@ -42,7 +42,7 @@ public:                                                                         
     }                                                                               \
     COMPONENT_EDITABLE_DEF(T);
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 struct Script : public Component
 {
@@ -54,4 +54,4 @@ struct Script : public Component
     virtual void update() = 0;
     virtual void postInit(){};
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

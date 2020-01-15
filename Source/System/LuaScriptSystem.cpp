@@ -3,7 +3,7 @@
 #include "Manager/EngineManager.hpp"
 #include "Component/LuaScript.hpp"
 #include "GameObject/Entity.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 SYSTEM_DEFINATION(LuaScriptSystem);
 
@@ -13,7 +13,7 @@ LuaScriptSystem::LuaScriptSystem()
 
 void LuaScriptSystem::update()
 {
-    auto currentScene = EngineManager::GetKuangyeEngine()->getCurrentScene();
+    auto currentScene = EngineManager::GetWeilanEngine()->getCurrentScene();
     for (auto &luaScript : LuaScript::collection)
     {
         if (luaScript->entity->IsEnable() || luaScript->entity->GetScene() != currentScene)
@@ -24,4 +24,4 @@ void LuaScriptSystem::update()
         }
     }
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -2,7 +2,7 @@
 #include <json.hpp>
 
 using Json = nlohmann::json;
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 #define SETTINGS_ENGINEMODE 1     // 1: editor, 0: gameplay
 #define SETTINGS_GAME_DIMENSION 0 // 1: 3D, 0: 2D
@@ -23,4 +23,4 @@ extern enum class GameDimension {
     Three
 } gameDimension;
 } // namespace Settings
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

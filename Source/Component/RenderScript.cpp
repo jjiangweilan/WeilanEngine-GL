@@ -1,5 +1,5 @@
 #include "Component/RenderScript.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 const std::size_t RenderScript::componentId = std::hash<std::string>()("RenderScript");
 bool RenderScript::isType(const std::size_t &typeId) const
@@ -15,5 +15,5 @@ size_t RenderScript::getId()
 {
     return componentId;
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine
 

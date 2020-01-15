@@ -22,7 +22,7 @@
         "getEntity", LuaScriptBridge::lua_component_getEntity \
     }
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 class LuaScriptBridge
 {

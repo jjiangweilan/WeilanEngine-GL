@@ -1,6 +1,6 @@
 #include "Graphics/Mesh.hpp"
 #include "Manager/ResourceManager.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -315,4 +315,4 @@ const std::vector<unsigned int> Vertex::boxElement = {
     2, 1, 0, 0, 1, 5,
     0, 3, 7, 0, 7, 4};
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

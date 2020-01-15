@@ -10,7 +10,7 @@
 
 #include "Manager/ResourceManager.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 COMPONENT_DEFINATION(Component, Sprite, 64);
 COMPONENT_EDITABLE_DEF(Sprite);
@@ -77,4 +77,4 @@ Graphics::Texture *Sprite::getMainTexture() const
 {
     return m_mesh.getTextures()->at(0);
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

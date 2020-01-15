@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstddef>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 
 template <typename T, size_t N>
@@ -92,4 +92,4 @@ private:
         return chunk->arena;
     }
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -2,7 +2,7 @@
 #include "Manager/EngineManager.hpp"
 #include "Component/Script.hpp"
 #include "GameObject/Entity.hpp"
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 ScriptSystem *ScriptSystem::system = nullptr;
 
@@ -13,7 +13,7 @@ ScriptSystem::ScriptSystem()
 
 void ScriptSystem::update()
 {
-    auto currentScene = EngineManager::GetKuangyeEngine()->getCurrentScene();
+    auto currentScene = EngineManager::GetWeilanEngine()->getCurrentScene();
     for (auto &s : Script::collection)
     {
         if (!s->entity->IsEnable() || s->entity->GetScene() != currentScene)
@@ -33,4 +33,4 @@ void ScriptSystem::init()
 {
     system = new ScriptSystem();
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

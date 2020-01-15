@@ -1,6 +1,6 @@
 #include "Component/Script.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 const std::size_t Script::componentId = std::hash<std::string>()("Script");
 bool Script::isType(const std::size_t &typeId) const
@@ -16,4 +16,4 @@ size_t Script::getId()
 {
     return componentId;
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

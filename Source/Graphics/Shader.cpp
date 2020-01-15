@@ -2,7 +2,7 @@
 #include "Graphics/Material.hpp"
 #include "Graphics/GlobalShaderParameter.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 namespace Graphics
 {
@@ -274,4 +274,4 @@ const GLuint &Shader::getPatches() const
     return m_patches;
 }
 } // namespace Graphics
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

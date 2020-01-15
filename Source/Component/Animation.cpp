@@ -7,7 +7,7 @@
 #include <json.hpp>
 #include <fstream>
 #include <iostream>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 using Json = nlohmann::json;
 
@@ -92,4 +92,4 @@ bool Animation::hasEnded() { return animationHasEnded; }
 
 int Animation::getCurrentFrame() { return currentFrame; }
 
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 
 class Audio : public Component
@@ -13,4 +13,4 @@ class Audio : public Component
 
     void play(const std::string &file);
 };
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

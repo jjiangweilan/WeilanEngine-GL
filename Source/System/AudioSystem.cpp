@@ -1,6 +1,6 @@
 #include "System/AudioSystem.hpp"
 
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 SYSTEM_DEFINATION(AudioSystem);
 AudioSystem::AudioSystem()
@@ -10,4 +10,4 @@ AudioSystem::AudioSystem()
 void AudioSystem::update()
 {
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine

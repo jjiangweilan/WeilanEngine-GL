@@ -3,7 +3,7 @@
 #include "Manager/ResourceManager.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
-namespace KuangyeEngine
+namespace WeilanEngine
 {
 COMPONENT_DEFINATION(Component, Text, 32);
 Text::Text(Entity *entity) : Component(entity), language(Language::English), animated(true), textRenderIndex(0), renderStarted(false), m_timePassed(0), animationSpeed(0.02)
@@ -40,14 +40,14 @@ void Text::loadText(const std::wstring &textStr, const int &maxLineWidth, const 
 {
     switch (language)
     {
-    case KuangyeEngine::Language::Chinese:
+    case WeilanEngine::Language::Chinese:
         loadChinese(textStr, maxLineWidth, lineSpace, charWidth, charHeight);
         break;
-    case KuangyeEngine::Language::Japanese:
+    case WeilanEngine::Language::Japanese:
         break;
-    case KuangyeEngine::Language::Korean:
+    case WeilanEngine::Language::Korean:
         break;
-    case KuangyeEngine::Language::English:
+    case WeilanEngine::Language::English:
         loadEnglish(textStr, maxLineWidth, lineSpace, charWidth, charHeight);
         break;
     default:
@@ -181,4 +181,4 @@ const float &Text::getTimePassed() const
 {
     return m_timePassed;
 }
-} // namespace KuangyeEngine
+} // namespace WeilanEngine
