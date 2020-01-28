@@ -14,7 +14,7 @@ public:
         auto transform = entity->GetComponent<Transform>();
         transform->Rotate({1, 0, 0}, 25);
     };
-    void update() override
+    void Update() override
     {
         auto transform = entity->GetComponent<Transform>();
         transform->Rotate({0, 1, 0}, 30 * Time::deltaTime);
@@ -31,7 +31,7 @@ class Rotate2 : public Script
 
 public:
     Rotate2(Entity *go) : Script(go){};
-    void update() override
+    void Update() override
     {
         auto transform = entity->GetComponent<Transform>();
         transform->Rotate({0, 1, 0}, 30 * Time::deltaTime);
@@ -48,7 +48,7 @@ public:
     std::vector<glm::vec3 *> lightPos;
     ModelUniformUpdate(Entity *entity) : RenderScript(entity), models(){};
 
-    Entity* light;
+    Entity* light = nullptr;
     void Update() override
     {
         auto model = entity->GetComponent<Transform>()->getModel();
@@ -148,18 +148,6 @@ public:
     }
     void Update() override
     {
-        static const auto gsp = Graphics::GlobalShaderParameter::Get();
-        static const auto projIndex = gsp->GetGlobalParameterIndex("GlobalProjMatrices");
-        static const auto cameraIndex = gsp->GetGlobalParameterIndex("MainCamera");
-        auto transform = entity->GetComponent<Transform>();
-        auto camera3d = entity->GetComponent<Camera3D>();
-		camera3d->update();
-        auto pos = transform->position;
-        auto viewMatrix = camera3d->GetViewMatrix();
-        auto projMatrix = camera3d->GetProjMatrix();
-        gsp->SubData(projIndex, 0, sizeof(glm::mat4), &viewMatrix[0][0]);
-        gsp->SubData(projIndex, sizeof(glm::mat4), sizeof(glm::mat4), &projMatrix[0][0]);
-        gsp->SubData(cameraIndex, 0, sizeof(glm::vec3), &pos[0]);
     }
 };
 RENDERSCRIPT_DEFINATION(RenderScript, CameraRenderUpdate, 2)

@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.hpp"
+#include "GameObject/Entity.hpp"
 
 #define SCRIPT_DECLARATION(P, T, N)                                             \
 public:                                                                         \
@@ -51,7 +52,7 @@ struct Script : public Component
     virtual bool isType(const std::size_t &typeId) const override;
     static std::set<Script *> collection;
     Script(Entity *entity) : Component(entity){};
-    virtual void update() = 0;
-    virtual void postInit(){};
+    virtual void Update() = 0;
+    virtual void PostInit(){};
 };
 } // namespace WeilanEngine

@@ -10,43 +10,43 @@ StateMachineSystem::StateMachineSystem()
 {
 }
 
-void StateMachineSystem::update()
+void StateMachineSystem::Update()
 {
-    auto currentScene = EngineManager::GetWeilanEngine()->getCurrentScene();
-    for (auto &sm : StateMachine::collection)
-    {
-        if (!sm->entity->IsEnable() || sm->entity->GetScene() != currentScene)
-        {
-            continue;
-        }
-        StatePriority max_ = 0;
-        const StateType &currStateTemp = sm->currentState;
-        const StateType *newState = nullptr;
-        for (auto &stateMap : sm->states[currStateTemp])
-        {
-            if (StatePriority priority = stateMap.second() > max_)
-            {
-                max_ = priority;
-                newState = &stateMap.first;
-            }
-        }
+	auto currentScene = EngineManager::GetWeilanEngine()->GetCurrentScene();
+	for (auto &sm : StateMachine::collection)
+	{
+		if (!sm->GetEntity()->IsEnable() || sm->GetEntity()->GetScene() != currentScene)
+		{
+			continue;
+		}
+		StatePriority max_ = 0;
+		const StateType &currStateTemp = sm->currentState;
+		const StateType *newState = nullptr;
+		for (auto &stateMap : sm->states[currStateTemp])
+		{
+			if (StatePriority priority = stateMap.second() > max_)
+			{
+				max_ = priority;
+				newState = &stateMap.first;
+			}
+		}
 
-        if (newState != nullptr)
-        {
-            const auto &exitFunc = sm->stateActions[currStateTemp][StateActionExitFuncIndex];
-            if (exitFunc)
-                exitFunc();
-            sm->currentState = *newState;
-            const auto &enterFunc = sm->stateActions[sm->currentState][StateActionEnterFuncIndex];
-            if (enterFunc)
-                enterFunc();
-        }
-        else
-        {
-            const auto &updateFunc = sm->stateActions[currStateTemp][StateActionUpdateFuncIndex];
-            if (updateFunc)
-                updateFunc();
-        }
-    }
+		if (newState != nullptr)
+		{
+			const auto &exitFunc = sm->stateActions[currStateTemp][StateActionExitFuncIndex];
+			if (exitFunc)
+				exitFunc();
+			sm->currentState = *newState;
+			const auto &enterFunc = sm->stateActions[sm->currentState][StateActionEnterFuncIndex];
+			if (enterFunc)
+				enterFunc();
+		}
+		else
+		{
+			const auto &updateFunc = sm->stateActions[currStateTemp][StateActionUpdateFuncIndex];
+			if (updateFunc)
+				updateFunc();
+		}
+	}
 }
 } // namespace WeilanEngine

@@ -91,44 +91,48 @@ public:                                                                         
     std::size_t T::getId() { return componentId; }                                  \
     std::set<T *> T::collection = std::set<T *>();
 
-#define COMPONENT_EDITABLE_DEC()                                     \
-public:                                                              \
-    static bool isComponentReg;                                      \
+#define COMPONENT_EDITABLE_DEC() \
+public:                          \
+    static bool isComponentReg;  \
+                                 \
 private:
 
-#define COMPONENT_EDITABLE_DEF(T)                                                                                       \
+#define COMPONENT_EDITABLE_DEF(T) \
     bool T::isComponentReg = registerComponent<T>([](Entity *go, void **args) { go->AddComponent<T>(args); });
 
 namespace WeilanEngine
 {
-	class Entity;
-	struct Component
-	{
-	public:
-		static std::size_t genComponentId(const std::string&);
-		static std::map<std::size_t, std::string>* componentIdToName; // this now is only used for Script, leave it here
-																	  // for extensibility
-		static std::map<std::size_t, std::string>* getComponentIdToName();
-		static std::map<std::size_t, std::function<void(Entity*, void**)>>* componentFactoryList;
-		static std::map<std::size_t, std::function<void(Entity*, void**)>>* getComponentFactoryList();
-		Component(Entity* go);
-		Entity* entity = nullptr;
+class Entity;
+struct Component
+{
+public:
+    static std::size_t genComponentId(const std::string &);
+    static std::map<std::size_t, std::string> *componentIdToName; // this now is only used for Script, leave it here
+                                                                  // for extensibility
+    static std::map<std::size_t, std::string> *getComponentIdToName();
+    static std::map<std::size_t, std::function<void(Entity *, void **)>> *componentFactoryList;
+    static std::map<std::size_t, std::function<void(Entity *, void **)>> *getComponentFactoryList();
+    Component(Entity *go);
 
-		static const std::size_t componentId;
-		virtual bool isType(const std::size_t& typeId) const;
+    static const std::size_t componentId;
+    virtual bool isType(const std::size_t &typeId) const;
 
-		virtual void destruct(Entity* go) {};
-		virtual std::size_t getId();
-		virtual ~Component() {};
-		template <class T>
-		static bool registerComponent(std::function<void(Entity*, void**)>);
-		bool enable;
-	};
+    virtual void destruct(Entity *go){};
+    virtual std::size_t getId();
+    Entity* GetEntity() const;
+    virtual ~Component(){};
+    template <class T>
+    static bool registerComponent(std::function<void(Entity *, void **)>);
+    bool enable;
 
-	template <class T>
-	bool Component::registerComponent(std::function<void(Entity*, void**)> f)
-	{
-		(*getComponentFactoryList())[T::componentId] = f;
-		return true;
-	}
+    protected:
+        Entity *entity = nullptr;
+};
+
+template <class T>
+bool Component::registerComponent(std::function<void(Entity *, void **)> f)
+{
+    (*getComponentFactoryList())[T::componentId] = f;
+    return true;
+}
 } // namespace WeilanEngine

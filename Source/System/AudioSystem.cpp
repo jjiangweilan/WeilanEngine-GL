@@ -7,7 +7,7 @@ AudioSystem::AudioSystem()
 {
 }
 
-void AudioSystem::update()
+void AudioSystem::Update()
 {
 }
 } // namespace WeilanEngine

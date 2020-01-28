@@ -11,7 +11,7 @@ public:
     static float dayTimeInSecond;
 
     static double timeAfterGameStart;
-    static void update();
+    static void Update();
     static void resetDayTime();
     static const float dayDuration; // the duration of a time period in second (morning + evening + night)
     static void setTimeScale(const float &s);

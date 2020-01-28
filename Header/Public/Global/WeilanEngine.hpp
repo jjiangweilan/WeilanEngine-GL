@@ -11,8 +11,6 @@
 #include "Component/Script.hpp"
 #include "Component/Animation.hpp"
 #include "Component/Model.hpp"
-#include "Component/Camera2D.hpp"
-#include "Component/Camera3D.hpp"
 #include "Component/StateMachine.hpp"
 #include "Component/Text.hpp"
 #include "Component/TRigidbody.hpp"
@@ -21,7 +19,8 @@
 #include "Component/Audio.hpp"
 #include "Component/VolumetricLight.hpp"
 #include "Component/RenderScript.hpp"
-#include "Component/RenderContext.hpp"
+#include "Component/Camera.hpp"
+#include "Component/CameraController.hpp"
 
 #include "System/System.hpp"
 #include "System/RenderSystem.hpp"

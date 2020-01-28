@@ -4,6 +4,6 @@ namespace WeilanEngine
 {
 class LuaScriptSystem : public System
 {
-    SYSTEM_DECLARATION(LuaScriptSystem);
+	SYSTEM_DECLARATION(LuaScriptSystem);
 };
 } // namespace WeilanEngine

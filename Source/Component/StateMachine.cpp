@@ -8,32 +8,32 @@ StateMachine::StateMachine(Entity *go, const StateType &initialState) : Componen
 
 void StateMachine::addTransition(const StateType &from, const StateType &to, StateConditionType condition)
 {
-    states[from][to] = condition;
+	states[from][to] = condition;
 }
 
 StateActionGroup *StateMachine::getActionGroup(const std::string &stateName)
 {
-    return &stateActions[stateName];
+	return &stateActions[stateName];
 }
 
 const StateType &StateMachine::getCurrentState()
 {
-    return currentState;
+	return currentState;
 }
 
 void StateMachine::changeState(const StateType &newState)
 {
-    const auto &exitFunc = stateActions[currentState][StateActionExitFuncIndex];
-    if (exitFunc)
-        exitFunc();
+	const auto &exitFunc = stateActions[currentState][StateActionExitFuncIndex];
+	if (exitFunc)
+		exitFunc();
 
-    currentState = newState;
-    const auto &enterFunc = stateActions[currentState][StateActionEnterFuncIndex];
-    if (enterFunc)
-        enterFunc();
+	currentState = newState;
+	const auto &enterFunc = stateActions[currentState][StateActionEnterFuncIndex];
+	if (enterFunc)
+		enterFunc();
 }
 void StateMachine::addState(const StateType &name)
 {
-    states[name];
+	states[name];
 }
 } // namespace WeilanEngine

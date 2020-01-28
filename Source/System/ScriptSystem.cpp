@@ -8,29 +8,29 @@ ScriptSystem *ScriptSystem::system = nullptr;
 
 ScriptSystem::ScriptSystem()
 {
-    registerSystem(this);
+	registerSystem(this);
 }
 
-void ScriptSystem::update()
+void ScriptSystem::Update()
 {
-    auto currentScene = EngineManager::GetWeilanEngine()->getCurrentScene();
-    for (auto &s : Script::collection)
-    {
-        if (!s->entity->IsEnable() || s->entity->GetScene() != currentScene)
-            continue;
-        s->update();
-    }
+	auto currentScene = EngineManager::GetWeilanEngine()->GetCurrentScene();
+	for (auto &s : Script::collection)
+	{
+		if (!s->GetEntity()->IsEnable() || s->GetEntity()->GetScene() != currentScene)
+			continue;
+		s->Update();
+	}
 }
 void ScriptSystem::PostInit()
 {
-    for (auto &s : Script::collection)
-    {
-        s->postInit();
-    }
+	for (auto &s : Script::collection)
+	{
+		s->PostInit();
+	}
 }
 
 void ScriptSystem::init()
 {
-    system = new ScriptSystem();
+	system = new ScriptSystem();
 }
 } // namespace WeilanEngine

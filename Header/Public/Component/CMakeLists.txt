@@ -1,17 +1,11 @@
-cmake_minimum_required(VERSION 3.15.0)
-
-target_sources(WeilanEngine
-    PUBLIC
+set(SOURCES 
     "Animation.hpp"
     "Audio.hpp"
     "Camera.hpp"
-    "Camera2D.hpp"
-    "Camera3D.hpp"
     "Component.hpp"
     "LuaScript.hpp"
     "Model.hpp"
     "NpcController.hpp"
-    "RenderContext.hpp"
     "RenderScript.hpp"
     "Script.hpp"
     "Sprite.hpp"
@@ -20,4 +14,10 @@ target_sources(WeilanEngine
     "Transform.hpp"
     "TRigidbody.hpp"
     "VolumetricLight.hpp"
+    "CameraController.hpp"
+)
+
+target_sources(WeilanEngine
+    PUBLIC
+    ${SOURCES}
 )

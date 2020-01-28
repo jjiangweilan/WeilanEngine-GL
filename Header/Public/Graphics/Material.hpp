@@ -19,7 +19,7 @@ class Material
 {
 public:
     Material();
-    Material(const unsigned int& renderIndex);
+    Material(const unsigned int &renderIndex);
     /**
      * @brief Construct a new Material object
      * seems as calling UseShader and ChangeTextures
@@ -27,19 +27,19 @@ public:
      * @param shader shader name
      * @param textures textures
      */
-    Material(const std::string &shader, std::vector<Texture *> &&textures, const unsigned int& renderIndex=1) : Material(renderIndex)
+    Material(const std::string &shader, std::vector<Texture *> &&textures, const unsigned int &renderIndex = 1) : Material(renderIndex)
     {
         SetShader(shader);
         m_parameters.SetTextures(textures);
     };
 
-    Material(const std::string &shader, const std::vector<Texture *> &textures, const unsigned int& renderIndex=1) : Material(renderIndex)
+    Material(const std::string &shader, const std::vector<Texture *> &textures, const unsigned int &renderIndex = 1) : Material(renderIndex)
     {
         SetShader(shader);
-		m_parameters.SetTextures(textures);
+        m_parameters.SetTextures(textures);
     }
 
-    Material(const std::string &shader, const std::vector<std::pair<std::string, Texture *>> &textures, const unsigned int& renderIndex=1) : Material(renderIndex)
+    Material(const std::string &shader, const std::vector<std::pair<std::string, Texture *>> &textures, const unsigned int &renderIndex = 1) : Material(renderIndex)
     {
         SetShader(shader);
         for (int i = 0; i < textures.size(); i++)
@@ -49,12 +49,12 @@ public:
         }
     }
 
-    Material(Shader *shader, const unsigned int& renderIndex=1) : Material(renderIndex) 
+    Material(Shader *shader, const unsigned int &renderIndex = 1) : Material(renderIndex)
     {
         m_shader = shader;
     }
 
-    Material(const std::string &shader, const unsigned int& renderIndex=1) : Material(renderIndex)
+    Material(const std::string &shader, const unsigned int &renderIndex = 1) : Material(renderIndex)
     {
         SetShader(shader);
     }
@@ -68,8 +68,8 @@ public:
      */
     void SetShader(const std::string &shader);
 
-    Material& operator=(const Material&);
-    Material& operator=(Material&&);
+    Material &operator=(const Material &);
+    Material &operator=(Material &&);
 
     /**
  * @brief return a copy of this material
@@ -78,21 +78,22 @@ public:
  */
     Material Clone() const;
 
-    void SetRenderIndex(const unsigned int& index);
+    void SetRenderIndex(const unsigned int &index);
     void UseMaterial() const;
     const Shader *GetShader() const;
     ShaderParameter *GetParameters() const;
     void ReloadShader() const;
-    
+
     std::string name;
+
 protected:
     mutable ShaderParameter m_parameters;
     Shader *m_shader;
-    mutable std::vector<const Mesh*> m_attachedMeshes;
+    mutable std::vector<const Mesh *> m_attachedMeshes;
     unsigned int m_renderIndex;
 
-    unsigned int AttachToMesh(const Mesh* mesh) const;
-    void DetachFromMesh(const Mesh* mesh) const;
+    unsigned int AttachToMesh(const Mesh *mesh) const;
+    void DetachFromMesh(const Mesh *mesh) const;
 
     /* Static ----*/
 public:
@@ -106,12 +107,12 @@ private:
 
     struct MaterialComp
     {
-        bool operator()(Material* first, Material* second) const {return first->m_renderIndex < second->m_renderIndex;};
+        bool operator()(Material *first, Material *second) const { return first->m_renderIndex < second->m_renderIndex; };
     };
 
     //all of the materials including named materials and the unique materials (copy from named materials, not shadered)
     //used for render sequence
-    static std::set<Material*, MaterialComp> materials; 
+    static std::set<Material *, MaterialComp> materials;
 
     friend class Mesh;
 };

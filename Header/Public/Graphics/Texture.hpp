@@ -32,7 +32,7 @@ enum TextureType
 class Texture
 {
 public:
-	enum InternalFormat
+    enum InternalFormat
     {
         RGBAInternal = GL_RGBA,
         RGBInternal = GL_RGB,
@@ -59,7 +59,7 @@ public:
         BGR = GL_BGR,
         RGBA = GL_RGBA,
         BGRA = GL_BGRA,
-        RedInteger  =GL_RED_INTEGER,
+        RedInteger = GL_RED_INTEGER,
         RGInteger = GL_RG_INTEGER,
         RGBInteger = GL_RGB_INTEGER,
         BGRInteger = GL_BGR_INTEGER,
@@ -80,17 +80,17 @@ public:
         HalfFloat = GL_HALF_FLOAT,
         Float = GL_FLOAT,
         UnsignedByte332 = GL_UNSIGNED_BYTE_3_3_2
-       // GL_UNSIGNED_BYTE_2_3_3_REV,
-       // GL_UNSIGNED_SHORT_5_6_5,
-       // GL_UNSIGNED_SHORT_5_6_5_REV,
-       // GL_UNSIGNED_SHORT_4_4_4_4,
-       // GL_UNSIGNED_SHORT_4_4_4_4_REV,
-       // GL_UNSIGNED_SHORT_5_5_5_1,
-       // GL_UNSIGNED_SHORT_1_5_5_5_REV,
-       // GL_UNSIGNED_INT_8_8_8_8,
-       // GL_UNSIGNED_INT_8_8_8_8_REV,
-       // GL_UNSIGNED_INT_10_10_10_2,
-       // and GL_UNSIGNED_INT_2_10_10_10_REV
+        // GL_UNSIGNED_BYTE_2_3_3_REV,
+        // GL_UNSIGNED_SHORT_5_6_5,
+        // GL_UNSIGNED_SHORT_5_6_5_REV,
+        // GL_UNSIGNED_SHORT_4_4_4_4,
+        // GL_UNSIGNED_SHORT_4_4_4_4_REV,
+        // GL_UNSIGNED_SHORT_5_5_5_1,
+        // GL_UNSIGNED_SHORT_1_5_5_5_REV,
+        // GL_UNSIGNED_INT_8_8_8_8,
+        // GL_UNSIGNED_INT_8_8_8_8_REV,
+        // GL_UNSIGNED_INT_10_10_10_2,
+        // and GL_UNSIGNED_INT_2_10_10_10_REV
     };
     Texture() = default;
     Texture(const unsigned int &width,
@@ -98,11 +98,11 @@ public:
             const InternalFormat &internalFormat,
             const DataFormat &format,
             const DataType &type);
-    Texture(const Texture& other);
-    Texture(Texture&& other);
+    Texture(const Texture &other);
+    Texture(Texture &&other);
 
-    Texture& operator=(const Texture& other);
-    Texture& operator=(Texture&& other);
+    Texture &operator=(const Texture &other);
+    Texture &operator=(Texture &&other);
 
     Texture(const std::string &file, const TextureType &type = TextureType::Diffuse);
     Texture(FT_GlyphSlot glyph);

@@ -8,9 +8,9 @@ namespace WeilanEngine
 
 class Audio : public Component
 {
-    COMPONENT_DECLARATION(Component, Audio, 32);
-    Audio(Entity *entity);
+	COMPONENT_DECLARATION(Component, Audio, 32);
+	Audio(Entity *entity);
 
-    void play(const std::string &file);
+	void play(const std::string &file);
 };
 } // namespace WeilanEngine

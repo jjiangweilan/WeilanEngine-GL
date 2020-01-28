@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
@@ -22,12 +21,12 @@ class Shader
 {
 public:
     ~Shader();
-	Shader(Shader&& shader);
-	Shader(const Shader& shader);
+    Shader(Shader &&shader);
+    Shader(const Shader &shader);
     void Use() const;
     bool hasTess() const;
-    const GLuint& getPatches() const;
-	const GLuint& getId() const;
+    const GLuint &getPatches() const;
+    const GLuint &getId() const;
     void Reload();
     void setBool(const std::string &name, bool value) const;
     void setInt(const std::string &name, int value) const;
@@ -94,14 +93,14 @@ public:
     {
         glUniform3fv(location, 1, &vec[0]);
     }
-	static void setUniform(const GLuint& location, const glm::vec4& vec)
-	{
-		glUniform4fv(location, 1, &vec[0]);
-	}
-	static void setUniform(const GLuint& location, const float& x, const float& y)
-	{
-		glUniform2f(location, x, y);
-	}
+    static void setUniform(const GLuint &location, const glm::vec4 &vec)
+    {
+        glUniform4fv(location, 1, &vec[0]);
+    }
+    static void setUniform(const GLuint &location, const float &x, const float &y)
+    {
+        glUniform2f(location, x, y);
+    }
     static void setUniform(const GLuint &location, const float &x, const float &y, const float &z)
     {
         glUniform3f(location, x, y, z);
@@ -122,10 +121,10 @@ public:
     {
         glUniform1i(location, v);
     }
-	static void setUniform(const GLuint& location, const double& v)
-	{
-		glUniform1d(location, v);
-	}
+    static void setUniform(const GLuint &location, const double &v)
+    {
+        glUniform1d(location, v);
+    }
 
 private:
     Shader(const std::string &vertexPath,
@@ -135,20 +134,19 @@ private:
            const std::string &fragmentPath,
            const GLuint &patches = 0);
 
-	
     GLuint createShaderFromFile(const std::string &path, const GLenum &type);
     GLuint createProgram(const GLuint &vertexShader, const GLuint &tessCtrlPath, const GLuint &tessEvalPath, const GLuint &geometryShader, const GLuint &fragmentShader);
 
     bool m_hasTessellation;
     GLuint m_patches;
-	unsigned int m_id;
+    unsigned int m_id;
 
     std::string m_vertPath;
     std::string m_tessCtrlPath;
     std::string m_tessEvalPath;
     std::string m_geometryPath;
     std::string m_fragPath;
-    
+
     /* Static ----*/
 public:
     static Shader *get(const std::string &id);
@@ -156,22 +154,22 @@ public:
                        const std::string &vertexPath,
                        const std::string &fragmentPath);
     static Shader *AddWithMaterial(const std::string &id,
-                       const std::string &vertexPath,
-                       const std::string &fragmentPath);
+                                   const std::string &vertexPath,
+                                   const std::string &fragmentPath);
     static Shader *Add(const std::string &name,
                        const std::string &vertexPath,
                        const std::string &tessCtrlPath,
                        const std::string &tessEvalPath,
                        const std::string &geometryPath,
                        const std::string &fragmentPath,
-                       const GLuint& patches = 0);
+                       const GLuint &patches = 0);
     static Shader *AddWithMaterial(const std::string &name,
-                       const std::string &vertexPath,
-                       const std::string &tessCtrlPath,
-                       const std::string &tessEvalPath,
-                       const std::string &geometryPath,
-                       const std::string &fragmentPath,
-                       const GLuint& patches = 0);
+                                   const std::string &vertexPath,
+                                   const std::string &tessCtrlPath,
+                                   const std::string &tessEvalPath,
+                                   const std::string &geometryPath,
+                                   const std::string &fragmentPath,
+                                   const GLuint &patches = 0);
 
     static void remove(const std::string &id);
 

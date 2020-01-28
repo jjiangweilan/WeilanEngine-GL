@@ -3,26 +3,27 @@
 #include "Scripts.hpp"
 
 using namespace WeilanEngine;
+
+
 TEST(GameTest, EngineStart)
 {
     auto engine = WeilanEngine::EngineManager::GetWeilanEngine();
     Scene scene;
 
     auto renderNodes = scene.CreateGameObject("renderNodes");
-	
+
+    Graphics::Model::Add("nano", "C:/Users/weilan/Desktop/nano/nanosuit.obj");
+
     //hdr camera
     auto sceneCamera = scene.CreateGameObject("sceneCamera");
-    sceneCamera->AddComponent<Transform>(0, 3, 12);
-    auto camera3d = sceneCamera->AddComponent<Camera3D>();
-    auto sceneRenderNode = sceneCamera->AddComponent<RenderContext>();
-    sceneRenderNode->GenFramebuffer();
-	sceneRenderNode->AttachTexture2D(PredefinedAttachmentType::HDR);
-	sceneRenderNode->AttachTexture2D(PredefinedAttachmentType::Depth);
-    sceneCamera->AddComponent<CameraRenderUpdate>();
+    sceneCamera->AddComponent<Transform>(0, 0, 10);
+    auto camera3d = sceneCamera->AddComponent<Camera>();
+	sceneCamera->AddComponent<CameraController>();
 
-    scene.SetMainCamera(sceneCamera);
-    RenderSystem::Get()->SetOutputRenderNode(sceneRenderNode);
-
+	auto model = scene.CreateGameObject("ModelTest");
+    model->AddComponent<Transform>(0,0,0);
+	auto modelM = model->AddComponent<Model>("nano");
+    model->AddComponent<ModelUniformUpdate>();
     engine->SetScene(&scene);
     engine->Start();
 }

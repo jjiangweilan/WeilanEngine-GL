@@ -6,15 +6,14 @@ namespace WeilanEngine
 {
 class LuaScript : public Component
 {
-    COMPONENT_DECLARATION(Component, LuaScript, 32);
-    LuaScript(Entity *entity, const std::string &file);
+	COMPONENT_DECLARATION(Component, LuaScript, 32);
+	LuaScript(Entity *entity, const std::string &file);
 
-    lua_State *state;
+	lua_State *state;
 
-    void PostInit();
+	void PostInit();
 
 private:
-    std::string file;
-
+	std::string file;
 };
 } // namespace WeilanEngine

@@ -15,32 +15,32 @@ using StateActionGroup = std::array<StateActionType, 3>;
 
 class StateMachine : public Component
 {
-    COMPONENT_DECLARATION(Component, StateMachine, 8);
+	COMPONENT_DECLARATION(Component, StateMachine, 8);
 
 public:
-    StateMachine(Entity *, const StateType &initialState);
-    /**
-         * @brief set the states from state to state with their condition
-         *
-         * @param from
-         * @param to
-         * @param condition, a function returns a unsigned int that indicates the priority of the condition
-         */
-    void addTransition(const StateType &from, const StateType &to, StateConditionType condition);
-    void addState(const StateType &name);
-    StateActionGroup *getActionGroup(const std::string &stateName);
-    void changeState(const StateType &newState);
-    const StateType &getCurrentState();
+	StateMachine(Entity *, const StateType &initialState);
+	/**
+			 * @brief set the states from state to state with their condition
+			 *
+			 * @param from
+			 * @param to
+			 * @param condition, a function returns a unsigned int that indicates the priority of the condition
+			 */
+	void addTransition(const StateType &from, const StateType &to, StateConditionType condition);
+	void addState(const StateType &name);
+	StateActionGroup *getActionGroup(const std::string &stateName);
+	void changeState(const StateType &newState);
+	const StateType &getCurrentState();
 
 private:
-    StateType currentState;
-    StateMachineType states;
+	StateType currentState;
+	StateMachineType states;
 
 #define StateActionEnterFuncIndex 0
 #define StateActionUpdateFuncIndex 1
 #define StateActionExitFuncIndex 2
-    std::map<StateType, StateActionGroup> stateActions;
+	std::map<StateType, StateActionGroup> stateActions;
 
-    friend class StateMachineSystem;
+	friend class StateMachineSystem;
 };
 } // namespace WeilanEngine

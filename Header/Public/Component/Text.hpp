@@ -29,14 +29,14 @@ public:
 	void loadFromFile(const std::string &fileName);
 	void loadText(const std::wstring &text);
 	/**
-         * @brief load text and calculate the Y offset using maxLineWidth and lineSpce
-         *
-         * @param textStr
-         * @param maxLineWidth
-         * @param lineSpace
-         * @param charWidth
-         * @param charHeight
-         */
+			 * @brief load text and calculate the Y offset using maxLineWidth and lineSpce
+			 *
+			 * @param textStr
+			 * @param maxLineWidth
+			 * @param lineSpace
+			 * @param charWidth
+			 * @param charHeight
+			 */
 	void loadText(const std::wstring &textStr, const int &maxLineWidth, const int &lineSpace, const int &charWidth, const int &charHeight);
 	void loadText(const std::string &textStr, const int &maxLineWidth, const int &lineSpace, const int &charWidth, const int &charHeight);
 
@@ -61,10 +61,10 @@ public:
 	const Graphics::Shader *getShader() const;
 
 	/**
-	 * @brief Get the Time Passed object
-	 * 
-	 * @return const float& the time passed since the text started render
-	 */
+		 * @brief Get the Time Passed object
+		 *
+		 * @return const float& the time passed since the text started render
+		 */
 	const float &getTimePassed() const;
 
 private:

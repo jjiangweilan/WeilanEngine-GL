@@ -10,22 +10,22 @@ float Time::dayTimeInSecond = Time::dayDuration + 1;
 float Time::timeScale = 1;
 
 std::chrono::time_point<std::chrono::steady_clock> Time::oldTime = std::chrono::steady_clock::now();
-void Time::update()
+void Time::Update()
 {
-    //delta time
-    auto newTime = std::chrono::steady_clock::now();
-    deltaTime = std::chrono::duration<float>(newTime - oldTime).count();
-    nonScaledDeltaTime = deltaTime;
-    deltaTime *= timeScale;
-    timeAfterGameStart += deltaTime;
-    oldTime = newTime;
+	//delta time
+	auto newTime = std::chrono::steady_clock::now();
+	deltaTime = std::chrono::duration<float>(newTime - oldTime).count();
+	nonScaledDeltaTime = deltaTime;
+	deltaTime *= timeScale;
+	timeAfterGameStart += deltaTime;
+	oldTime = newTime;
 
-    //day time
-    dayTimeInSecond += deltaTime;
+	//day time
+	dayTimeInSecond += deltaTime;
 }
 
 void Time::resetDayTime()
 {
-    dayTimeInSecond = 0;
+	dayTimeInSecond = 0;
 }
 } // namespace WeilanEngine

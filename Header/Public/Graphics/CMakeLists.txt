@@ -1,5 +1,5 @@
-target_sources(WeilanEngine
-    PUBLIC
+file(GLOB SOURCES *.cpp)
+set (SOURCESS
     "Character.hpp"
     "DebugDraw3D.hpp"
     "GlobalShaderParameter.hpp"
@@ -11,5 +11,6 @@ target_sources(WeilanEngine
     "Shader.hpp"
     "ShaderParameter.hpp"
     "ShaderParameterDefines.hpp"
+    "RenderContext.hpp"
     "Texture.hpp"
 )

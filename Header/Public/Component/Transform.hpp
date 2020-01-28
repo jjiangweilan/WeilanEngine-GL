@@ -11,46 +11,46 @@ namespace WeilanEngine
 class Entity;
 class Transform : public Component
 {
-    COMPONENT_DECLARATION(Component, Transform, COMPONENT_ALLOCATION_SIZE);
-    COMPONENT_EDITABLE_DEC();
+	COMPONENT_DECLARATION(Component, Transform, COMPONENT_ALLOCATION_SIZE);
+	COMPONENT_EDITABLE_DEC();
 
 public:
-    Transform(Entity *);
-    Transform(Entity *, const float &x, const float &y, const float &z);
-    Transform(Entity *, const glm::vec3 &);
-    Transform(Entity *, void **data);
+	Transform(Entity *);
+	Transform(Entity *, const float &x, const float &y, const float &z);
+	Transform(Entity *, const glm::vec3 &);
+	Transform(Entity *, void **data);
 
-    glm::vec3 position;
-    glm::vec3 prePosition;
-    glm::mat4 positionMat4;
-    glm::mat4 rotation;
-    glm::mat4 rotateArou;
-    glm::mat4 scaleMat4;
+	glm::vec3 position;
+	glm::vec3 prePosition;
+	glm::mat4 positionMat4;
+	glm::mat4 rotation;
+	glm::mat4 rotateArou;
+	glm::mat4 scaleMat4;
 
-    glm::vec3 scale;
+	glm::vec3 scale;
 
-    struct
-    {
-        glm::vec3 axis;
-        float degree;
-    } rotationData;
+	struct
+	{
+		glm::vec3 axis;
+		float degree;
+	} rotationData;
 
-    void moveBy(const float &x, const float &y, const float &z = 0);
-    void moveBy(const glm::vec3& vec);
-    void setPosition(const glm::vec3 &pos);
-    void setLocalPosition(const glm::vec3 &pos);
-    void setToPreviousPosition();
-    glm::vec3 getLocalPosition();
+	void moveBy(const float &x, const float &y, const float &z = 0);
+	void moveBy(const glm::vec3 &vec);
+	void setPosition(const glm::vec3 &pos);
+	void setLocalPosition(const glm::vec3 &pos);
+	void setToPreviousPosition();
+	glm::vec3 getLocalPosition();
 
-    void Rotate(const glm::vec3 &axis, const float &radius);
-    void setRotation(const glm::mat4 &ro);
-    void setScale(const float &x, const float &y, const float &z);
-    void SetScale(const float &ratio);
-    void rotateAround(const glm::vec3 &axis, const float &radius);
-    glm::mat4 getModel() const;
+	void Rotate(const glm::vec3 &axis, const float &radius);
+	void setRotation(const glm::mat4 &ro);
+	void setScale(const float &x, const float &y, const float &z);
+	void SetScale(const float &ratio);
+	void rotateAround(const glm::vec3 &axis, const float &radius);
+	glm::mat4 getModel() const;
 
 private:
-    friend class Entity;
+	friend class Entity;
 };
 } // namespace WeilanEngine
 
