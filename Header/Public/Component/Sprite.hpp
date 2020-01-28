@@ -14,46 +14,46 @@
 namespace WeilanEngine
 {
 /* class Texture
- * @description: use initialized GraphicsManager to draw picture on
- * windowRenderer
- */
+	 * @description: use initialized GraphicsManager to draw picture on
+	 * windowRenderer
+	 */
 class Entity;
 class Sprite : public Component
 {
-  COMPONENT_DECLARATION(Component, Sprite, 64);
-  COMPONENT_EDITABLE_DEC();
+	COMPONENT_DECLARATION(Component, Sprite, 64);
+	COMPONENT_EDITABLE_DEC();
 
 public:
-  Sprite(Entity *);
-  Sprite(Entity *, const std::string &path);
-  Sprite(Entity *, const std::string &path, const std::string &shader);
-  Sprite(Entity *, void **args);
-  ~Sprite();
+	Sprite(Entity *);
+	Sprite(Entity *, const std::string &path);
+	Sprite(Entity *, const std::string &path, const std::string &shader);
+	Sprite(Entity *, void **args);
+	~Sprite();
 
-  void useShader(const std::string &);
-  std::function<void()> beforeRenderFunc;
-  std::function<void()> afterRenderFunc;
-  void loadTexture(const std::string& path);
-  void changeTexture(const int& loc, Graphics::Texture* texture);
-  Graphics::Texture* getMainTexture() const;
-  /**
-     * @brief the render system will use this to let user takes full control of the rendering
-     * sequence, instead of using the defualt render sequence
-     * 
-     * @param view
-     * @param projection
-     * 
-     */
-  std::function<void(const glm::mat4 &, const glm::mat4 &)> draw;
+	void useShader(const std::string &);
+	std::function<void()> beforeRenderFunc;
+	std::function<void()> afterRenderFunc;
+	void loadTexture(const std::string &path);
+	void changeTexture(const int &loc, Graphics::Texture *texture);
+	Graphics::Texture *getMainTexture() const;
+	/**
+		   * @brief the render system will use this to let user takes full control of the rendering
+		   * sequence, instead of using the defualt render sequence
+		   *
+		   * @param view
+		   * @param projection
+		   *
+		   */
+	std::function<void(const glm::mat4 &, const glm::mat4 &)> draw;
 
-  const Graphics::Shader *getShader() const;
-  const Graphics::Mesh2D *getMesh() const;
+	const Graphics::Shader *getShader() const;
+	const Graphics::Mesh2D *getMesh() const;
 
-  float transparency;
+	float transparency;
 
 private:
-  Graphics::Mesh2D m_mesh;
-  Graphics::Shader *m_shader;
+	Graphics::Mesh2D m_mesh;
+	Graphics::Shader *m_shader;
 };
 } // namespace WeilanEngine
 #endif

@@ -25,37 +25,37 @@ class TRigidbody;
 class PhysicsSystem : public System
 {
 public:
-  static PhysicsSystem *get() { return system; }
-  static void init();
-  void update() override;
+	static PhysicsSystem *get() { return system; }
+	static void init();
+	void Update() override;
 
 private:
-  struct CollisionResult
-  {
-    bool separated = false;
-    glm::vec2 penetrationVec = {0, 0};
-    CollisionResult(glm::vec2 &penetrationVec, bool separated) : penetrationVec(penetrationVec), separated(separated){};
-    CollisionResult(){};
-  };
-  struct MinMax
-  {
-    float min = FLT_MAX;
-    float max = -FLT_MAX;
-  };
-  PhysicsSystem();
-  bool polygonVsPolygon(TRigidbody *polygon1, TRigidbody *polygon2, glm::vec2 &penetractionVec);
-  bool polygonVsCircle(TRigidbody *polygon, TRigidbody *circle, glm::vec2 &penetractionVec);
-  bool circleVsCircle(TRigidbody *circle1, TRigidbody *circle2, glm::vec2 &penetractionVec);
-  bool lineVsLine(TRigidbody *line1, TRigidbody *line2, glm::vec2 &penetrationVec);
-  bool lineVsPolygon(TRigidbody *line, TRigidbody *polygon, glm::vec2 &penetrationVec);
-  bool lineVsCircle(TRigidbody *line, TRigidbody *circle, glm::vec2 &penetrationVec);
-  void collisionCheck(TRigidbody *body, TRigidbody *other, const bool &otherIsDynamic);
-  MinMax getMinMax(const std::vector<glm::vec2> &vecs, const glm::vec2 &normals);
+	struct CollisionResult
+	{
+		bool separated = false;
+		glm::vec2 penetrationVec = {0, 0};
+		CollisionResult(glm::vec2 &penetrationVec, bool separated) : penetrationVec(penetrationVec), separated(separated){};
+		CollisionResult(){};
+	};
+	struct MinMax
+	{
+		float min = FLT_MAX;
+		float max = -FLT_MAX;
+	};
+	PhysicsSystem();
+	bool polygonVsPolygon(TRigidbody *polygon1, TRigidbody *polygon2, glm::vec2 &penetractionVec);
+	bool polygonVsCircle(TRigidbody *polygon, TRigidbody *circle, glm::vec2 &penetractionVec);
+	bool circleVsCircle(TRigidbody *circle1, TRigidbody *circle2, glm::vec2 &penetractionVec);
+	bool lineVsLine(TRigidbody *line1, TRigidbody *line2, glm::vec2 &penetrationVec);
+	bool lineVsPolygon(TRigidbody *line, TRigidbody *polygon, glm::vec2 &penetrationVec);
+	bool lineVsCircle(TRigidbody *line, TRigidbody *circle, glm::vec2 &penetrationVec);
+	void collisionCheck(TRigidbody *body, TRigidbody *other, const bool &otherIsDynamic);
+	MinMax getMinMax(const std::vector<glm::vec2> &vecs, const glm::vec2 &normals);
 
-  void contactBeginHelper(TRigidbody *body1, TRigidbody *body2);
-  void contactEndHelper(TRigidbody *body1, TRigidbody *body2);
-  static PhysicsSystem *system;
+	void contactBeginHelper(TRigidbody *body1, TRigidbody *body2);
+	void contactEndHelper(TRigidbody *body1, TRigidbody *body2);
+	static PhysicsSystem *system;
 
-  friend struct Physics;
+	friend struct Physics;
 };
 } // namespace WeilanEngine

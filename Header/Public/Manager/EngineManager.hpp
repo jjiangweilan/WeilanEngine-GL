@@ -5,49 +5,49 @@
 #include "GameObject/Scene.hpp"
 #include "Global/Time.hpp"
 
-namespace WeilanEngine {
-    class System;
-    class EngineManager {
-        public:
-            static EngineManager* GetWeilanEngine();
+namespace WeilanEngine
+{
+class System;
+class EngineManager
+{
+public:
+    static EngineManager *GetWeilanEngine();
 
-            void SetScene(Scene*);
+    void SetScene(Scene *);
 
-            
-            
-            ~EngineManager();
+    ~EngineManager();
 
+    Scene *GetCurrentScene() { return currentScene; };
 
-            Scene* getCurrentScene() {return currentScene;};
+    void addGameplaySystem(System *);
 
-            void addGameplaySystem(System*);
+    void Start();
+    const unsigned long long &getFrameCount() const;
 
-            void Start();
-            const unsigned long long& getFrameCount() const;
-        private:
-            void loop();
-			/**
+private:
+    void loop();
+    /**
 			* @brief initialize anything that needs to be inited before game loop
 			*/
-			void postInitialization();
-            bool quit;
-            
-            EngineManager();
-            static EngineManager* engine;
+    void postInitialization();
+    bool quit;
 
-            Scene* currentScene; 
+    EngineManager();
+    static EngineManager *engine;
 
-            void update();
+    Scene *currentScene;
 
-            void initializeSystems();
-            void initializeManagers();
+    void Update();
 
-            std::vector<System*> gameplaySystem;
+    void initializeSystems();
+    void initializeManagers();
 
-            void systemUpdate();
-            void SDLinit();
-    };
+    std::vector<System *> gameplaySystem;
 
-    } // namespace WeilanEngine
+    void systemUpdate();
+    void SDLinit();
+};
+
+} // namespace WeilanEngine
 
 #endif

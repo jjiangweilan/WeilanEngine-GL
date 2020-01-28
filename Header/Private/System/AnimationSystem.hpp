@@ -6,8 +6,8 @@ namespace WeilanEngine
 class Animation;
 class AnimationSystem : public System
 {
-    SYSTEM_DECLARATION(AnimationSystem);
+	SYSTEM_DECLARATION(AnimationSystem);
 
-    void updateClip(Animation *);
+	void updateClip(Animation *);
 };
 } // namespace WeilanEngine

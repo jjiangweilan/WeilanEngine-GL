@@ -12,5 +12,6 @@ target_sources(WeilanEngine
 "RenderGroup.cpp"
 "Shader.cpp"
 "ShaderParameter.cpp"
+"RenderContext.cpp"
 "Texture.cpp"
 )

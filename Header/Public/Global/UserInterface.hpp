@@ -7,9 +7,9 @@ class Entity;
 class UserInterface
 {
 public:
-  static Entity *showDialog(NpcController *);
-  static void showInfoBoard();
-  static void showSettings();
-  static void switchToUIMode();
+	static Entity *showDialog(NpcController *);
+	static void showInfoBoard();
+	static void showSettings();
+	static void switchToUIMode();
 };
 } // namespace WeilanEngine

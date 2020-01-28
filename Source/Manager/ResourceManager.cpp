@@ -15,165 +15,165 @@ namespace WeilanEngine
 ResourceManager *ResourceManager::resourceManager = nullptr;
 ResourceManager::~ResourceManager()
 {
-    FT_Done_Face(m_face);
-    FT_Done_FreeType(m_freeTypeLibrary);
-    FreeAudioChunk();
-    Mix_CloseAudio();
+	FT_Done_Face(m_face);
+	FT_Done_FreeType(m_freeTypeLibrary);
+	FreeAudioChunk();
+	Mix_CloseAudio();
 }
 
 void ResourceManager::SaveResourcePreferences()
 {
-    Utility::WriteJsonToFile("WeilanEngine.cfg", m_EngineConfig);
+	Utility::WriteJsonToFile("wlengine.cfg", m_EngineConfig);
 }
 
 ResourceManager::ResourceManager()
 {
-    LocateResourceDirectory();
-    //load text resource
-    FT_Error error = FT_Init_FreeType(&m_freeTypeLibrary);
-    if (error)
-    {
-        std::cerr << "FT Library Init Error\n";
-    }
+	LocateResourceDirectory();
+	//load text resource
+	FT_Error error = FT_Init_FreeType(&m_freeTypeLibrary);
+	if (error)
+	{
+		std::cerr << "FT Library Init Error\n";
+	}
 
-    error = FT_New_Face(m_freeTypeLibrary, "../WeilanEngine/etc/fonts/Zpix.ttf", 0, &m_face);
+	error = FT_New_Face(m_freeTypeLibrary, "../WeilanEngine/etc/fonts/Zpix.ttf", 0, &m_face);
 
-    if (error)
-    {
-        std::cerr << "FT Face Init Error\n";
-    }
+	if (error)
+	{
+		std::cerr << "FT Face Init Error\n";
+	}
 
-    /* this looks like a game specific game*/
-   // //npc json data
-   // std::ifstream ifs;
-   // ifs.open("../NpcData/NpcJsonData.json");
-   // if (ifs)
-   // {
-   //     std::ostringstream oss;
-   //     oss << ifs.rdbuf();
-   //     m_npcJsonData = Json::parse(oss.str());
-   // }
-   // ifs.close();
-
+	/* this looks like a game specific game*/
+	// //npc json data
+	// std::ifstream ifs;
+	// ifs.open("../NpcData/NpcJsonData.json");
+	// if (ifs)
+	// {
+	//     std::ostringstream oss;
+	//     oss << ifs.rdbuf();
+	//     m_npcJsonData = Json::parse(oss.str());
+	// }
+	// ifs.close();
 }
 
 void ResourceManager::LocateResourceDirectory()
 {
-    const std::string EngineCfgName = "WeilanEngine.cfg";
-    bool hasInit = Utility::ReadJsonFromFile(EngineCfgName, m_EngineConfig); 
-    //create the init file if it doesn't exist
-    if (!hasInit)
-    {
-        Json cfg;
-        cfg["ResourceDirectory"] = "./Resource";
-        Utility::WriteJsonToFile(EngineCfgName, cfg);
+	const std::string EngineCfgName = "wlengine.cfg";
+	bool hasInit = Utility::ReadJsonFromFile(EngineCfgName, m_EngineConfig);
+	//create the init file if it doesn't exist
+	if (!hasInit)
+	{
+		Json cfg;
+		cfg["ResourceDirectory"] = "./Resource";
+		Utility::WriteJsonToFile(EngineCfgName, cfg);
 
-        m_resourceDir = "./Resource";
-    }
+		m_resourceDir = "./Resource";
+	}
 
-    m_resourceDir = m_EngineConfig["ResourceDirectory"].get<std::string>();
+	m_resourceDir = m_EngineConfig["ResourceDirectory"].get<std::string>();
 }
 
 const std::string &ResourceManager::GetResourceDir()
 {
-    return m_resourceDir;
+	return m_resourceDir;
 }
 
 void ResourceManager::init()
 {
-    resourceManager = new ResourceManager();
-    setlocale(LC_ALL, "");
+	resourceManager = new ResourceManager();
+	setlocale(LC_ALL, "");
 }
 
 Graphics::Character *ResourceManager::GetCharacter(const wchar_t &wideCharacter, const int &pixelSizeWidth, const int &pixelSizeHeight)
 {
-    std::wstring id = std::wstring(1, wideCharacter) + L"_" + std::to_wstring(pixelSizeWidth) + L"_" + std::to_wstring(pixelSizeHeight); // IMPROVE: we can write this as a struct to improve performance
-    auto iter = m_characters.find(id);
-    if (iter != m_characters.end())
-        return &m_characters[id];
+	std::wstring id = std::wstring(1, wideCharacter) + L"_" + std::to_wstring(pixelSizeWidth) + L"_" + std::to_wstring(pixelSizeHeight); // IMPROVE: we can write this as a struct to improve performance
+	auto iter = m_characters.find(id);
+	if (iter != m_characters.end())
+		return &m_characters[id];
 
-    FT_UInt glyph_index = FT_Get_Char_Index(m_face, (FT_ULong)wideCharacter);
-    FT_Error error = FT_Set_Pixel_Sizes(
-        m_face,
-        pixelSizeWidth, pixelSizeHeight);
-    error = FT_Load_Glyph(m_face, glyph_index, FT_LOAD_DEFAULT);
-    error = FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL);
+	FT_UInt glyph_index = FT_Get_Char_Index(m_face, (FT_ULong)wideCharacter);
+	FT_Error error = FT_Set_Pixel_Sizes(
+		m_face,
+		pixelSizeWidth, pixelSizeHeight);
+	error = FT_Load_Glyph(m_face, glyph_index, FT_LOAD_DEFAULT);
+	error = FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL);
 
-    auto characterTexture = m_textTextures[id].loadFromFTBitmap(m_face->glyph);
-    m_characters[id] = Graphics::Character(m_face, characterTexture);
-    return &m_characters[id];
+	auto characterTexture = m_textTextures[id].loadFromFTBitmap(m_face->glyph);
+	m_characters[id] = Graphics::Character(m_face, characterTexture);
+	return &m_characters[id];
 }
 
 Json &ResourceManager::getNpcJsonData()
 {
-    return m_npcJsonData;
+	return m_npcJsonData;
 }
 
 Json &ResourceManager::getMonsterData()
 {
-    return m_monsterData;
+	return m_monsterData;
 }
 
 Mix_Chunk *ResourceManager::getAudioChunk(const std::string &file)
 {
-    auto find = m_audioChunks.find(file);
-    if (find != m_audioChunks.end())
-    {
-        return find->second;
-    }
+	auto find = m_audioChunks.find(file);
+	if (find != m_audioChunks.end())
+	{
+		return find->second;
+	}
 
-    auto rlt = Mix_LoadWAV(file.data());
-    if (rlt)
-    {
-        m_audioChunks[file] = rlt;
-    }
-    else
-        std::cerr << "audio chunk loads failed: " << file << std::endl;
-    return rlt;
+	auto rlt = Mix_LoadWAV(file.data());
+	if (rlt)
+	{
+		m_audioChunks[file] = rlt;
+	}
+	else
+		std::cerr << "audio chunk loads failed: " << file << std::endl;
+	return rlt;
 }
 
 void ResourceManager::SetResourceDir(std::string &dir)
 {
-    auto size = dir.find_first_of('\0');
-    m_resourceDir.resize(size);
-    dir.copy(&m_resourceDir[0], size);
+	auto size = dir.find_first_of('\0');
+	m_resourceDir.resize(size);
+	dir.copy(&m_resourceDir[0], size);
 
-    //replace all \ by /
-    for (auto& character : m_resourceDir)
-    {
-        if (character == '\\') character = '/'; 
-    }
+	//replace all \ by /
+	for (auto &character : m_resourceDir)
+	{
+		if (character == '\\')
+			character = '/';
+	}
 
-    //ignore the last character if it's /
-    if (m_resourceDir[m_resourceDir.size() - 1] == '/')
-    {
-        m_resourceDir.pop_back();
-    }
+	//ignore the last character if it's /
+	if (m_resourceDir[m_resourceDir.size() - 1] == '/')
+	{
+		m_resourceDir.pop_back();
+	}
 
-    m_EngineConfig["ResourceDirectory"] = m_resourceDir;
+	m_EngineConfig["ResourceDirectory"] = m_resourceDir;
 }
 
 void ResourceManager::FreeAudioChunk(const std::string &file)
 {
-    auto chunk = m_audioChunks[file];
-    if (chunk)
-    {
-        Mix_FreeChunk(chunk);
-        m_audioChunks.erase(file);
-    }
-    else
-    {
-        std::cerr << "there is no audio chunk named " << file << std::endl;
-    }
+	auto chunk = m_audioChunks[file];
+	if (chunk)
+	{
+		Mix_FreeChunk(chunk);
+		m_audioChunks.erase(file);
+	}
+	else
+	{
+		std::cerr << "there is no audio chunk named " << file << std::endl;
+	}
 }
 
 void ResourceManager::FreeAudioChunk()
 {
-    for (auto pair : m_audioChunks)
-    {
-        Mix_FreeChunk(pair.second);
-    }
-    m_audioChunks.clear();
+	for (auto pair : m_audioChunks)
+	{
+		Mix_FreeChunk(pair.second);
+	}
+	m_audioChunks.clear();
 }
 
 } // namespace WeilanEngine

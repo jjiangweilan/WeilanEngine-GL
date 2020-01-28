@@ -5,7 +5,7 @@ namespace WeilanEngine
 class ScriptSystem : public System
 {
 public:
-	void update() override;
+	void Update() override;
 	void PostInit();
 
 	static void init();

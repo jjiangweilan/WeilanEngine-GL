@@ -4,6 +4,6 @@ namespace WeilanEngine
 {
 class StateMachineSystem : public System
 {
-    SYSTEM_DECLARATION(StateMachineSystem);
+	SYSTEM_DECLARATION(StateMachineSystem);
 };
 } // namespace WeilanEngine

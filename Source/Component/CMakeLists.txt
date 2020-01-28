@@ -4,13 +4,10 @@ set(SOURCES
     "Animation.cpp"
     "Audio.cpp"
     "Camera.cpp"
-    "Camera2D.cpp"
-    "Camera3D.cpp"
     "Component.cpp"
     "LuaScript.cpp"
     "Model.cpp"
     "NpcController.cpp"
-    "RenderContext.cpp"
     "RenderScript.cpp"
     "Script.cpp"
     "Sprite.cpp"
@@ -19,6 +16,7 @@ set(SOURCES
     "Transform.cpp"
     "TRigidbody.cpp"
     "VolumetricLight.cpp"
+    "CameraController.cpp"
 )
 
 target_sources(WeilanEngine

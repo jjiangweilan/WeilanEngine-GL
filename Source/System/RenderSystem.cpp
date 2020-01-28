@@ -10,16 +10,18 @@
 #include "Component/Text.hpp"
 #include "Component/TRigidbody.hpp"
 #include "Component/VolumetricLight.hpp"
-#include "Component/Camera2D.hpp"
-#include "Component/Camera3D.hpp"
+#include "Component/Camera.hpp"
 #include "Component/RenderScript.hpp"
-#include "Component/RenderContext.hpp"
+#include "Component/CameraController.hpp"
 
 #include "Graphics/Mesh.hpp"
 #include "Graphics/Material.hpp"
 #include "Graphics/Mesh2D.hpp"
 #include "Graphics/Model.hpp"
 #include "Graphics/DebugDraw3D.hpp"
+#include "Graphics/GlobalShaderParameter.hpp"
+
+#include "Global/Input.hpp"
 
 #include "GameEditor/GameEditor.hpp"
 
@@ -33,33 +35,28 @@ namespace WeilanEngine
 {
 RenderSystem *RenderSystem::renderSystem = nullptr;
 
-RenderSystem::RenderSystem() 
+RenderSystem::RenderSystem()
 {
-    // SDL and OpenGL init
-    SDLInit();
-    ImGuiInit();
-    initSceneFrambufferData();
+	// SDL and OpenGL init
+	SDLInit();
+	ImGuiInit();
 
-    auto shaderPath = ROOT_DIR + "/Extra/Material/Shader/";
-    Graphics::Shader::Add("Text", ROOT_DIR + "/Extra/Material/Shader/Text.vert", ROOT_DIR + "/Extra/Material/Shader/Text.frag");
+	auto shaderPath = ROOT_DIR + "/Extra/Material/Shader/";
+	Graphics::Shader::Add("Text", ROOT_DIR + "/Extra/Material/Shader/Text.vert", ROOT_DIR + "/Extra/Material/Shader/Text.frag");
+    Graphics::Shader::Add("_Model", ROOT_DIR + "/Extra/Material/Shader/Model.vert", ROOT_DIR + "/Extra/Material/Shader/Model.frag");
 
-#ifdef DEBUG
-    physicsDebugDrawShader = Graphics::Shader::Add("PhysicsDebugDrawShader",
-                                                   ROOT_DIR + "/Extra/Material/Shader/PhysicsDebugDraw.vert",
-                                                   ROOT_DIR + "/Extra/Material/Shader/PhysicsDebugDraw.frag");
-    glGenVertexArrays(1, &physicsDebugVAO);
-    glGenBuffers(1, &physicsDebugVBO);
-#endif
-
-    //uniform buffers
-    registerSystem(this);
+	auto globalShaderParam = Graphics::GlobalShaderParameter::Get();
+	globalShaderParam->GenBlock("GlobalProjMatrices", 0, 2 * sizeof(glm::mat4), nullptr);
+	globalShaderParam->GenBlock("MainCamera", 1, sizeof(glm::vec3), nullptr);
+	//uniform buffers
+	registerSystem(this);
 }
 
 RenderSystem::~RenderSystem()
 {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
 }
 
 RenderSystem *RenderSystem::Get() { return renderSystem; }
@@ -68,342 +65,53 @@ void RenderSystem::init() { renderSystem = new RenderSystem(); }
 
 void RenderSystem::render()
 {
-    glClearColor(0,0,0,0);
-    auto renderNode = m_outputNode;
-	if (!renderNode) return;
-    auto attachment = renderNode->GetAttachment();
-    Render(renderNode);
+	auto currentScene = EngineManager::GetWeilanEngine()->GetCurrentScene();
+	Camera* mainCamera;
+	for (auto &camera : Camera::collection)
+	{
+		if (!camera->enable || camera->GetEntity()->GetScene() != currentScene) continue;
+		if (camera->IsMainCamera())
+		{
+			mainCamera = camera;
+			continue;
+		}
+		OnRenderScene(camera);
+	}
+	OnRenderScene(mainCamera);//main camera should be the last camera to render
 
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear main frambuffer
-    glViewport(0, 0, windowWidth, windowHeight);
-    unsigned int id = attachment->colors[0]->GetId();
-    renderGameEditor(id);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear main frambuffer
+	glViewport(0, 0, windowWidth, windowHeight);
+	unsigned int id = mainCamera->GetRenderContext()->GetColorAttachment(0)->GetId();
+	renderGameEditor(id);
 
 	//End of the frame, swap the window and set back the draw flags in each render node
-    SDL_GL_SwapWindow(window);
-	ResetDrawFlags(renderNode);
+	SDL_GL_SwapWindow(window);
 }
 
-void RenderSystem::ResetDrawFlags(RenderContext* node)
+void RenderSystem::Update()
 {
-	node->SetDrawFlag(false);
-	for (auto& source : *node->GetSource())
+	for (auto cameraController : CameraController::collection)
 	{
-		for (auto node : source.nodes)
-		{
-			ResetDrawFlags(node);
-		}
+		cameraController->Update();
 	}
+	render();
 }
-
-void RenderSystem::update()
-{
-    render();
-}
-
-void RenderSystem::Render(RenderContext* node, const bool& loop) 
-{
-    if (node->GetDrawFlag() && !loop) return;
-    auto sources = node->GetSource();
-    auto loopIn = node->GetLoopIn();
-    auto loopOut = node->GetLoopOut();
-    if (loopIn && loopOut && loopIn->out == loopOut->in) assert( false && "RenderContext shouldn't loop itself, do so in shader");
-    //This is a looped render path
-    if (loopOut)
-    {
-        size_t count = loopOut->count;
-
-        while (count--) //then start loop
-        {
-            RenderInputSources(node, true);
-        }
-        loopOut->in->GetLoopIn()->firstTime = true;
-    }
-
-    if (loopIn)
-    {
-        if (loopIn->firstTime)
-        {
-            loopIn->firstTime = false;
-            if (sources->size() == 0)
-                RenderFromScene(node);
-            else
-                RenderInputSources(node, false);
-        }
-        else
-        {
-            //only has one frame buffer so we don't call RenderInputSources, because
-            //the only source is the loopIn->source
-            auto renderScript = node->entity->GetComponent<RenderScript>();
-            if (renderScript)
-                renderScript->Update();
-
-			auto sceneSize = WeilanEngine::RenderSystem::Get()->GetSceneSize();
-            glBindFramebuffer(GL_FRAMEBUFFER, node->GetFramebuffer()); 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear framebuffer
-            glViewport(0, 0, sceneSize.x, sceneSize.y);
-            RenderToFramebuffer(&loopIn->mesh);
-        }
-    }
-
-    if (!loopOut && !loopIn)
-    {
-        if (sources->size() == 0)
-            RenderFromScene(node);
-        else
-            RenderInputSources(node, loop);
-    }
-
-    node->SetDrawFlag(true);
-
-}
-void RenderSystem::RenderInputSources(RenderContext *node, const bool& loop)
-{
-    auto sources = node->GetSource();
-    for (auto &inputSource : *sources)
-    {
-        for (auto subNode : inputSource.nodes)
-        {
-            Render(subNode, loop);
-        }
-    }
-
-    //draw
-    auto renderScript = node->entity->GetComponent<RenderScript>();
-    if (renderScript)
-        renderScript->Update();
-    auto sceneSize = WeilanEngine::RenderSystem::Get()->GetSceneSize();
-    glBindFramebuffer(GL_FRAMEBUFFER, node->GetFramebuffer()); 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); // clear framebuffer
-    glViewport(0, 0, sceneSize.x, sceneSize.y);
-    for (auto &inputSource : *sources)
-    {
-        RenderToFramebuffer(&inputSource.mesh);
-    }
-}
-void RenderSystem::RenderToFramebuffer(const Graphics::Mesh *mesh)
-{
-    mesh->GetMaterial()->UseMaterial();
-    glBindVertexArray(mesh->GetVAO());
-    glDrawElements(GL_TRIANGLES, mesh->GetIndices()->size(), GL_UNSIGNED_INT, nullptr);
-}
-void RenderSystem::RenderFromScene(RenderContext *node)
-{
-    auto renderScript = node->entity->GetComponent<RenderScript>();
-    if (renderScript)
-        renderScript->Update();
-
-    glBindFramebuffer(GL_FRAMEBUFFER, node->GetFramebuffer());
-    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    auto sceneSize = WeilanEngine::RenderSystem::Get()->GetSceneSize();
-    glViewport(0, 0, sceneSize.x, sceneSize.y);
-    RenderModel(node);
-}
+/*
 void RenderSystem::RenderModel(RenderContext *node)
 {
-    auto currentScene = WeilanEngine::EngineManager::GetWeilanEngine()->getCurrentScene();
-    for (auto model : WeilanEngine::Model::collection)
-    {
-        if (!model->entity->IsEnable() || model->entity->GetScene() != currentScene)
-            continue;
 
-        auto gameObject = model->entity;
-        auto modelM = model->GetModel();
-        if (!modelM)
-            return;
-        auto renderScript = model->entity->GetComponent<RenderScript>();
-        if (renderScript)
-            renderScript->Update();
-
-        for (auto& mesh : *modelM->GetMeshes())
-        {
-            auto material = mesh.GetMaterial();
-            auto shader = material->GetShader();
-            shader->Use();
-            material->GetParameters()->Use();
-            //
-            // draw mesh
-            glBindVertexArray(mesh.GetVAO());
-            if (shader->hasTess())
-            {
-                glPolygonMode(GL_FRONT_AND_BACK, model->GetDrawMode());
-                glPatchParameteri(GL_PATCH_VERTICES, shader->getPatches());
-                glDrawElements(GL_PATCHES, mesh.GetIndices()->size(), GL_UNSIGNED_INT, 0);
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            }
-            else
-            {
-                glDrawElements(GL_TRIANGLES, mesh.GetIndices()->size(), GL_UNSIGNED_INT, 0);
-            }
-        }
-        glBindVertexArray(0);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        Input::getKeyStatus(SDL_SCANCODE_F10);
-#ifdef DEBUG
-        static bool show = false;
-        static bool lastFramePressed = false;
-        bool keyPressed = Input::getKeyStatus(SDL_SCANCODE_F11);
-        if (keyPressed && !lastFramePressed)
-        {
-            lastFramePressed = true;
-            show = !show;
-        }
-        if (!keyPressed) lastFramePressed = false;
-        if (show)
-        {
-            auto aabb = modelM->GetAABB(); 
-            //small offset to prevent collision
-            const float offset = 0.001;
-            Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, model->entity->GetComponent<Transform>()->getModel());
-        }
-#endif
-    }
 }
-
-#ifdef DEBUG
-void RenderSystem::debugRender()
-{
-    for (auto &rb : TRigidbody::collection)
-    {
-        if (!rb->entity->IsEnable())
-            continue;
-        auto shape = rb->shape->getShapeType();
-        if (shape == ShapeType::Polygon || shape == ShapeType::Line)
-        {
-            std::vector<glm::vec2> vertices;
-            if (shape == ShapeType::Polygon)
-                vertices = static_cast<PolygonShape *>(rb->shape)->getPoints();
-            else
-                vertices = static_cast<LineShape *>(rb->shape)->getPoints();
-            std::vector<float> glVertices(vertices.size() * 2);
-            physicsDebugDrawShader->Use();
-            auto pos = rb->entity->GetComponent<Transform>()->position;
-            for (int i = 0; i < vertices.size(); i++)
-            {
-                glVertices[2 * i] = vertices[i].x + pos.x;
-                glVertices[2 * i + 1] = vertices[i].y + pos.y;
-            }
-
-            glBindVertexArray(physicsDebugVAO);
-            glBindBuffer(GL_ARRAY_BUFFER, physicsDebugVBO);
-            glBufferData(GL_ARRAY_BUFFER, glVertices.size() * sizeof(float), glVertices.data(), GL_STATIC_DRAW);
-            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
-            glEnableVertexAttribArray(0);
-
-            glm::mat4 proj = glm::mat4(1.0f);
-
-#if SETTINGS_GAME_DIMENSION
-            proj = glm::perspective(glm::radians(45.0f), (float)windowWidth / windowHeight, 0.1f, 100000.0f);
-
-#else
-            proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
-#endif
-            physicsDebugDrawShader->setMat4("view", m_viewMatrix);
-            physicsDebugDrawShader->setMat4("projection", m_projMatrix);
-            glm::vec3 color;
-            if (rb->type == BodyType::Dynamic)
-                color = {1, 0, 0};
-            else
-                color = {0, 1, 0};
-            physicsDebugDrawShader->setVec3("color", glm::vec3(color.r, color.g, color.b));
-            if (shape == ShapeType::Polygon)
-                glDrawArrays(GL_LINE_LOOP, 0, vertices.size());
-            else
-                glDrawArrays(GL_LINE_STRIP, 0, vertices.size());
-        }
-        else if (shape == ShapeType::Circle)
-        {
-            auto circle = static_cast<CircleShape *>(rb->shape);
-            float centerX = circle->center.x;
-            float centerY = circle->center.y;
-            float radius = circle->radius; // 1.41421356237 ~ square root of 2
-            std::vector<glm::vec2> vertices = {{centerX + radius, centerY + radius}, {centerX + radius, centerY - radius}, {centerX - radius, centerY - radius}, {centerX - radius, centerY + radius}};
-
-            std::vector<float> glVertices(vertices.size() * 2);
-            physicsDebugDrawShader->Use();
-            auto pos = rb->entity->GetComponent<Transform>()->position;
-            for (int i = 0; i < vertices.size(); i++)
-            {
-                glVertices[2 * i] = vertices[i].x + pos.x;
-                glVertices[2 * i + 1] = vertices[i].y + pos.y;
-            }
-
-            glBindVertexArray(physicsDebugVAO);
-            glBindBuffer(GL_ARRAY_BUFFER, physicsDebugVBO);
-            glBufferData(GL_ARRAY_BUFFER, glVertices.size() * sizeof(float), glVertices.data(), GL_STATIC_DRAW);
-            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
-            glEnableVertexAttribArray(0);
-
-            glm::mat4 proj = glm::mat4(1.0f);
-
-#if SETTINGS_GAME_DIMENSION
-            proj = glm::perspective(glm::radians(45.0f), (float)windowWidth / windowHeight, 0.1f, 100000.0f);
-
-#else
-            proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
-#endif
-            physicsDebugDrawShader->setMat4("view", m_viewMatrix);
-            physicsDebugDrawShader->setMat4("projection", m_projMatrix);
-            glm::vec3 color;
-            if (rb->type == BodyType::Dynamic)
-                color = {1, 0, 0};
-            else
-                color = {0, 1, 0};
-            physicsDebugDrawShader->setVec3("color", glm::vec3(color.r, color.g, color.b));
-
-            glDrawArrays(GL_LINE_LOOP, 0, vertices.size());
-        }
-
-        // render render line
-        {
-            auto shape = rb->shape;
-            std::vector<glm::vec2> vertices = {shape->leftPoint, shape->rightPoint};
-
-            std::vector<float> glVertices(vertices.size() * 2);
-            physicsDebugDrawShader->Use();
-            auto pos = rb->entity->GetComponent<Transform>()->position;
-            for (int i = 0; i < vertices.size(); i++)
-            {
-                glVertices[2 * i] = vertices[i].x + pos.x;
-                glVertices[2 * i + 1] = vertices[i].y + pos.y;
-            }
-
-            glBindVertexArray(physicsDebugVAO);
-            glBindBuffer(GL_ARRAY_BUFFER, physicsDebugVBO);
-            glBufferData(GL_ARRAY_BUFFER, glVertices.size() * sizeof(float), glVertices.data(), GL_STATIC_DRAW);
-            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void *)0);
-            glEnableVertexAttribArray(0);
-
-            glm::mat4 proj = glm::mat4(1.0f);
-
-#if SETTINGS_GAME_DIMENSION
-            proj = glm::perspective(glm::radians(45.0f), (float)windowWidth / windowHeight, 0.1f, 100000.0f);
-
-#else
-            proj = glm::ortho(0.0f, (float)windowWidth, 0.0f, (float)windowHeight, -1.0f, 1000.0f);
-#endif
-            physicsDebugDrawShader->setMat4("view", m_viewMatrix);
-            physicsDebugDrawShader->setMat4("projection", m_projMatrix);
-            glm::vec3 color;
-            color = {0.3, 0.8, 0.8};
-            physicsDebugDrawShader->setVec3("color", glm::vec3(color.r, color.g, color.b));
-
-            glDrawArrays(GL_LINE_STRIP, 0, vertices.size());
-        }
-    }
-}
-#endif
-int RenderSystem::windowResizeCallbackWrapper(void* data, SDL_Event* event)
+*/
+int RenderSystem::windowResizeCallbackWrapper(void *data, SDL_Event *event)
 {
 	if (renderSystem)
 		return renderSystem->windowResizeCallback(data, event);
 	return 0;
 }
 
-int RenderSystem::windowResizeCallback(void* data, SDL_Event* event)
+int RenderSystem::windowResizeCallback(void *data, SDL_Event *event)
 {
 	if (event->type == SDL_WINDOWEVENT)
 	{
@@ -450,7 +158,7 @@ void RenderSystem::SDLInit()
 void RenderSystem::ImGuiInit()
 {
 	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO &io = ImGui::GetIO();
 
 	ImGui::StyleColorsDark();
 	ImGui_ImplSDL2_InitForOpenGL(window, &glContext);
@@ -458,13 +166,13 @@ void RenderSystem::ImGuiInit()
 	ImGui_ImplOpenGL3_Init("#version 450");
 }
 #if SETTINGS_ENGINEMODE
-void RenderSystem::renderGameEditor(unsigned int& sceneTexId)
+void RenderSystem::renderGameEditor(unsigned int &sceneTexId)
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplSDL2_NewFrame(window);
 	ImGui::NewFrame();
 
-	void* data[3];
+	void *data[3];
 	data[0] = &sceneTexId;
 	data[1] = &sceneWidth;
 	data[2] = &sceneHeight;
@@ -478,36 +186,36 @@ void RenderSystem::renderGameEditor(unsigned int& sceneTexId)
 /* Render *************/
 void RenderSystem::renderGame()
 {
-	auto currentScene = EngineManager::GetWeilanEngine()->getCurrentScene();
+	auto currentScene = EngineManager::GetWeilanEngine()->GetCurrentScene();
 
 	for (auto c : Model::collection)
 	{
-		if (!c->entity->IsEnable() || c->entity->GetScene() != currentScene)
+		if (!c->GetEntity()->IsEnable() || c->GetEntity()->GetScene() != currentScene)
 			continue;
 		render(c);
 	}
 
 	for (auto c : Sprite::collection)
 	{
-		if (!c->entity->IsEnable() || c->entity->GetScene() != currentScene)
+		if (!c->GetEntity()->IsEnable() || c->GetEntity()->GetScene() != currentScene)
 			continue;
 		render(c);
 	}
 
 	for (auto text : Text::collection)
 	{
-		if (!text->entity->IsEnable())
+		if (!text->GetEntity()->IsEnable())
 			continue;
 		render(text);
 	}
 }
-void RenderSystem::render(VolumetricLight* vl)
+void RenderSystem::render(VolumetricLight *vl)
 {
 	auto vlShader = vl->getShader();
 	auto mesh = vl->getMesh();
-	auto& vlTextures = *mesh->getTextures();
+	auto &vlTextures = *mesh->getTextures();
 	vlShader->Use();
-	auto transform = vl->entity->GetComponent<Transform>();
+	auto transform = vl->GetEntity()->GetComponent<Transform>();
 	vlShader->setMat4("model", transform->getModel());
 	vlShader->setMat4("view", m_viewMatrix);
 	vlShader->setMat4("projection", m_projMatrix);
@@ -518,17 +226,17 @@ void RenderSystem::render(VolumetricLight* vl)
 	glBindTexture(GL_TEXTURE_2D, t);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
-void RenderSystem::render(Text* t)
+void RenderSystem::render(Text *t)
 {
 	t->getShader()->Use();
 	//
 	// main texture
 	glActiveTexture(GL_TEXTURE0);
-	auto model = t->entity->GetComponent<Transform>()->getModel();
+	auto model = t->GetEntity()->GetComponent<Transform>()->getModel();
 	size_t till = t->renderUntilCharacter();
 	for (size_t i = 0; i < till; i++)
 	{
-		auto& characterETX = t->text[i];
+		auto &characterETX = t->text[i];
 		auto mesh = characterETX.character->getMesh();
 		glBindTexture(GL_TEXTURE_2D, mesh->getTextures()->at(0)->GetId());
 
@@ -543,7 +251,7 @@ void RenderSystem::render(Text* t)
 	// glBindVertexArray(0);
 }
 
-void RenderSystem::render(Sprite* t)
+void RenderSystem::render(Sprite *t)
 {
 	if (!t->enable)
 		return;
@@ -567,9 +275,9 @@ void RenderSystem::render(Sprite* t)
 		Graphics::Shader::setUniform(1000 + i, i);
 	}
 
-	auto animation = t->entity->GetComponent<Animation>();
-	auto tRigidbody = t->entity->GetComponent<TRigidbody>();
-	auto transform = t->entity->GetComponent<Transform>();
+	auto animation = t->GetEntity()->GetComponent<Animation>();
+	auto tRigidbody = t->GetEntity()->GetComponent<TRigidbody>();
+	auto transform = t->GetEntity()->GetComponent<Transform>();
 	if (animation)
 		t->getMesh()->clip(animation->getCurrentClip());
 
@@ -600,13 +308,13 @@ void RenderSystem::render(Sprite* t)
 	glBindVertexArray(0);
 }
 
-void RenderSystem::render(Model* model)
+void RenderSystem::render(Model *model)
 {
-	auto gameObject = model->entity;
+	auto gameObject = model->GetEntity();
 	auto modelM = model->GetModel();
 	if (!modelM)
 		return;
-	for (auto& mesh : *modelM->GetMeshes())
+	for (auto &mesh : *modelM->GetMeshes())
 	{
 		auto shader = mesh.GetMaterial()->GetShader();
 		shader->Use();
@@ -625,7 +333,6 @@ void RenderSystem::render(Model* model)
 		{
 			glDrawElements(GL_TRIANGLES, mesh.m_indices.size(), GL_UNSIGNED_INT, 0);
 		}
-
 	}
 	glBindVertexArray(0);
 	glActiveTexture(GL_TEXTURE0);
@@ -634,45 +341,88 @@ void RenderSystem::render(Model* model)
 	auto aabb = modelM->GetAABB();
 	//small offset to prevent collision
 	const float offset = 0.001;
-	Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, model->entity->GetComponent<Transform>()->getModel());
+	Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, model->GetEntity()->GetComponent<Transform>()->getModel());
 #endif
-}
-
-void RenderSystem::initSceneFrambufferData()
-{
-	GLfloat vertices[] = {
-		1.0, 1.0, 1.0f, 1.0f,   // top right
-		1.0, -1.0, 1.0f, 0.0f,  // bottom right
-		-1.0, -1.0, 0.0f, 0.0f, // bottom left
-		-1.0, 1.0, 0.0f, 1.0f   // top left
-	};
-
-	unsigned int indices[] = {
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
-	};
-
-	glGenVertexArrays(1, &sceneVAO);
-	glGenBuffers(1, &sceneVBO);
-	glGenBuffers(1, &sceneEBO);
-	glBindVertexArray(sceneVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, sceneVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sceneEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glBindVertexArray(0);
 }
 
 void RenderSystem::PostInit()
 {
 	m_engine = EngineManager::GetWeilanEngine();
 }
-void RenderSystem::SetOutputRenderNode(RenderContext *node)
+
+void RenderSystem::OnRenderScene(Camera *camera)
 {
-    m_outputNode = node;
+	// confiture camera relative settings
+	auto gsp = Graphics::GlobalShaderParameter::Get();
+	auto projIndex = gsp->GetGlobalParameterIndex("GlobalProjMatrices");
+	auto cameraIndex = gsp->GetGlobalParameterIndex("MainCamera");
+	auto transform = camera->GetEntity()->GetComponent<Transform>();
+	auto pos = transform->position;
+	auto viewMatrix = camera->GetViewMatrix();
+	gsp->SubData(projIndex, 0, sizeof(glm::mat4), &viewMatrix[0][0]);
+	gsp->SubData(projIndex, sizeof(glm::mat4), sizeof(glm::mat4), &camera->GetProjMatrix()[0][0]);
+	gsp->SubData(cameraIndex, 0, sizeof(glm::vec3), &pos[0]);
+
+	//draw model
+	camera->GetRenderContext()->Use();
+	auto currentScene = camera->GetEntity()->GetScene();
+	for (auto model : WeilanEngine::Model::collection)
+	{
+		if (!model->GetEntity()->IsEnable() || model->GetEntity()->GetScene() != currentScene)
+			continue;
+
+		auto modelM = model->GetModel();
+		if (!modelM)
+			return;
+		auto renderScript = model->GetEntity()->GetComponent<RenderScript>();
+		if (renderScript)
+			renderScript->Update();
+
+		for (auto &mesh : *modelM->GetMeshes())
+		{
+			auto material = mesh.GetMaterial();
+			auto shader = material->GetShader();
+			shader->Use();
+			material->GetParameters()->Use();
+			//
+			// draw mesh
+			glBindVertexArray(mesh.GetVAO());
+			if (shader->hasTess())
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, model->GetDrawMode());
+				glPatchParameteri(GL_PATCH_VERTICES, shader->getPatches());
+				glDrawElements(GL_PATCHES, mesh.GetIndices()->size(), GL_UNSIGNED_INT, 0);
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+			else
+			{
+				glDrawElements(GL_TRIANGLES, mesh.GetIndices()->size(), GL_UNSIGNED_INT, 0);
+			}
+		}
+		glBindVertexArray(0);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		
+#ifdef DEBUG
+		static bool show = false;
+		static bool lastFramePressed = false;
+		bool keyPressed = Input::getKeyStatus(SDL_SCANCODE_F11);
+		if (keyPressed && !lastFramePressed)
+		{
+			lastFramePressed = true;
+			show = !show;
+		}
+		if (!keyPressed)
+			lastFramePressed = false;
+		if (show)
+		{
+			auto aabb = modelM->GetAABB();
+			//small offset to prevent collision
+			const float offset = 0.001;
+			Graphics::DebugDraw3D::get()->drawBox(aabb.min, aabb.max, model->GetEntity()->GetComponent<Transform>()->getModel());
+		}
+#endif
+
+	}
 }
 } // namespace WeilanEngine

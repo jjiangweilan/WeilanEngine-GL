@@ -4,7 +4,7 @@ cmake_policy(SET CMP0091 NEW) #for unit testing
 project(WeilanEngine)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILEoCOMMANDS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG")
@@ -27,6 +27,15 @@ add_library(WeilanEngine)
 
 add_subdirectory(Header/)
 add_subdirectory(Source/)
+
+get_target_property(ENGINE_SOURCES WeilanEngine SOURCES)
+
+foreach(FILE ${ENGINE_SOURCES})
+    source_group(
+        TREE ${CMAKE_CURRENT_SOURCE_DIR}
+        FILES ${FILE}
+    )
+endforeach()
 
 target_include_directories(WeilanEngine
     PUBLIC 
@@ -56,3 +65,4 @@ add_compile_definitions(ROOT_DIR=std::string\(\"${CMAKE_CURRENT_SOURCE_DIR}\"\))
 
 #Test
 add_subdirectory(Test/)
+

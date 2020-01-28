@@ -7,6 +7,6 @@ namespace WeilanEngine
 {
 class AudioSystem : public System
 {
-    SYSTEM_DECLARATION(AudioSystem);
+	SYSTEM_DECLARATION(AudioSystem);
 };
 } // namespace WeilanEngine

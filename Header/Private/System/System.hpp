@@ -8,7 +8,7 @@
 public:                                \
     static SystemName *get();          \
     static SystemName *init();         \
-    void update() override;            \
+    void Update() override;            \
                                        \
 private:                               \
     static SystemName *system;         \
@@ -32,7 +32,7 @@ namespace WeilanEngine
 class System
 {
 public:
-    virtual void update(){};
+    virtual void Update(){};
     virtual void PostInit(){};
     static std::unordered_set<System *> collection;
 
